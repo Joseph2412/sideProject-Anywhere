@@ -1,22 +1,17 @@
 import fastify from 'fastify'
+import cors from '@fastify/cors'
 
 const server = fastify()
-//To Do
-//Esporre un endpoint GET /ping su BE, l'endooint legge un parametro t in queryString e ritorna un JSON
-// {
-//   "value": t
-// }
-// Sul front effettuare una chiamata alla GET /ping?t=xxx, aspettare la risposta e mostrare a schermo il valore tornato da value
-// Fare in modo che la chiamata punti all'ambiente di sviluppo corretto in base allo script lanciato
+server.register(cors, { origin: true })
 
-//Idea: Modifico con queryString => richiamo il value Corretto t: tipo Stringa
-//Se value corretto => risposta 200?
-//Ritorno tipo JSON e mando value : t
-//Ho scritto una cazzata? Forse
-
-
-server.get('/ping', async (request, reply) => {
+server.get('/ping',async (request, reply) => {
   //return 'pong' test con curl corretto
+  const { t } = request.query as { t?: string}
+  if(!t){
+    return reply.code(400).send({ error: "Errore: Manca Value"})
+  }
+
+  return reply.send({ value : t })
 })
 
 server.listen({ port: 3001 }, (err, address) => {
