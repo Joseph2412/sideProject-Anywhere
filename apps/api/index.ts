@@ -1,7 +1,6 @@
 import fastify from 'fastify'
 import cors from '@fastify/cors'
-import type {User} '@types/user'
-
+import {User} from "@repo/types"
 
 const server = fastify()
 server.register(cors, { origin: true })
