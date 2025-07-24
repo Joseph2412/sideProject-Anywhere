@@ -1,44 +1,33 @@
 import fastify from 'fastify'
 import cors from '@fastify/cors'
-import {User} from "@repo/types"
-import {signupSchema, loginSchema} from "./schemas/authSchema"
-import { loginHandler } from 'handlers/auth/login'
+import { signupSchema, loginSchema } from './schemas/authSchema'
+import { loginHandler } from './handlers/auth/login'
+import { signupHandler } from './handlers/auth/signup'
 
 const server = fastify()
+
 server.register(cors, { origin: true })
 
-// EndPoint Per Prova FE<->BE + Valued i Ritorno
-// server.get('/ping',async (request, reply) => {
-//   //return 'pong' test con curl corretto
-//   const { t } = request.query as { t?: string}
-//   if(!t){
-//     return reply.code(400).send({ error: "Errore: Manca Value"})
-//   }
+// Signup
+server.post('/signup', { schema: signupSchema }, signupHandler)
 
-//   return reply.send({ value : t })
-// })
+// Login
+server.post('/login', { schema: loginSchema }, loginHandler)
 
-server.post('/signup', {schema: signupSchema}, async (request, reply) => {
-  return reply.code(200).send({ message: 'EndPoint SignUp' })
-})
-
-server.post('/login',{schema:loginSchema}, async (request, reply) => {
-  return reply.code(200).send({ message: 'EndPoint login' })
-})
-
+// Reset Password
 server.post('/resetPassword', async (request, reply) => {
   return reply.code(200).send({ message: 'EndPoint Reset' })
 })
 
+// Restore Password
 server.post('/restorePassword', async (request, reply) => {
   return reply.code(200).send({ message: 'EndPoint Restore' })
 })
-
 
 server.listen({ port: 3001 }, (err, address) => {
   if (err) {
     console.error(err)
     process.exit(1)
   }
-  console.log(`Server listening at ${address}`)
+  console.log(`✅ Server listening at ${address}`)
 })
