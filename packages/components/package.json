@@ -1,0 +1,11 @@
+{
+  "name": "@repo/components",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {},
+  "dependencies": {
+    "react": "^18.2.0",
+    "antd": "^5.13.0"
+  }
+}
