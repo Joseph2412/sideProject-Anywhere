@@ -20,7 +20,8 @@ model User {
   password String
   name    String?
   role    Role     @default(USER) 
-
 }
 
 //Abbiamo due tipologie di Utenti, Specifichiamolo
+
+//Richiama nello schema il types
