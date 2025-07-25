@@ -1,8 +1,10 @@
+import { ROLE } from "../user/user"
+
 export interface SignupPayload {
   email: string
   password: string
   name: string
-  role: string
+  role: ROLE
 }
 
 export interface LoginPayload {
