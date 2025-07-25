@@ -1,18 +1,26 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { PrismaClient} from 'generated/prisma'
-import { User, ROLE } from '@repo/types/src/user/user'
+import { User } from '@repo/types/src/user/user' //Usa questo USER e ROLE
 import bcrypt from 'bcrypt'
+import { PrismaClient, Prisma } from '@prisma/client'
+import { SignupPayload } from '@repo/types/src/auth/auth'
 
 const prisma = new PrismaClient()
-const user = new 
 
-export const signupHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-    const {email, password, name, role } = request.body as {
-        email: string
-        password: string
-        name: string
-        role: Role
-    }
+const userBase: User = Prisma.validator<Prisma.UserDefaultArgs>()({
+    select: {
+        id:true,
+        email:true,
+        name: true,
+        role:true
+    },
+});
+export type UserFromDb = Prisma.UserGetPayload<typeof userBase>
+
+export const signupHandler = async (
+    request: FastifyRequest<{Body: SignupPayload}>,
+    reply: FastifyReply
+    ) => {
+    const {email, password, name, role } = request.body
 
 
     try {
@@ -30,9 +38,15 @@ export const signupHandler = async (request: FastifyRequest, reply: FastifyReply
                 password: hashedPassword,
                 name, 
                 role
+            },
+            select: {
+                id:true,
+                email:true,
+                name:true,
+                role:true
             }
         })
-        return reply.code(201).send({ userId: newUser.id})
+        return reply.code(201).send({ user: newUser})
     } catch (error) {
         return reply.code(500).send({error : "Huston, Abbiamo un Problema"})
     }

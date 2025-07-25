@@ -5,5 +5,9 @@
       "@types/*": ["packages/types/*"],
       "@components/*": ["packages/components/*"]
     }
-  }
+  },
+  "include": [
+    "packages",
+    "packages/types/src"
+  ]
 }

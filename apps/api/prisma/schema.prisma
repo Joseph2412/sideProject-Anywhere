@@ -5,8 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js" 
 }
 
 datasource db {
@@ -19,9 +18,13 @@ model User {
   email   String   @unique
   password String
   name    String?
-  role    Role     @default(USER) 
+  role    Role     
 }
 
+enum Role {
+  USER
+  HOST
+}
 //Abbiamo due tipologie di Utenti, Specifichiamolo
 
 //Richiama nello schema il types
