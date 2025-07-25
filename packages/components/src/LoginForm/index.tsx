@@ -1,19 +1,17 @@
-
-
-import { Form, Input, Button, Divider, message } from 'antd';
-import { GoogleOutlined } from '@ant-design/icons';
-import React from 'react';
+import { Form, Input, Button, Divider, message } from "antd";
+import { GoogleOutlined } from "@ant-design/icons";
+import React from "react";
 import { useState } from "react";
-import styles from './LoginForm.module.css';
+import styles from "./LoginForm.module.css";
 
 const LoginForm: React.FC = () => {
   const [form] = Form.useForm();
-  const [step, setStep] = useState< "email"| "password">("email");
-  const [email, setEmail] = useState ("");
-  const [loading, setLoading] = useState (false);
+  const [step, setStep] = useState<"email" | "password">("email");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleFinish = (values: any) => {
-    console.log('Dati inviati:', values);
+    console.log("Dati inviati:", values);
     // Qui va la tua logica: fetch, redirect, ecc.
   };
 
@@ -37,8 +35,8 @@ const LoginForm: React.FC = () => {
             label="Email"
             name="email"
             rules={[
-              { required: true, message: 'Inserisci la tua email' },
-              { type: 'email', message: 'Email non valida' },
+              { required: true, message: "Inserisci la tua email" },
+              { type: "email", message: "Email non valida" },
             ]}
           >
             <Input placeholder="esempio@email.com" size="large" />
@@ -51,13 +49,15 @@ const LoginForm: React.FC = () => {
           </Form.Item>
         </Form>
 
-        <Divider plain className={styles.orDivider}>OR</Divider>
+        <Divider plain className={styles.orDivider}>
+          OR
+        </Divider>
 
         <Button
           icon={<GoogleOutlined />}
           size="large"
           block
-          onClick={() => console.log('Login con Google')}
+          onClick={() => console.log("Login con Google")}
         >
           Continua con Google
         </Button>

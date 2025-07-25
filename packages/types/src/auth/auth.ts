@@ -1,13 +1,13 @@
-import { ROLE } from "../user/user"
+import { Role } from "@repo/database";
 
 export interface SignupPayload {
-  email: string
-  password: string
-  name: string
-  role: ROLE
+  email: string;
+  password: string;
+  name: string;
+  role: Role;
 }
 
 export interface LoginPayload {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
