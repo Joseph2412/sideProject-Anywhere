@@ -1,8 +1,10 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { PrismaClient, Role } from 'generated/prisma'
+import { PrismaClient} from 'generated/prisma'
+import { User, ROLE } from '@repo/types/src/user/user'
 import bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient()
+const user = new 
 
 export const signupHandler = async (request: FastifyRequest, reply: FastifyReply) => {
     const {email, password, name, role } = request.body as {

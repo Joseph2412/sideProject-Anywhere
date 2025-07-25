@@ -16,6 +16,8 @@ export const signupSchema = {
     }
 }
 
+//Richiama qui il types da Packages...See PRISMA DOCS
+
 export const loginSchema = {
   body: {
     type: 'object',

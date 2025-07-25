@@ -23,8 +23,4 @@ model User {
 
 }
 
-enum Role {
-  HOST 
-  USER
-}
 //Abbiamo due tipologie di Utenti, Specifichiamolo
