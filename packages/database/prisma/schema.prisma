@@ -19,6 +19,9 @@ model User {
   password String
   name     String?
   role     Role
+
+  resetToken   String?  //Codice a 6 cifre. To Do: Token per Reset
+  resetTokenExpiry   DateTime?  //Scade entro X minuti
 }
 
 enum Role {

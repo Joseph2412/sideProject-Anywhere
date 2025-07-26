@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { User, PrismaClient } from "@repo/database";
-import bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 import { UserLogin } from "@repo/types/src/user/user";
 
 const Prisma = new PrismaClient();
@@ -12,7 +12,7 @@ export const loginHandler = async (
   const { email, password } = request.body as UserLogin;
 
   try {
-    const user: User = await Prisma.user.findUnique({
+    const user: User | null = await Prisma.user.findUnique({
       where: { email },
     });
 

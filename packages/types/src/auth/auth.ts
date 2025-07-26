@@ -11,3 +11,8 @@ export interface LoginPayload {
   email: string;
   password: string;
 }
+
+export interface RestorePasswordPayload {
+  token: string;
+  newPassword: string;
+}

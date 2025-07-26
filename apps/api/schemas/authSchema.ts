@@ -22,8 +22,41 @@ export const loginSchema = {
     type: "object",
     required: ["email", "password"],
     properties: {
-      email: { type: "string", format: "email" },
-      password: { type: "string", minLength: 1 },
+      email: {
+        type: "string",
+        format: "email",
+      },
+
+      password: {
+        type: "string",
+        minLength: 1,
+      },
+    },
+    additionalProperties: false,
+  },
+};
+
+export const resetPasswordScheme = {
+  body: {
+    type: "object",
+    required: ["email"],
+    properties: {
+      email: {
+        type: "string",
+        format: "email",
+      },
+    },
+    additionalProperties: false,
+  },
+};
+
+export const restorePasswordScheme = {
+  body: {
+    type: "object",
+    required: ["token", "newPassoword"],
+    properties: {
+      token: { type: "string" },
+      newPassword: { type: "string", minLength: 10 },
     },
     additionalProperties: false,
   },

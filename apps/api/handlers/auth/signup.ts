@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { PrismaClient, User, Role } from "@repo/database";
-import bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
@@ -16,7 +16,7 @@ export const signupHandler = async (
   };
 
   try {
-    const existingUser: User = await prisma.user.findUnique({
+    const existingUser: User | null = await prisma.user.findUnique({
       where: { email },
     });
 
