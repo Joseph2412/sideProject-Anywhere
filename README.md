@@ -91,7 +91,6 @@ pnpm --filter api dev
 pnpm --filter @repo/database studio
 ```
 
-
 ## 🧼 Convenzioni e Pulizia del Codice
 
 | Script              | Comando                  | Descrizione                                                 |
@@ -101,7 +100,6 @@ pnpm --filter @repo/database studio
 | `check-types`       | `pnpm check-types`       | Verifica i tipi TypeScript su tutti i pacchetti (via Turbo) |
 | `commit`            | `pnpm commit`            | Lint, format, git add e commit guidato con Commitizen       |
 | `database:generate` | `pnpm database:generate` | Entra in `packages/database` e genera il Prisma Client      |
-
 
 ### 🧪 Verifica e Lint
 
