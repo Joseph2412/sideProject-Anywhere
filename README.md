@@ -87,6 +87,11 @@ pnpm --filter api dev
 | `migrate`  | `prisma migrate dev` | Crea una nuova migration e la applica     |
 | `studio`   | `prisma studio`      | Avvia la GUI di Prisma per gestire i dati |
 
+```bash
+pnpm --filter @repo/database studio
+```
+
+
 ## 🧼 Convenzioni e Pulizia del Codice
 
 | Script              | Comando                  | Descrizione                                                 |
@@ -97,9 +102,6 @@ pnpm --filter api dev
 | `commit`            | `pnpm commit`            | Lint, format, git add e commit guidato con Commitizen       |
 | `database:generate` | `pnpm database:generate` | Entra in `packages/database` e genera il Prisma Client      |
 
-```bash
-pnpm --filter @repo/database studio
-```
 
 ### 🧪 Verifica e Lint
 
