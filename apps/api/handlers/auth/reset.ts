@@ -31,9 +31,7 @@ export const resetPasswordHandler = async (
 
   console.log(`Link Reset: http://localhost3000/reset?token=${token}`);
 
-  return reply
-    .code(200)
-    .send({
-      message: `Abbiamo Appena Inviato alla mail ${email} un link di Reset: Controlla nella Spam!`,
-    });
+  return reply.code(200).send({
+    message: `Abbiamo Appena Inviato alla mail ${email} un link di Reset: Controlla nella Spam!`,
+  });
 };
