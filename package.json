@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "npm run database:generate && turbo run dev",
+    
     "commit": "pnpm lint && pnpm format && git add . && pnpm dlx git-cz",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

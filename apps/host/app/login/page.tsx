@@ -1,8 +1,17 @@
+"use client";
 import React from "react";
 import LoginForm from "@repo/ui/loginform/LoginForm";
+import { useRouter } from "next/navigation";
 
-const LoginPage = () => {
-  return <LoginForm />;
-};
+export default function LoginPage() {
+  const router = useRouter();
 
-export default LoginPage;
+  return (
+    <LoginForm
+      onLoginSuccess={({ name }) => {
+        router.push(`/dashboard?name=${encodeURIComponent(name)}`);
+      }}
+      onGoToSignup={() => router.replace("/signup")}
+    />
+  );
+}

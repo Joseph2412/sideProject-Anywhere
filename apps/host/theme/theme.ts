@@ -4,12 +4,19 @@ import type { ThemeConfig } from "antd";
 
 const theme: ThemeConfig = {
   token: {
-    // Seed Token
-    colorPrimary: "#00b96b",
-    borderRadius: 2,
-
-    // Alias Token
-    colorBgContainer: "#f6ffed",
+    fontFamily: "Inter, sans-serif",
+    colorPrimary: "#00063e",
+  },
+  components: {
+    Button: {
+      fontFamily: "Inter, sans-serif",
+    },
+    Input: {
+      fontFamily: "Inter, sans-serif",
+    },
+    Typography: {
+      fontFamily: "Inter, sans-serif",
+    },
   },
 };
 

@@ -1,12 +1,15 @@
-import { Form, Input, Button, Divider, message } from "antd";
-import { GoogleOutlined } from "@ant-design/icons";
+"use client";
+import { Form, Button, Divider, message } from "antd";
 import { useState } from "react";
 import styles from "./LoginForm.module.css";
+import { NibolInput } from "../inputs/Input";
+import { PrimaryButton } from "../buttons/PrimaryButton";
+import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
 
 // Simula check se l'email è registrata
 const fakeCheckEmail = async (email: string): Promise<boolean> => {
   await new Promise((res) => setTimeout(res, 700));
-  return email === "riccardo.suardi@nibol.com";
+  return email === "giuseppe.randisi@nibol.com";
 };
 
 // Simula login
@@ -15,7 +18,12 @@ const fakeLogin = async (email: string, password: string): Promise<boolean> => {
   return password === "PasswordCorretta123!";
 };
 
-const LoginForm = () => {
+type Props = {
+  onLoginSuccess?: (user: { name: string }) => void;
+  onGoToSignup?: () => void;
+};
+
+const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
   const [form] = Form.useForm();
   const [step, setStep] = useState<"email" | "password">("email");
   const [email, setEmail] = useState("");
@@ -68,7 +76,7 @@ const LoginForm = () => {
       }
 
       message.success("Login effettuato!");
-      // ... redirect
+      onLoginSuccess?.({ name: email });
     } finally {
       setLoading(false);
     }
@@ -83,7 +91,7 @@ const LoginForm = () => {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <img src="/Logo Header.svg" alt="Nibol" className={styles.logo} />
+        <img src="Logo.svg" alt="Nibol" className={styles.logo} />
         <Divider />
 
         <div className={styles.title}>
@@ -91,39 +99,33 @@ const LoginForm = () => {
         </div>
 
         <Form form={form} layout="vertical" style={{ width: "100%" }}>
-          <Form.Item
+          <NibolInput
             label="Email"
             name="email"
             rules={[
               { required: true, message: "Inserisci la tua email" },
               { type: "email", message: "Email non valida" },
             ]}
-          >
-            <Input disabled={step === "password"} size="large" />
-          </Form.Item>
+            disabled={step === "password"}
+          />
 
           {step === "password" && (
-            <Form.Item
+            <NibolInput
               label="Password"
               name="password"
               rules={[{ required: true, message: "Inserisci la password" }]}
-            >
-              <Input.Password size="large" />
-            </Form.Item>
+              password
+            />
           )}
 
           <Form.Item>
-            <Button
-              type="primary"
-              block
-              size="large"
+            <PrimaryButton
               loading={loading}
               onClick={
                 step === "email" ? handleEmailCheck : handlePasswordLogin
               }
-            >
-              Continua
-            </Button>
+              text="Continua"
+            />
           </Form.Item>
         </Form>
 
@@ -143,13 +145,11 @@ const LoginForm = () => {
             <Divider plain className={styles.orDivider}>
               OR
             </Divider>
-            <Button icon={<GoogleOutlined />} size="large" block>
-              Continua con Google
-            </Button>
+            <GoogleLoginButton />
           </>
         )}
 
-        <Button type="link" block>
+        <Button type="link" block onClick={onGoToSignup}>
           Non hai un account? Registrati
         </Button>
       </div>

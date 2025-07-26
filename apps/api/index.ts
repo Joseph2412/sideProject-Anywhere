@@ -9,8 +9,7 @@ import {
 import { loginHandler } from "./handlers/auth/login";
 import { signupHandler } from "./handlers/auth/signup";
 import { resetPasswordHandler } from "./handlers/auth/reset";
-import { restorePasswordHandler } from "./handlers/auth/reset";
-
+import { restorePasswordHandler } from "./handlers/auth/restore";
 const server = fastify();
 
 server.register(cors, { origin: true });
