@@ -29,6 +29,19 @@ export const loginHandler = async (
       return reply.code(401).send({ error: "PassoWord Errata" });
     }
 
+    //Token di Login
+    const token = reply.server.jwt.sign({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    reply.setCookie("token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+
     //Login Corretto. Ritorno l'utente con le specifiche
     return reply.send({
       message: "Login Effettuato con Successo",

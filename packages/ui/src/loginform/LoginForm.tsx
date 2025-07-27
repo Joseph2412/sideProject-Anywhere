@@ -1,10 +1,17 @@
 "use client";
-import { Form, Button, Divider, message } from "antd";
+
+import { Form, Button, Divider, message, Modal } from "antd";
 import { useState } from "react";
 import styles from "./LoginForm.module.css";
 import { NibolInput } from "../inputs/Input";
 import { PrimaryButton } from "../buttons/PrimaryButton";
 import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
+
+message.config({
+  top: 100,
+  duration: 4,
+  getContainer: () => document.body,
+});
 
 type LoginResponse = {
   message: string;
@@ -25,6 +32,7 @@ const userLogin = async (
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify({ email, password }),
   });
   const data = await res.json();
@@ -100,10 +108,34 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
     }
   };
 
-  const handleResetPassword = () => {
-    message.success(
-      `Abbiamo mandato una email a ${email} con le istruzioni. Controlla la cartella SPAM.`,
-    );
+  const handleResetPassword = async () => {
+    try {
+      setLoading(true);
+
+      const res = await fetch(`${endPoint}/resetPassword`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Errore durante il reset password");
+      }
+
+      Modal.success({
+        title: "Email inviata",
+        content: `Abbiamo mandato una email a ${email} con le istruzioni. Controlla anche la cartella SPAM.`,
+      });
+    } catch (err) {
+      console.log(err);
+      message.error("Errore durante l'invio dell'email");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

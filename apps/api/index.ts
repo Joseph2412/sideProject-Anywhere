@@ -1,4 +1,9 @@
-import fastify from "fastify";
+import dotenv from "dotenv";
+dotenv.config();
+
+import fastify, { FastifyInstance } from "fastify";
+import fastifyJwt from "@fastify/jwt";
+import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 import {
   signupSchema,
@@ -7,14 +12,30 @@ import {
   resetPasswordScheme,
   checkEmailSchema,
 } from "./schemas/authSchema";
+
 import { loginHandler } from "./handlers/auth/login";
 import { signupHandler } from "./handlers/auth/signup";
 import { resetPasswordHandler } from "./handlers/auth/reset";
 import { restorePasswordHandler } from "./handlers/auth/restore";
 import { checkEmailHandler } from "./handlers/auth/checkEmail";
-const server = fastify();
 
-server.register(cors, { origin: true });
+const server: FastifyInstance = fastify();
+
+server.register(cors, {
+  origin: "http://localhost:3000",
+  credentials: true,
+});
+
+server.register(cookie);
+server.register(fastifyJwt, { secret: process.env.JWT_SECRET! });
+
+server.decorate("authenticate", async function (request, reply) {
+  try {
+    await request.jwtVerify();
+  } catch (err) {
+    reply.code(401).send({ message: "Non Autorizzato" });
+  }
+});
 
 // Signup
 server.post("/signup", { schema: signupSchema }, signupHandler);
@@ -35,6 +56,17 @@ server.post(
   "/restorePassword",
   { schema: restorePasswordScheme },
   restorePasswordHandler,
+);
+
+server.get(
+  "/dashboard",
+  { preHandler: server.authenticate },
+  async (request, reply) => {
+    return {
+      message: "Autenticato",
+      user: request.user,
+    };
+  },
 );
 
 server.listen({ port: 3001 }, (err, address) => {

@@ -9,10 +9,10 @@
 }
 
 .card {
-  width: 420px;
+  width: 440px;
   border: 1px solid #ededed;
   border-radius: 8px;
-  padding: 32px 24px 24px;
+  padding: 32px 16px 16px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
@@ -20,6 +20,19 @@
   gap: 16px;
   background-color: #fff;
   animation: fadeIn 0.5s ease;
+}
+
+.ant-form-item,
+.ant-input {
+  width: 100%;
+}
+
+.ant-message {
+  z-index: 9999 !important;
+  position: fixed !important;
+  top: 100px !important;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 @keyframes fadeIn {

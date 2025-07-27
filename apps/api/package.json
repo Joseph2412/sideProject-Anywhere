@@ -12,10 +12,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.0.1",
-    "@repo/types": "workspace:*",
+    "@fastify/jwt": "^9.1.0",
     "@repo/database": "workspace:*",
+    "@repo/types": "workspace:*",
     "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.1",
     "fastify": "^5.4.0"
   },
   "devDependencies": {
