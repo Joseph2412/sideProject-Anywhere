@@ -5,11 +5,13 @@ import {
   loginSchema,
   restorePasswordScheme,
   resetPasswordScheme,
+  checkEmailSchema,
 } from "./schemas/authSchema";
 import { loginHandler } from "./handlers/auth/login";
 import { signupHandler } from "./handlers/auth/signup";
 import { resetPasswordHandler } from "./handlers/auth/reset";
 import { restorePasswordHandler } from "./handlers/auth/restore";
+import { checkEmailHandler } from "./handlers/auth/checkEmail";
 const server = fastify();
 
 server.register(cors, { origin: true });
@@ -17,8 +19,9 @@ server.register(cors, { origin: true });
 // Signup
 server.post("/signup", { schema: signupSchema }, signupHandler);
 
-// Login
+// Login+CheckEmail
 server.post("/login", { schema: loginSchema }, loginHandler);
+server.post("/check-email", { schema: checkEmailSchema }, checkEmailHandler);
 
 // Reset Password
 server.post(

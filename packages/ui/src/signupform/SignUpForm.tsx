@@ -1,16 +1,82 @@
 "use client";
-import { Form, Checkbox, Divider } from "antd";
+import { Form, Checkbox, Divider, message } from "antd";
 import { NibolInput } from "../inputs/Input";
 import { PrimaryButton } from "../buttons/PrimaryButton";
 import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
 import styles from "./SignUpForm.module.css";
+import React from "react";
+import { useState } from "react";
+
+type SignupPayload = {
+  name: string;
+  email: string;
+  password: string;
+  role: "HOST";
+};
+
+type SignupResponse = {
+  message: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    role: "HOST";
+  };
+};
+
+const userSignup = async (payload: SignupPayload): Promise<SignupResponse> => {
+  const res = await fetch("http://localhost:3001/signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || data.message || "Errore nella registrazione");
+  }
+
+  return data;
+};
 
 type SignUpFormProps = {
   onGoToLogin?: () => void;
 };
+type FormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  terms: boolean;
+};
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
+  const handleSubmit = async (values: FormValues) => {
+    try {
+      setLoading(true);
+      const payload: SignupPayload = {
+        name: `${values.firstName} ${values.lastName}`,
+        email: values.email,
+        password: values.password,
+        role: "HOST", // forzato per ora
+      };
+
+      await userSignup(payload);
+      form.resetFields();
+
+      message.success("Registrazione completata con successo!");
+
+      onGoToLogin?.(); // Redirect automatico al login
+    } catch (err) {
+      if (err instanceof Error)
+        message.error(err.message || "Errore nella registrazione");
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -26,7 +92,12 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
           </b>
         </div>
 
-        <Form form={form} layout="vertical" style={{ width: "100%" }}>
+        <Form
+          form={form}
+          layout="vertical"
+          style={{ width: "100%" }}
+          onFinish={handleSubmit}
+        >
           <div className={styles.doubleInput}>
             <NibolInput
               label="Nome"
@@ -85,7 +156,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
           </Form.Item>
 
           <Form.Item>
-            <PrimaryButton text="Crea account" htmlType="submit" />
+            <PrimaryButton
+              text="Crea account"
+              htmlType="submit"
+              loading={loading}
+            />
           </Form.Item>
         </Form>
 

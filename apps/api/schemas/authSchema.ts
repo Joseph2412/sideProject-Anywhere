@@ -61,3 +61,17 @@ export const restorePasswordScheme = {
     additionalProperties: false,
   },
 };
+
+export const checkEmailSchema = {
+  body: {
+    type: "object",
+    required: ["email"],
+    properties: {
+      email: {
+        type: "string",
+        format: "email",
+      },
+    },
+    additionalProperties: false,
+  },
+};

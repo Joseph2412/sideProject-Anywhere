@@ -6,16 +6,32 @@ import { NibolInput } from "../inputs/Input";
 import { PrimaryButton } from "../buttons/PrimaryButton";
 import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
 
-// Simula check se l'email è registrata
-const fakeCheckEmail = async (email: string): Promise<boolean> => {
-  await new Promise((res) => setTimeout(res, 700));
-  return email === "giuseppe.randisi@nibol.com";
+type LoginResponse = {
+  message: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
 };
+const endPoint = "http://localhost:3001";
 
-// Simula login
-const fakeLogin = async (email: string, password: string): Promise<boolean> => {
-  await new Promise((res) => setTimeout(res, 700));
-  return password === "PasswordCorretta123!";
+const userLogin = async (
+  email: string,
+  password: string,
+): Promise<LoginResponse> => {
+  const res = await fetch(endPoint + "/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || "Errore Nel Login");
+  }
+  return data;
 };
 
 type Props = {
@@ -35,10 +51,17 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
       const values = await form.validateFields();
       const email = values.email;
 
-      // Simulazione chiamata API check email
-      const exists = await fakeCheckEmail(email);
+      const res = await fetch(endPoint + "/check-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
-      if (!exists) {
+      const data = await res.json();
+
+      if (!data.exists) {
         form.setFields([
           {
             name: "email",
@@ -62,23 +85,18 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
       setLoading(true);
       const values = await form.validateFields();
 
-      const success = await fakeLogin(email, values.password);
-      if (!success) {
+      const response = await userLogin(email, values.password);
+
+      message.success("Login effettuato!");
+      onLoginSuccess?.({ name: response.user.name });
+    } catch (err) {
+      if (err instanceof Error)
         form.setFields([
           {
             name: "password",
-            errors: [
-              "Credenziali sbagliate. Controlla l’indirizzo email o utilizza un’altra password.",
-            ],
+            errors: [err.message],
           },
         ]);
-        return;
-      }
-
-      message.success("Login effettuato!");
-      onLoginSuccess?.({ name: email });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -121,6 +139,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
           <Form.Item>
             <PrimaryButton
               loading={loading}
+              disabled={loading}
               onClick={
                 step === "email" ? handleEmailCheck : handlePasswordLogin
               }
