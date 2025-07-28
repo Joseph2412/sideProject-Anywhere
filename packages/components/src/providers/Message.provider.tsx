@@ -25,6 +25,7 @@ export function MessageProvider({
         type: "success",
         message: "ciaoooone",
         description: "sono una descrizione",
+        placement: "bottomRight",
         onClose: () => {
           setMessage(false);
         },
