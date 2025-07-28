@@ -1,7 +1,11 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import fastify, { FastifyInstance } from "fastify";
+import fastify, {
+  FastifyInstance,
+  FastifyReply,
+  FastifyRequest,
+} from "fastify";
 import fastifyJwt from "@fastify/jwt";
 import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
@@ -29,13 +33,16 @@ server.register(cors, {
 server.register(cookie);
 server.register(fastifyJwt, { secret: process.env.JWT_SECRET! });
 
-server.decorate("authenticate", async function (request, reply) {
-  try {
-    await request.jwtVerify();
-  } catch (err) {
-    reply.code(401).send({ message: "Non Autorizzato" });
-  }
-});
+server.decorate(
+  "authenticate",
+  async function (request: FastifyRequest, reply: FastifyReply) {
+    try {
+      await request.jwtVerify();
+    } catch (err) {
+      reply.code(401).send({ message: "Non Autorizzato" });
+    }
+  },
+);
 
 // Signup
 server.post("/signup", { schema: signupSchema }, signupHandler);
