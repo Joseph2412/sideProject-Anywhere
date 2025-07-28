@@ -37,7 +37,7 @@ const userLogin = async (
   });
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(data.message || "Errore Nel Login");
+    throw new Error(data.message || data.error);
   }
   return data;
 };
@@ -105,6 +105,8 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
             errors: [err.message],
           },
         ]);
+    } finally {
+      setLoading(false);
     }
   };
 

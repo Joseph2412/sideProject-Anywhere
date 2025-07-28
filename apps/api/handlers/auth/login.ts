@@ -18,15 +18,14 @@ export const loginHandler = async (
 
     //Blocco Errori se !user e !passWord Sbagliata
     if (!user) {
-      return reply.code(401).send({ error: "Email non corretta" });
+      return reply.code(401).send({ message: "Email non corretta" });
     }
     const passwordFound: boolean = await bcrypt.compare(
       password,
       user.password,
     );
-
     if (!passwordFound) {
-      return reply.code(401).send({ error: "PassoWord Errata" });
+      return reply.code(401).send({ message: "Passoword Errata" });
     }
 
     //Token di Login
