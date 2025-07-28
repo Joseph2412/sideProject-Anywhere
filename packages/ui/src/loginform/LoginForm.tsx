@@ -6,6 +6,8 @@ import styles from "./LoginForm.module.css";
 import { NibolInput } from "../inputs/Input";
 import { PrimaryButton } from "../buttons/PrimaryButton";
 import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
+import {useSetAtom} from "jotai";
+import {messageToast} from "../../../store/LayoutStore"
 
 message.config({
   top: 100,
@@ -137,13 +139,17 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
     }
   };
 
+  const setMessage = useSetAtom(messageToast);
+
   return (
     <div className={styles.container}>
       <div className={styles.card}>
         <img src="Logo.svg" alt="Nibol" className={styles.logo} />
         <Divider />
 
-        <div className={styles.title}>
+        <div className={styles.title} onClick={() => {
+          setMessage(true);
+        }}>
           <b>Accedi per gestire il tuo locale su Nibol</b>
         </div>
 
