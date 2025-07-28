@@ -1,6 +1,6 @@
 "use client";
 
-import { Form, Button, Divider, message, Modal } from "antd";
+import { Form, Button, Divider, message } from "antd";
 import { useState } from "react";
 import styles from "./LoginForm.module.css";
 import { NibolInput } from "../inputs/Input";
@@ -126,10 +126,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
         throw new Error(data.message || "Errore durante il reset password");
       }
 
-      Modal.success({
-        title: "Email inviata",
-        content: `Abbiamo mandato una email a ${email} con le istruzioni. Controlla anche la cartella SPAM.`,
-      });
+      //setShowNotification(true)
     } catch (err) {
       console.log(err);
       message.error("Errore durante l'invio dell'email");

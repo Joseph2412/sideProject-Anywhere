@@ -30,6 +30,7 @@ const userSignup = async (payload: SignupPayload): Promise<SignupResponse> => {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -58,12 +59,13 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
   const [form] = Form.useForm();
   const handleSubmit = async (values: FormValues) => {
     try {
+      console.log("FORM VALUE: ", values); //Ritorno in console del PAYLOAD inviato al DB ELIMINA IN FASE DI RELEASE
       setLoading(true);
       const payload: SignupPayload = {
         name: `${values.firstName} ${values.lastName}`,
         email: values.email,
         password: values.password,
-        role: "HOST", // forzato per ora
+        role: "HOST", // Registro forzato per ora di HOST
       };
 
       await userSignup(payload);

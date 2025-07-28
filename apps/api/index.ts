@@ -58,16 +58,29 @@ server.post(
   restorePasswordHandler,
 );
 
-server.get(
-  "/dashboard",
-  { preHandler: server.authenticate },
-  async (request, reply) => {
-    return {
-      message: "Autenticato",
-      user: request.user,
-    };
-  },
-);
+// server.get(
+//   "/dashboard",
+//   { preHandler: server.authenticate },
+//   async (request, reply) => {
+//     return {
+//       message: "Autenticato",
+//       user: request.user,
+//     };
+//   },
+// );
+
+//Rimanda Gli errori di validazione. Da Modificare per Build Finale
+server.setErrorHandler((error, request, reply) => {
+  if ((error as any).validation) {
+    console.error("Validation failed:", (error as any).validation);
+    return reply.status(400).send({
+      error: "Validation failed",
+      details: (error as any).validation,
+    });
+  }
+
+  reply.send(error);
+});
 
 server.listen({ port: 3001 }, (err, address) => {
   if (err) {

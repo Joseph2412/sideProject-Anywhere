@@ -4,7 +4,7 @@ export const signupSchema = {
     required: ["email", "password", "name", "role"],
     properties: {
       email: { type: "string", format: "email" },
-      password: { type: "string", minLength: 10 }, //dieci caratteri? Why Not.
+      password: { type: "string", minLength: 8 }, //dieci caratteri? Why Not.
       name: { type: "string" },
       role: {
         type: "string",
