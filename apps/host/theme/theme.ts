@@ -4,6 +4,7 @@ const theme: ThemeConfig = {
   token: {
     colorPrimary: "#000000",
     controlOutline: "none",
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
   },
   components: {
     Input: {
@@ -14,6 +15,9 @@ const theme: ThemeConfig = {
     Button: {
       defaultBorderColor: "#000000",
       defaultHoverBorderColor: "#000000",
+    },
+    Typography: {
+      fontFamily: "'Plus Jakarta Sans', sans-serif",
     },
   },
 };
