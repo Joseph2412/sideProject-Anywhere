@@ -6,7 +6,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["400", "600", "700"], // scegli i pesi che userai
+  weight: ["500"], // scegli i pesi che userai
   display: "swap",
 });
 

@@ -1,17 +1,34 @@
-  .ant-checkbox-inner {
-    border-radius: 4px;
-    border-color: #000639 !important;
-  }
 
-  .ant-checkbox-checked .ant-checkbox-inner {
-    background-color: #000639 !important;
-    border-color: #000639 !important;
-  }
+/* Override FONT FAMILY */
+.ant-form,
+.ant-form-item-label > label,
+.ant-btn,
+.ant-btn > span,
+.ant-typography,
+.ant-checkbox-wrapper,
+.ant-checkbox-inner,
+.ant-input,
+.ant-input::placeholder {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
 
-  .ant-checkbox-checked .ant-checkbox-inner::after {
-    border-color: white !important; /* Colore della spunta */
-  }
 
-  .ant-form-item {
-    margin: 5px; 
-  }
+/* CheckBox con Colore Custom */
+.ant-checkbox-inner {
+  border-radius: 4px;
+  border-color: #000639 !important;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #000639 !important;
+  border-color: #000639 !important;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner::after {
+  border-color: white !important; /* Colore della spunta */
+}
+
+.ant-form-item {
+  margin: 5px; 
+}
+
