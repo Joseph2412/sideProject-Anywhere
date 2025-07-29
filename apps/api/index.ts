@@ -65,16 +65,15 @@ server.post(
   restorePasswordHandler,
 );
 
-// server.get(
-//   "/dashboard",
-//   { preHandler: server.authenticate },
-//   async (request, reply) => {
-//     return {
-//       message: "Autenticato",
-//       user: request.user,
-//     };
-//   },
-// );
+server.get(
+  "/dashboard",
+  { preHandler: server.authenticate },
+  async (request, reply) => {
+    return {
+      user: request.user,
+    };
+  },
+);
 
 //Rimanda Gli errori di validazione. Da Modificare per Build Finale
 server.setErrorHandler((error, request, reply) => {

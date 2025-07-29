@@ -29,21 +29,16 @@ export const loginHandler = async (
     }
 
     //Token di Login
-    const token = reply.server.jwt.sign({
+    const token = await reply.jwtSign({
       id: user.id,
       email: user.email,
       role: user.role,
     });
 
-    reply.setCookie("token", token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-    });
-
     //Login Corretto. Ritorno l'utente con le specifiche
     return reply.send({
       message: "Login Effettuato con Successo",
+      token,
       user: {
         id: user.id,
         name: user.name,

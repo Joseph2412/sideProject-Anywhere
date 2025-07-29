@@ -10,6 +10,7 @@ type NibolInputProps = InputProps &
     rules?: Rule[];
     password?: boolean;
     validateTrigger?: string;
+    hideAsterisk?: boolean;
   };
 
 export const NibolInput: React.FC<NibolInputProps> = ({
@@ -19,6 +20,7 @@ export const NibolInput: React.FC<NibolInputProps> = ({
   password = false,
   className,
   validateTrigger,
+  hideAsterisk = false, // ✅ corretto qui
   ...rest
 }) => {
   return (
@@ -27,6 +29,7 @@ export const NibolInput: React.FC<NibolInputProps> = ({
       name={name}
       rules={rules}
       validateTrigger={validateTrigger}
+      required={!hideAsterisk}
     >
       {password ? (
         <Input.Password {...rest} size="large" className={className} />

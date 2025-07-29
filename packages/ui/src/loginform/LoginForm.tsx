@@ -17,6 +17,7 @@ message.config({
 
 type LoginResponse = {
   message: string;
+  token: string;
   user: {
     id: number;
     name: string;
@@ -37,6 +38,7 @@ const userLogin = async (
     credentials: "include",
     body: JSON.stringify({ email, password }),
   });
+  console.log("Risposta BackEnd", res);
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.message || data.error);
@@ -57,6 +59,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
 
   const handleEmailCheck = async () => {
     try {
+      console.log("Email Check OK");
       setLoading(true);
       const values = await form.validateFields(["email"]);
       const email = values.email;
@@ -96,7 +99,9 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
       const values = await form.validateFields(["password"]);
 
       const response = await userLogin(email, values.password);
-
+      console.log("Value di Ritorno ", response);
+      localStorage.setItem("token", response.token);
+      console.log("Token Salvato: ", response.token);
       message.success("Login effettuato!");
       onLoginSuccess?.({ name: response.user.name });
     } catch (err) {
@@ -156,6 +161,8 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
             validateTrigger="onSubmit"
             label="Email"
             name="email"
+            hideAsterisk={true}
+            required={false}
             style={{ height: 32 }}
             className={styles.input}
             rules={[
@@ -170,6 +177,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
               validateTrigger="onSubmit"
               label="Password"
               name="password"
+              hideAsterisk={true}
               className={styles.input}
               style={{ height: 32 }}
               rules={[{ required: true, message: "Inserisci la password" }]}
