@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="it">
-      <body>
+      <body className="{inter.className}">
         <ConfigProvider theme={theme}>{children}</ConfigProvider>
       </body>
     </html>

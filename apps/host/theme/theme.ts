@@ -1,21 +1,20 @@
-//Theme Casuale Gentilmente offerto dalla documentazione di Ant Design
 // app/host/theme/theme.ts
 import type { ThemeConfig } from "antd";
 
 const theme: ThemeConfig = {
   token: {
-    fontFamily: "Inter, sans-serif",
-    colorPrimary: "#00063e",
+    colorPrimary: "#000000",
+    controlOutline: "none",
   },
   components: {
-    Button: {
-      fontFamily: "Inter, sans-serif",
-    },
     Input: {
-      fontFamily: "Inter, sans-serif",
+      hoverBorderColor: "#000000",
+      activeBorderColor: "#000000",
+      activeShadow: "none",
     },
-    Typography: {
-      fontFamily: "Inter, sans-serif",
+    Button: {
+      defaultBorderColor: "#000000",
+      defaultHoverBorderColor: "#000000",
     },
   },
 };

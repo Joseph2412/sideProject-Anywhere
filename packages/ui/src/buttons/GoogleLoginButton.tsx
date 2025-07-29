@@ -1,8 +1,30 @@
 import { Button } from "antd";
-import { GoogleOutlined } from "@ant-design/icons";
+import type { ButtonProps } from "antd";
 
-export const GoogleLoginButton = () => (
-  <Button icon={<GoogleOutlined />} size="large" block>
+type Props = ButtonProps & {
+  inconSrc?: string;
+};
+
+export const GoogleLoginButton = ({
+  className,
+  inconSrc = "/google-logo.png",
+  ...rest
+}: Props) => (
+  <Button
+    icon={
+      <img
+        src={inconSrc}
+        alt="Google"
+        width={20}
+        height={20}
+        style={{ marginRight: 8 }}
+      />
+    }
+    size="large"
+    block
+    className={className}
+    {...rest}
+  >
     Continua con Google
   </Button>
 );

@@ -1,3 +1,3 @@
-import {atom} from "jotai";
+import { atom } from "jotai";
 
-export const messageToast = atom<boolean>(false)
+export const messageToast = atom<boolean>(false);

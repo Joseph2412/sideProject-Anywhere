@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import {React, useEffect} from "react";
-import {messageToast} from "../../../store/LayoutStore"
-import {useAtom} from "jotai"
-import {notification} from "antd"
+import { React, useEffect } from "react";
+import { messageToast } from "../../../store/LayoutStore";
+import { useAtom } from "jotai";
+import { notification } from "antd";
 
 export function MessageProvider({
-  children
+  children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }): React.ReactElement {
   const [api, contextHolder] = notification.useNotification({
     duration: 3,
@@ -19,7 +19,7 @@ export function MessageProvider({
   const [message, setMessage] = useAtom(messageToast);
 
   useEffect(() => {
-    if(message){
+    if (message) {
       api.open({
         duration: 3,
         type: "success",
@@ -31,13 +31,12 @@ export function MessageProvider({
         },
       });
     }
-  }, [message])
+  }, [message]);
 
   return (
     <>
       {children}
       {contextHolder}
     </>
-  )
+  );
 }
-

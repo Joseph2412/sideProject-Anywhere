@@ -1,5 +1,5 @@
 "use client";
-import { Form, Checkbox, Divider, message } from "antd";
+import { Form, Checkbox, Divider, message, Button } from "antd";
 import { NibolInput } from "../inputs/Input";
 import { PrimaryButton } from "../buttons/PrimaryButton";
 import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
@@ -104,11 +104,13 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
             <NibolInput
               label="Nome"
               name="firstName"
+              style={{ height: 32 }}
               rules={[{ required: true, message: "Inserisci il nome" }]}
             />
             <NibolInput
               label="Cognome"
               name="lastName"
+              style={{ height: 32 }}
               rules={[{ required: true, message: "Inserisci il cognome" }]}
             />
           </div>
@@ -116,6 +118,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
           <NibolInput
             label="Email"
             name="email"
+            style={{ height: 32 }}
             rules={[
               { required: true, message: "Inserisci la tua email" },
               { type: "email", message: "Email non valida" },
@@ -125,6 +128,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
           <NibolInput
             label="Password"
             name="password"
+            style={{ height: 32 }}
             password
             rules={[
               { required: true, message: "Inserisci una password" },
@@ -150,10 +154,16 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
               },
             ]}
           >
-            <Checkbox>
+            <Checkbox className={styles.checkboxText}>
               Creando un account, accetto le{" "}
-              <a href="#">Condizioni di Servizio – Locale</a> e la{" "}
-              <a href="#">Privacy Policy</a>.
+              <a href="#" className={styles.link}>
+                Condizioni di Servizio – Locale
+              </a>{" "}
+              e la{" "}
+              <a href="#" className={styles.link}>
+                Privacy Policy
+              </a>
+              .
             </Checkbox>
           </Form.Item>
 
@@ -162,6 +172,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
               text="Crea account"
               htmlType="submit"
               loading={loading}
+              style={{ height: 32 }}
             />
           </Form.Item>
         </Form>
@@ -169,14 +180,18 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
         <Divider plain className={styles.orDivider}>
           OR
         </Divider>
-        <GoogleLoginButton />
-
-        <div className={styles.loginLink}>
-          Hai già un account?{" "}
-          <a onClick={onGoToLogin} style={{ cursor: "pointer" }}>
-            Accedi
-          </a>
-        </div>
+        <GoogleLoginButton style={{ height: 32, marginBottom: 0 }} />
+      </div>
+      <div
+        style={{ marginTop: "16px", display: "flex", justifyContent: "center" }}
+      >
+        <Button
+          type="text"
+          onClick={onGoToLogin}
+          className={`${styles.register} ${styles.registerWrapper}`}
+        >
+          Non hai un account? Registrati
+        </Button>
       </div>
     </div>
   );

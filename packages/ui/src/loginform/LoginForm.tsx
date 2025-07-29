@@ -6,8 +6,8 @@ import styles from "./LoginForm.module.css";
 import { NibolInput } from "../inputs/Input";
 import { PrimaryButton } from "../buttons/PrimaryButton";
 import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
-import {useSetAtom} from "jotai";
-import {messageToast} from "../../../store/LayoutStore"
+import { useSetAtom } from "jotai";
+import { messageToast } from "../../../store/LayoutStore";
 
 message.config({
   top: 100,
@@ -58,7 +58,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
   const handleEmailCheck = async () => {
     try {
       setLoading(true);
-      const values = await form.validateFields();
+      const values = await form.validateFields(["email"]);
       const email = values.email;
 
       const res = await fetch(endPoint + "/check-email", {
@@ -93,7 +93,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
   const handlePasswordLogin = async () => {
     try {
       setLoading(true);
-      const values = await form.validateFields();
+      const values = await form.validateFields(["password"]);
 
       const response = await userLogin(email, values.password);
 
@@ -112,6 +112,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
     }
   };
 
+  const setMessage = useSetAtom(messageToast);
   const handleResetPassword = async () => {
     try {
       setLoading(true);
@@ -136,10 +137,9 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
       message.error("Errore durante l'invio dell'email");
     } finally {
       setLoading(false);
+      setMessage(true);
     }
   };
-
-  const setMessage = useSetAtom(messageToast);
 
   return (
     <div className={styles.container}>
@@ -147,16 +147,17 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
         <img src="Logo.svg" alt="Nibol" className={styles.logo} />
         <Divider />
 
-        <div className={styles.title} onClick={() => {
-          setMessage(true);
-        }}>
+        <div className={styles.title}>
           <b>Accedi per gestire il tuo locale su Nibol</b>
         </div>
 
         <Form form={form} layout="vertical" style={{ width: "100%" }}>
           <NibolInput
+            validateTrigger="onSubmit"
             label="Email"
             name="email"
+            style={{ height: 32 }}
+            className={styles.input}
             rules={[
               { required: true, message: "Inserisci la tua email" },
               { type: "email", message: "Email non valida" },
@@ -166,46 +167,70 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
 
           {step === "password" && (
             <NibolInput
+              validateTrigger="onSubmit"
               label="Password"
               name="password"
+              className={styles.input}
+              style={{ height: 32 }}
               rules={[{ required: true, message: "Inserisci la password" }]}
               password
             />
           )}
 
-          <Form.Item>
+          <Form.Item style={{ marginBottom: step === "password" ? 6 : 12 }}>
             <PrimaryButton
               loading={loading}
               disabled={loading}
               onClick={
-                step === "email" ? handleEmailCheck : handlePasswordLogin
+                step === "password" ? handlePasswordLogin : handleEmailCheck
               }
+              style={{ height: 32, marginBottom: 10 }}
               text="Continua"
             />
           </Form.Item>
+
+          {step === "password" ? (
+            <>
+              <Button
+                block
+                type="text"
+                onClick={() => setStep("email")}
+                className={styles.secondaryButton}
+              >
+                Cambia email
+              </Button>
+              <Button
+                block
+                type="text"
+                onClick={handleResetPassword}
+                className={styles.secondaryButton}
+                style={{ marginTop: 15 }}
+              >
+                Reimposta password
+              </Button>
+            </>
+          ) : (
+            <>
+              <Divider
+                plain
+                className={styles.orDivider}
+                style={{ marginTop: "0px", marginBottom: "8px" }}
+              >
+                OR
+              </Divider>
+              <GoogleLoginButton className={styles.googleButton} />
+            </>
+          )}
         </Form>
-
-        {step === "password" && (
-          <>
-            <Button block type="text" onClick={() => setStep("email")}>
-              Cambia email
-            </Button>
-            <Button block type="text" onClick={handleResetPassword}>
-              Reimposta password
-            </Button>
-          </>
-        )}
-
-        {step === "email" && (
-          <>
-            <Divider plain className={styles.orDivider}>
-              OR
-            </Divider>
-            <GoogleLoginButton />
-          </>
-        )}
-
-        <Button type="link" block onClick={onGoToSignup}>
+      </div>
+      <div
+        style={{ marginTop: "16px", display: "flex", justifyContent: "center" }}
+      >
+        <Button
+          type="text"
+          onClick={onGoToSignup}
+          className={`${styles.register} ${styles.registerWrapper}`}
+        >
           Non hai un account? Registrati
         </Button>
       </div>

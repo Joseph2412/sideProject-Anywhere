@@ -2,6 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      
       "@types/*": ["packages/types/*"],
       "@components/*": ["packages/ui/*"]
     },
