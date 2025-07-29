@@ -9,5 +9,9 @@
   }
 
   .ant-checkbox-checked .ant-checkbox-inner::after {
-    border-color: white !important; /* Colore del segno di spunta */
+    border-color: white !important; /* Colore della spunta */
+  }
+
+  .ant-form-item {
+    margin: 5px; 
   }

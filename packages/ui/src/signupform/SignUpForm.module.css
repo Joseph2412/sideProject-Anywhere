@@ -86,6 +86,8 @@ margin-bottom: 10px;
   display: flex;
   gap: 10px;
   width: 100%;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
 }
 
 .doubleInput > * {
@@ -110,24 +112,14 @@ margin-bottom: 10px;
   margin-top: 12px;
 }
 
-:global {
-  .ant-checkbox-inner {
-    border-radius: 4px;
-    border-color: #000639 !important;
-  }
-
-  .ant-checkbox-checked .ant-checkbox-inner {
-    background-color: #000639 !important;
-    border-color: #000639 !important;
-  }
-
-  .ant-checkbox-checked .ant-checkbox-inner::after {
-    border-color: white !important; /* Colore del segno di spunta */
-  }
-}
 
 .link {
   text-decoration: underline;
   color: inherit; 
   font-weight: 500;
 }
+
+.input:hover {
+  border: 1px solid;
+}
+

@@ -7,7 +7,7 @@ type Props = ButtonProps & {
 
 export const GoogleLoginButton = ({
   className,
-  inconSrc = "/google-logo.png",
+  inconSrc = "/google-logo.svg",
   ...rest
 }: Props) => (
   <Button

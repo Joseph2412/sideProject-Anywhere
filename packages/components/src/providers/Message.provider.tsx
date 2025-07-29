@@ -1,7 +1,7 @@
 "use client";
 
 import { React, useEffect } from "react";
-import { messageToast } from "../../../store/LayoutStore";
+import { messageToast, ToastPayload } from "../../../store/LayoutStore";
 import { useAtom } from "jotai";
 import { notification } from "antd";
 
@@ -16,22 +16,22 @@ export function MessageProvider({
       threshold: 3,
     },
   });
-  const [message, setMessage] = useAtom(messageToast);
+  const [toast, setToast] = useAtom<ToastPayload | false>(messageToast);
 
   useEffect(() => {
-    if (message) {
+    if (toast) {
       api.open({
-        duration: 3,
-        type: "success",
-        message: "ciaoooone",
-        description: "sono una descrizione",
-        placement: "bottomRight",
+        type: toast.type || "info",
+        message: toast.message,
+        description: toast.description || "",
+        duration: toast.duration ?? 3,
+        placement: toast.placement || "bottomRight",
         onClose: () => {
-          setMessage(false);
+          setToast(false);
         },
       });
     }
-  }, [message]);
+  }, [toast]);
 
   return (
     <>

@@ -1,7 +1,7 @@
 import { ConfigProvider } from "antd";
 import "antd/dist/reset.css";
 import theme from "../theme/theme";
-import "./global.css"; //sistma
+import "./global.css"; //CSS Globale
 
 export const metadata = {
   title: "Nibol Login",

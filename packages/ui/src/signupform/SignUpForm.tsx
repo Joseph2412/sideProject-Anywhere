@@ -104,14 +104,18 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
             <NibolInput
               label="Nome"
               name="firstName"
+              className={styles.input}
               style={{ height: 32 }}
               rules={[{ required: true, message: "Inserisci il nome" }]}
+              hideAsterisk={true}
             />
             <NibolInput
               label="Cognome"
               name="lastName"
+              className={styles.input}
               style={{ height: 32 }}
               rules={[{ required: true, message: "Inserisci il cognome" }]}
+              hideAsterisk={true}
             />
           </div>
 
@@ -119,17 +123,21 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
             label="Email"
             name="email"
             style={{ height: 32 }}
+            className={styles.input}
             rules={[
               { required: true, message: "Inserisci la tua email" },
               { type: "email", message: "Email non valida" },
             ]}
+            hideAsterisk={true}
           />
 
           <NibolInput
             label="Password"
             name="password"
             style={{ height: 32 }}
+            className={styles.input}
             password
+            hideAsterisk={true}
             rules={[
               { required: true, message: "Inserisci una password" },
               {
@@ -172,7 +180,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
               text="Crea account"
               htmlType="submit"
               loading={loading}
-              style={{ height: 32 }}
+              disabled={loading}
+              style={{ height: 32, marginTop: 10 }}
             />
           </Form.Item>
         </Form>
