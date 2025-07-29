@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      
+      "@types/*": ["packages/types/*"],
+      "@components/*": ["packages/ui/*"]
+    },
+    "lib": ["DOM", "ES2020"]
+  },
+  "include": [
+    "packages",
+    "packages/types/src"
+  ]
+}

@@ -1,135 +1,148 @@
-# Turborepo starter
+# 📚 Anywhere – Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+## 📁 Struttura delle cartelle (Schema Parlante)
 
-## Using this example
-
-Run the following command:
-
-```sh
-npx create-turbo@latest
+```txt
+anywhere/
+├── apps/
+│   ├── api/               # Backend: Fastify + Prisma
+│   │   ├── handlers/      # Handler per login, signup, reset, restore
+│   │   ├── schemas/       # Schemi JSON per la validazione input (no Zod)
+│   │   ├── db/            # (vuota o deprecata)
+│   │   ├── index.ts       # Entrypoint server Fastify
+│   │   └── migrate.sh     # Script shell per generare migrations Prisma
+│   │
+│   └── host/              # Frontend: Next.js con App Router + Ant Design
+│       ├── app/           # Entry layout + pagine principali
+│       ├── theme/         # Customizzazione tema Ant Design (colori, border)
+│       ├── next.config.js # Configurazione Next.js
+│       ├── tsconfig.json  # Config TypeScript del frontend
+│       └── package.json   # Script e dipendenze FE
+│
+├── packages/              # Moduli condivisi riusabili
+│   ├── components/        # Componenti React condivisi (Button, Input, ecc.)
+│   ├── database/          # Prisma schema e migrations (DB layer)
+│   │   ├── prisma/
+│   │   │   ├── schema.prisma  # Definizione del DB (PostgreSQL)
+│   │   │   └── migrations/    # Cartelle auto-generate per ogni migration
+│   │   └── src/               # (eventuali metodi helper, se presenti)
+│   ├── types/             # Tipi condivisi TS (auth, user, ecc.)
+│   ├── ui/                # (eventuali componenti generici, se presenti)
+│   ├── eslint-config/     # Configurazione condivisa ESLint
+│   └── typescript-config/ # Configurazione TS base riusata dai pacchetti
+│
+├── .env                   # Variabili d'ambiente (API_URL, DB_URL, ecc.)
+├── turbo.json             # Configurazione build/dev con Turborepo
+├── pnpm-workspace.yaml    # Definizione workspace usati da PNPM
+├── tsconfig.base.json     # TSConfig base estesa nei pacchetti
+└── README.md              # Documentazione progetto
 ```
 
-## What's inside?
+## 🧰 Stack Tecnologico
 
-This Turborepo includes the following packages/apps:
+| Area           | Tecnologia                          |
+| -------------- | ----------------------------------- |
+| 🧠 Linguaggio  | **TypeScript**                      |
+| 🔙 Backend     | **Node.js** con **Fastify**         |
+| 📦 ORM         | **Prisma**                          |
+| 🗄️ Database    | **PostgreSQL**                      |
+| 🎨 Frontend    | **React** (Next.js App Router)      |
+| 🧩 UI Library  | **Ant Design**                      |
+| 📚 Monorepo    | **PNPM workspaces** + **Turborepo** |
+| ✅ Validazione | JSON Schema via Fastify             |
 
-### Apps and Packages
+## 🛠️ Comandi Utili
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### 📦 Frontend (`apps/host`)
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+| Script  | Comando      | Descrizione                           |
+| ------- | ------------ | ------------------------------------- |
+| `dev`   | `next dev`   | Avvia Next.js in sviluppo             |
+| `build` | `next build` | Compila il frontend per la produzione |
+| `start` | `next start` | Avvia l'app in modalità production    |
+| `lint`  | `next lint`  | Lint del progetto frontend            |
 
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```bash
+pnpm --filter host dev
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+### 🔙 Backend (`apps/api`)
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+| Script    | Comando                                           | Descrizione                             |
+| --------- | ------------------------------------------------- | --------------------------------------- |
+| `dev`     | `ts-node-dev --respawn --transpile-only index.ts` | Avvia il backend Fastify con hot-reload |
+| `build`   | `tsup index.ts --format esm,cjs --dts`            | Compila per la produzione               |
+| `start`   | `node dist/index.js`                              | Avvia il backend buildato               |
+| `migrate` | `bash ./migrate.sh`                               | Esegue `prisma migrate dev` con nome    |
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+```bash
+pnpm --filter api dev
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+### 🧬 Database (`packages/database`)
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+| Script     | Comando              | Descrizione                               |
+| ---------- | -------------------- | ----------------------------------------- |
+| `generate` | `prisma generate`    | Genera il client Prisma                   |
+| `migrate`  | `prisma migrate dev` | Crea una nuova migration e la applica     |
+| `studio`   | `prisma studio`      | Avvia la GUI di Prisma per gestire i dati |
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+```bash
+pnpm --filter @repo/database studio
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## 🧼 Convenzioni e Pulizia del Codice
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+| Script              | Comando                  | Descrizione                                                 |
+| ------------------- | ------------------------ | ----------------------------------------------------------- |
+| `format`            | `pnpm format`            | Applica Prettier a tutti i file `.ts`, `.tsx`, `.md`        |
+| `lint`              | `pnpm lint`              | Esegue linting su tutta la monorepo con le regole condivise |
+| `check-types`       | `pnpm check-types`       | Verifica i tipi TypeScript su tutti i pacchetti (via Turbo) |
+| `commit`            | `pnpm commit`            | Lint, format, git add e commit guidato con Commitizen       |
+| `database:generate` | `pnpm database:generate` | Entra in `packages/database` e genera il Prisma Client      |
 
+### 🧪 Verifica e Lint
+
+```bash
+pnpm lint         # Lint di tutti i pacchetti
+pnpm check-types  # Verifica tipi TypeScript
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+## 🚀 Come Iniziare (Setup Completo)
+
+1. **Clona la repository**
+
+```bash
+git clone <repo-url>
+cd anywhere
 ```
 
-## Useful Links
+2. **Installa le dipendenze**
 
-Learn more about the power of Turborepo:
+```bash
+pnpm install
+```
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+3. **Configura le variabili d’ambiente**
+
+```bash
+cp .env.example .env
+```
+
+4. **Genera il client Prisma**
+
+```bash
+pnpm --filter @repo/database generate
+```
+
+5. **Applica le migrations**
+
+```bash
+pnpm --filter api migrate --name init
+```
+
+6. **Avvia in modalità sviluppo**
+
+```bash
+pnpm dev
+```

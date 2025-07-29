@@ -5,11 +5,14 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "baseUrl": "."
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "types/**/*.ts",
     "next-env.d.ts",
     "next.config.js",
     ".next/types/**/*.ts"

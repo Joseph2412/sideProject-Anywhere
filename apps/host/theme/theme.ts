@@ -1,18 +1,21 @@
-//Theme Casuale Gentilmente offerto dalla documentazione di Ant Design
-// app/host/theme/theme.ts
-import type { ThemeConfig } from 'antd'
+import type { ThemeConfig } from "antd";
 
 const theme: ThemeConfig = {
-   
-      token: {
-        // Seed Token
-        colorPrimary: '#00b96b',
-        borderRadius: 2,
+  token: {
+    colorPrimary: "#000000",
+    controlOutline: "none",
+  },
+  components: {
+    Input: {
+      hoverBorderColor: "#000000",
+      activeBorderColor: "#000000",
+      activeShadow: "none",
+    },
+    Button: {
+      defaultBorderColor: "#000000",
+      defaultHoverBorderColor: "#000000",
+    },
+  },
+};
 
-        // Alias Token
-        colorBgContainer: '#f6ffed',
-      },
-    
-}
-
-export default theme
+export default theme;

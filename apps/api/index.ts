@@ -1,23 +1,104 @@
-import fastify from 'fastify'
-import cors from '@fastify/cors'
+import dotenv from "dotenv";
+dotenv.config();
 
-const server = fastify()
-server.register(cors, { origin: true })
+import fastify, {
+  FastifyInstance,
+  FastifyReply,
+  FastifyRequest,
+} from "fastify";
+import fastifyJwt from "@fastify/jwt";
+import cookie from "@fastify/cookie";
+import cors from "@fastify/cors";
+import {
+  signupSchema,
+  loginSchema,
+  restorePasswordScheme,
+  resetPasswordScheme,
+  checkEmailSchema,
+} from "./schemas/authSchema";
 
-server.get('/ping',async (request, reply) => {
-  //return 'pong' test con curl corretto
-  const { t } = request.query as { t?: string}
-  if(!t){
-    return reply.code(400).send({ error: "Errore: Manca Value"})
+import { loginHandler } from "./handlers/auth/login";
+import { signupHandler } from "./handlers/auth/signup";
+import { resetPasswordHandler } from "./handlers/auth/reset";
+import { restorePasswordHandler } from "./handlers/auth/restore";
+import { checkEmailHandler } from "./handlers/auth/checkEmail";
+
+const server: FastifyInstance = fastify();
+
+server.register(cors, {
+  origin: "http://localhost:3000",
+  credentials: true,
+});
+
+server.register(cookie);
+server.register(fastifyJwt, { secret: process.env.JWT_SECRET! });
+
+server.register(async function (protectedRoutes) {
+  protectedRoutes.addHook("onRequest", async (request, reply) => {
+    try {
+      await request.jwtVerify();
+    } catch (err) {
+      return reply
+        .status(401)
+        .send({ message: "Token Non Valido o Non Presente" });
+    }
+  });
+  protectedRoutes.get("/dashboard", async (request, reply) => {
+    return {
+      user: request.user,
+    };
+  });
+});
+
+server.decorate(
+  "authenticate",
+  async function (request: FastifyRequest, reply: FastifyReply) {
+    try {
+      await request.jwtVerify();
+    } catch (err) {
+      reply.code(401).send({ message: "Non Autorizzato" });
+    }
+  },
+);
+
+// Signup
+server.post("/signup", { schema: signupSchema }, signupHandler);
+
+// Login+CheckEmail
+server.post("/login", { schema: loginSchema }, loginHandler);
+server.post("/check-email", { schema: checkEmailSchema }, checkEmailHandler);
+
+// Reset Password
+server.post(
+  "/resetPassword",
+  { schema: resetPasswordScheme },
+  resetPasswordHandler,
+);
+
+// Restore Password
+server.post(
+  "/restorePassword",
+  { schema: restorePasswordScheme },
+  restorePasswordHandler,
+);
+
+//Rimanda Gli errori di validazione. Da Modificare per Build Finale
+server.setErrorHandler((error, request, reply) => {
+  if ((error as any).validation) {
+    console.error("Validation failed:", (error as any).validation);
+    return reply.status(400).send({
+      error: "Validation failed",
+      details: (error as any).validation,
+    });
   }
 
-  return reply.send({ value : t })
-})
+  reply.send(error);
+});
 
 server.listen({ port: 3001 }, (err, address) => {
   if (err) {
-    console.error(err)
-    process.exit(1)
+    console.error(err);
+    process.exit(1);
   }
-  console.log(`Server listening at ${address}`)
-})
+  console.log(`✅ Server listening at ${address}`);
+});

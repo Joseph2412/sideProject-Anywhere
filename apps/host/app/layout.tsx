@@ -1,18 +1,22 @@
-import 'antd/dist/reset.css'  
-
+import { ConfigProvider } from "antd";
+import "antd/dist/reset.css";
+import theme from "../theme/theme";
+import "./global.css"; //CSS Globale
 
 export const metadata = {
-  title: 'Prova BE<->FE',
-}
+  title: "Nibol Login",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="it">
+      <body>
+        <ConfigProvider theme={theme}>{children}</ConfigProvider>
+      </body>
     </html>
-  )
+  );
 }

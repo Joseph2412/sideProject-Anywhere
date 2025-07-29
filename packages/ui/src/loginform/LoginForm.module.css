@@ -1,0 +1,129 @@
+/* Contenitore centrale: centrato verticalmente e orizzontalmente */
+.container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background-color: #ffffff;
+  flex-direction: column;
+}
+
+/* Card form */
+.card {
+  width: 420px;
+  background-color: #ffffff;
+  border: 1px solid #ededed;
+  border-radius: 8px;
+  padding: 32px 16px 16px; 
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* distanza tra blocchi principali */
+  animation: fadeIn 0.5s ease;
+}
+
+/* Logo in alto */
+.logo {
+  height: 40px;
+  margin-bottom: 0;
+}
+
+/* Titolo */
+.title {
+width: 100%;
+margin-bottom: 12px;
+font-weight:400;
+position: relative;
+font-size: 30px;
+line-height: 32px;
+display: inline-block;
+color: #1f1f1f;
+text-align: center;
+}
+
+/* Divider principale */
+.divider {
+  margin-top: 16px;
+}
+
+/* Divider con testo “OR” */
+.orDivider {
+  font-weight: 500;
+  color: #999999;
+}
+
+/* Form */
+.form {
+  width: 100%;
+}
+/* 
+.register {
+  background-color: #fff;
+  color: #1f1f1f;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border-style:solid;
+  box-shadow: none;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  align-items: center;
+}
+
+.register:hover {
+  background-color: #eaeaea;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+} */
+
+.registerWrapper {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.actionButtons {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.secondaryButton {
+  border: 1px solid;
+  border-color: #d6d7e6;
+  font-weight: 500;
+  color: #1f1f1f;
+  font-weight: 500;
+  border-radius: 6px;
+  height: 32px;
+  transition: all 0.2s ease;
+  }
+
+.secondaryButton:hover {
+    border: 1px solid !important;
+    background-color: white !important;
+}
+
+.input:hover {
+  border: 1px solid;
+}
+.googleButton {
+  background-color: white !important;
+  color: #1f1f1f !important;
+  border: 1px solid #d9d9d9 !important;
+  font-weight: 500;
+  border-radius: 6px;
+  height: 30px;
+  transition: all 0.2s ease;
+}
+
+.googleButton:hover,
+.googleButton:focus {
+  background-color: white !important;
+  color: #1f1f1f !important;
+  border-color: #1f1f1f !important;
+}
