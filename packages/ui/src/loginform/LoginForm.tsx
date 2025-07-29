@@ -61,9 +61,33 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
       setLoading(true);
       const values = await form.validateFields(); // email e password assieme
       const response = await userLogin(values.email, values.password);
+
+      //  Salva il token
       localStorage.setItem("token", response.token);
-      message.success("Login effettuato!");
+
+      // Verifica accesso a rotta protetta /dashboard
+      const res = await fetch("http://localhost:3001/dashboard", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${response.token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(
+          data.message || data.error || "Accesso negato alla dashboard",
+        );
+      }
+
+      // Login e accesso riusciti
+      message.success("Login effettuato! Accesso alla dashboard OK");
+      console.log("Accesso a dashboard:", data);
+
       onLoginSuccess?.({ name: response.user.name });
+
+      // (Opzionale) puoi fare redirect qui con useRouter
     } catch (err) {
       if (err instanceof Error) {
         form.setFields([
@@ -151,7 +175,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
               loading={loading}
               disabled={loading}
               onClick={handleLogin}
-              style={{ height: 32, marginBottom: 10 }}
+              style={{ height: 32, marginBottom: 10, marginTop: 20 }}
               text="Continua"
             />
             <Divider
