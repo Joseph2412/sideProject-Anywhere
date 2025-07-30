@@ -14,17 +14,16 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.15.3",
-    "@types/react": "19.1.0",
-    "@types/react-dom": "19.1.1",
+    "@types/react": "18.0.37",
+    "@types/react-dom": "18.0.11",
     "eslint": "^9.31.0",
     "typescript": "5.8.2"
   },
   "dependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "@ant-design/icons": "^6.0.0",
-    "antd": "^5.13.0",
-    "react": "^18.2.0"
+    "react-dom": "18.0.0",
+    "@ant-design/icons": "6.0.0",
+    "antd": "5.13.0",
+    "react": "18.0.0"
     
   }
 }

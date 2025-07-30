@@ -1,12 +1,11 @@
-import { ConfigProvider } from "antd";
 import "antd/dist/reset.css";
-import theme from "../theme/theme";
-import "./global.css"; //CSS Globale
+import "./global.css";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import LayoutClientWrapper from "./LayoutClientWrapper";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["500"], // scegli i pesi che userai
+  weight: ["500"],
   display: "swap",
 });
 
@@ -22,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="it">
       <body className={jakarta.className}>
-        <ConfigProvider theme={theme}>{children}</ConfigProvider>
+        <LayoutClientWrapper>{children}</LayoutClientWrapper>
       </body>
     </html>
   );

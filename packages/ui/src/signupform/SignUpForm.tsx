@@ -189,7 +189,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
         <Divider plain className={styles.orDivider}>
           OR
         </Divider>
-        <GoogleLoginButton style={{ height: 32, marginBottom: 0 }} />
+        <GoogleLoginButton style={{ height: 32, width: 380 }} />
       </div>
       <div
         style={{ marginTop: "16px", display: "flex", justifyContent: "center" }}

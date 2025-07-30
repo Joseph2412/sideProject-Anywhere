@@ -1,19 +1,23 @@
 import { Button, ButtonProps } from "antd";
+import * as React from "react";
 import styles from "./PrimaryButton.module.css";
-import React from "react";
 
-type PrimaryButtonProps = ButtonProps & {
-  text: string;
+type Props = ButtonProps & {
+  text?: string;
 };
 
-export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
-  text,
-  children,
-  ...rest
-}) => {
+const PrimaryButtonInner = (
+  { text, children, ...rest }: Props,
+  ref: React.Ref<HTMLButtonElement>,
+) => {
   return (
-    <Button size="large" block className={styles.primary} {...rest}>
+    <Button {...rest} ref={ref} size="large" block className={styles.primary}>
       {text || children}
     </Button>
   );
 };
+
+// Wrapper corretto per React 19
+export const PrimaryButton = React.forwardRef(PrimaryButtonInner);
+
+PrimaryButton.displayName = "PrimaryButton";

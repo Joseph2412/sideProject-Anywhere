@@ -1,6 +1,6 @@
 "use client";
 
-import { Form, Button, Divider, message } from "antd";
+import { Form, Button, Divider } from "antd";
 import { useState } from "react";
 import styles from "./LoginForm.module.css";
 import { NibolInput } from "../inputs/Input";
@@ -8,12 +8,6 @@ import { PrimaryButton } from "../buttons/PrimaryButton";
 import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
 import { useSetAtom } from "jotai";
 import { messageToast } from "../../../store/LayoutStore";
-
-message.config({
-  top: 100,
-  duration: 4,
-  getContainer: () => document.body,
-});
 
 type LoginResponse = {
   message: string;
@@ -82,7 +76,13 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
       }
 
       // Login e accesso riusciti
-      message.success("Login effettuato! Accesso alla dashboard OK");
+      setMessage({
+        type: "success",
+        message: "Login effettuato!",
+        description: "Accesso alla dashboard OK",
+        duration: 3,
+        placement: "bottomRight",
+      });
       console.log("Accesso a dashboard:", data);
 
       onLoginSuccess?.({ name: response.user.name });
@@ -103,11 +103,19 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
   };
 
   const handleResetPassword = async () => {
+    let email: string;
+
     try {
       const values = await form.validateFields(["email"]);
-      const email = values.email;
+      email = values.email;
+    } catch {
+      // Validazione fallita → blocca qui, NON mostrare toast
+      return;
+    }
 
+    try {
       setLoading(true);
+
       const res = await fetch(`${endPoint}/resetPassword`, {
         method: "POST",
         headers: {
@@ -117,8 +125,19 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
       });
 
       const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.message || "Errore durante il reset password");
+
+      if (!res.ok) {
+        console.warn("Reset password fallita:", data);
+        setMessage({
+          type: "error",
+          message: "Errore durante il reset password",
+          description:
+            data.message || data.error || "Email non Presente in Database.",
+          duration: 4,
+          placement: "bottomRight",
+        });
+        return;
+      }
 
       setMessage({
         type: "success",
@@ -128,94 +147,105 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
         placement: "bottomRight",
       });
     } catch (err) {
-      console.log("Errore Reset Password: ", err);
-      message.error("Errore durante l'invio dell'email");
+      console.error("Errore Reset Password:", err);
+
+      if (err instanceof Error) {
+        setMessage({
+          type: "error",
+          message: "Errore durante l'invio dell'email",
+          description: err.message,
+          duration: 4,
+          placement: "bottomRight",
+        });
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.card}>
-        <img src="Logo.svg" alt="Nibol" className={styles.logo} />
-        <Divider />
-        <div className={styles.title}>
-          <b>Accedi per gestire il tuo locale su Nibol</b>
+    <>
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <img src="Logo.svg" alt="Nibol" className={styles.logo} />
+          <Divider />
+          <div className={styles.title}>
+            <b>Accedi per gestire il tuo locale su Nibol</b>
+          </div>
+
+          <Form form={form} layout="vertical" style={{ width: "100%" }}>
+            <NibolInput
+              validateTrigger="onSubmit"
+              label="Email"
+              name="email"
+              hideAsterisk={true}
+              required={false}
+              style={{ height: 32 }}
+              className={styles.input}
+              rules={[
+                { required: true, message: "Inserisci la tua email" },
+                { type: "email", message: "Email non valida" },
+              ]}
+            />
+
+            <NibolInput
+              validateTrigger="onSubmit"
+              label="Password"
+              name="password"
+              hideAsterisk={true}
+              className={styles.input}
+              style={{ height: 32 }}
+              rules={[{ required: true, message: "Inserisci la password" }]}
+              password
+            />
+
+            <Form.Item style={{ marginBottom: 12 }}>
+              <PrimaryButton
+                loading={loading}
+                disabled={loading}
+                onClick={handleLogin}
+                style={{ height: 32, marginBottom: 10, marginTop: 20 }}
+                text="Continua"
+              />
+              <Divider
+                plain
+                className={styles.orDivider}
+                style={{ marginTop: "0px", marginBottom: "8px" }}
+              >
+                OR
+              </Divider>
+              <GoogleLoginButton className={styles.googleButton} />
+            </Form.Item>
+          </Form>
         </div>
 
-        <Form form={form} layout="vertical" style={{ width: "100%" }}>
-          <NibolInput
-            validateTrigger="onSubmit"
-            label="Email"
-            name="email"
-            hideAsterisk={true}
-            required={false}
-            style={{ height: 32 }}
-            className={styles.input}
-            rules={[
-              { required: true, message: "Inserisci la tua email" },
-              { type: "email", message: "Email non valida" },
-            ]}
-          />
-
-          <NibolInput
-            validateTrigger="onSubmit"
-            label="Password"
-            name="password"
-            hideAsterisk={true}
-            className={styles.input}
-            style={{ height: 32 }}
-            rules={[{ required: true, message: "Inserisci la password" }]}
-            password
-          />
-
-          <Form.Item style={{ marginBottom: 12 }}>
-            <PrimaryButton
-              loading={loading}
-              disabled={loading}
-              onClick={handleLogin}
-              style={{ height: 32, marginBottom: 10, marginTop: 20 }}
-              text="Continua"
-            />
-            <Divider
-              plain
-              className={styles.orDivider}
-              style={{ marginTop: "0px", marginBottom: "8px" }}
-            >
-              OR
-            </Divider>
-            <GoogleLoginButton className={styles.googleButton} />
-          </Form.Item>
-        </Form>
-      </div>
-
-      <div
-        style={{
-          marginTop: "8px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "0px", // spazio tra i due pulsanti
-        }}
-      >
-        <Button
-          type="text"
-          onClick={onGoToSignup}
-          className={`${styles.register} ${styles.registerWrapper}`}
+        <div
+          style={{
+            marginTop: "8px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0px", // spazio tra i due pulsanti
+          }}
         >
-          Non hai un account? Registrati
-        </Button>
-        <Button
-          type="text"
-          onClick={handleResetPassword}
-          className={`${styles.register} ${styles.registerWrapper}`}
-          style={{ marginTop: 4 }}
-        >
-          Reimposta password
-        </Button>
+          <Button
+            type="text"
+            onClick={onGoToSignup}
+            className={`${styles.register} ${styles.registerWrapper}`}
+          >
+            Non hai un account? Registrati
+          </Button>
+          <Button
+            type="text"
+            onClick={handleResetPassword}
+            className={`${styles.register} ${styles.registerWrapper}`}
+            style={{ marginTop: 4 }}
+          >
+            Reimposta password
+          </Button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

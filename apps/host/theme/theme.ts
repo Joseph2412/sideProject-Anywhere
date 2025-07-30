@@ -14,9 +14,13 @@ const theme: ThemeConfig = {
       fontFamily: "Plus Jakarta Sans, sans-serif",
     },
     Button: {
-      defaultBorderColor: "#000000",
-      defaultHoverBorderColor: "#000000",
+      colorBorder: "#000000",
+      colorPrimaryHover: "#000000",
       fontFamily: "Plus Jakarta Sans, sans-serif",
+      borderRadius: 6,
+      fontWeight: 500,
+      fontSize: 14,
+      controlHeight: 40,
     },
     Typography: {
       fontFamily: "Plus Jakarta Sans, sans-serif",
