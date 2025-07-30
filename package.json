@@ -7,7 +7,9 @@
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "database:generate": "cd packages/database && npm run generate && cd -"
+    "database:generate": "cd packages/database && npm run generate && cd -",
+    "backend":"cd apps/api && pnpm run dev",
+    "frontend":"cd apps/host && pnpm run dev"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
