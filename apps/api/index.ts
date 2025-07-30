@@ -6,6 +6,7 @@ import fastify, {
   FastifyReply,
   FastifyRequest,
 } from "fastify";
+
 import fastifyJwt from "@fastify/jwt";
 import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
@@ -15,23 +16,30 @@ import {
   restorePasswordScheme,
   resetPasswordScheme,
   checkEmailSchema,
+  profileSchema,
 } from "./schemas/authSchema";
 
 import { loginHandler } from "./handlers/auth/login";
 import { signupHandler } from "./handlers/auth/signup";
+import { profileHandler } from "./handlers/user/profile";
 import { resetPasswordHandler } from "./handlers/auth/reset";
 import { restorePasswordHandler } from "./handlers/auth/restore";
 import { checkEmailHandler } from "./handlers/auth/checkEmail";
+import { PrismaClient } from "@repo/database";
 
 const server: FastifyInstance = fastify();
+const prisma = new PrismaClient();
 
 server.register(cors, {
   origin: "http://localhost:3000",
   credentials: true,
 });
 
-server.register(cookie);
-server.register(fastifyJwt, { secret: process.env.JWT_SECRET! });
+server.register(fastifyJwt, {
+  secret: process.env.JWT_SECRET!,
+  sign: { expiresIn: "7d" },
+  //extra: aggiungo la scadenza del token
+});
 
 server.register(async function (protectedRoutes) {
   protectedRoutes.addHook("onRequest", async (request, reply) => {
@@ -80,6 +88,12 @@ server.post(
   "/restorePassword",
   { schema: restorePasswordScheme },
   restorePasswordHandler,
+);
+
+server.get(
+  "/user/profile",
+  { preHandler: server.authenticate, schema: profileSchema },
+  profileHandler,
 );
 
 //Rimanda Gli errori di validazione. Da Modificare per Build Finale

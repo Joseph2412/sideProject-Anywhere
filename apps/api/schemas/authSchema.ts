@@ -75,3 +75,23 @@ export const checkEmailSchema = {
     additionalProperties: false,
   },
 };
+
+export const profileSchema = {
+  response: {
+    200: {
+      type: "object",
+      properties: {
+        user: {
+          type: "object",
+          properties: {
+            id: { type: "number" },
+            name: { type: "string" },
+            email: { type: "string" },
+            role: { type: "string", enum: ["USER", "HOST"] },
+          },
+          required: ["id", "name", "email", "role"],
+        },
+      },
+    },
+  },
+};

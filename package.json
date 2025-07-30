@@ -8,10 +8,12 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "database:generate": "cd packages/database && npm run generate && cd -",
-    "backend":"cd apps/api && pnpm run dev",
-    "frontend":"cd apps/host && pnpm run dev"
+    "backend": "cd apps/api && pnpm run dev",
+    "frontend": "cd apps/host && pnpm run dev"
   },
   "devDependencies": {
+    "@types/react": "18.0.37",
+    "@types/react-dom": "18.0.11",
     "prettier": "^3.6.2",
     "turbo": "^2.5.5",
     "typescript": "5.8.3"
