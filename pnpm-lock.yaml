@@ -67,7 +67,7 @@ importers:
         specifier: ^6.0.0
         version: 6.0.0
       '@types/node':
-        specifier: ^24.0.15
+        specifier: ^24.1.0
         version: 24.1.0
       prisma:
         specifier: ^6.12.0

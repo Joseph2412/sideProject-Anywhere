@@ -1,34 +1,14 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import fastify, {
-  FastifyInstance,
-  FastifyReply,
-  FastifyRequest,
-} from "fastify";
-
+import fastify, { FastifyInstance } from "fastify";
 import fastifyJwt from "@fastify/jwt";
-import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
-import {
-  signupSchema,
-  loginSchema,
-  restorePasswordScheme,
-  resetPasswordScheme,
-  checkEmailSchema,
-  profileSchema,
-} from "./schemas/authSchema";
+import { decorateAuth } from "./plugins/auth";
 
-import { loginHandler } from "./handlers/auth/login";
-import { signupHandler } from "./handlers/auth/signup";
-import { profileHandler } from "./handlers/user/profile";
-import { resetPasswordHandler } from "./handlers/auth/reset";
-import { restorePasswordHandler } from "./handlers/auth/restore";
-import { checkEmailHandler } from "./handlers/auth/checkEmail";
-import { PrismaClient } from "@repo/database";
+//Ricorda di importare prisma in ogni handler senza istanziarlo sempre
 
 const server: FastifyInstance = fastify();
-const prisma = new PrismaClient();
 
 server.register(cors, {
   origin: "http://localhost:3000",
@@ -41,60 +21,7 @@ server.register(fastifyJwt, {
   //extra: aggiungo la scadenza del token
 });
 
-server.register(async function (protectedRoutes) {
-  protectedRoutes.addHook("onRequest", async (request, reply) => {
-    try {
-      await request.jwtVerify();
-    } catch (err) {
-      return reply
-        .status(401)
-        .send({ message: "Token Non Valido o Non Presente" });
-    }
-  });
-  protectedRoutes.get("/dashboard", async (request, reply) => {
-    return {
-      user: request.user,
-    };
-  });
-});
-
-server.decorate(
-  "authenticate",
-  async function (request: FastifyRequest, reply: FastifyReply) {
-    try {
-      await request.jwtVerify();
-    } catch (err) {
-      reply.code(401).send({ message: "Non Autorizzato" });
-    }
-  },
-);
-
-// Signup
-server.post("/signup", { schema: signupSchema }, signupHandler);
-
-// Login+CheckEmail
-server.post("/login", { schema: loginSchema }, loginHandler);
-server.post("/check-email", { schema: checkEmailSchema }, checkEmailHandler);
-
-// Reset Password
-server.post(
-  "/resetPassword",
-  { schema: resetPasswordScheme },
-  resetPasswordHandler,
-);
-
-// Restore Password
-server.post(
-  "/restorePassword",
-  { schema: restorePasswordScheme },
-  restorePasswordHandler,
-);
-
-server.get(
-  "/user/profile",
-  { preHandler: server.authenticate, schema: profileSchema },
-  profileHandler,
-);
+decorateAuth(server); //Sostituito con plugins/auth
 
 //Rimanda Gli errori di validazione. Da Modificare per Build Finale
 server.setErrorHandler((error, request, reply) => {

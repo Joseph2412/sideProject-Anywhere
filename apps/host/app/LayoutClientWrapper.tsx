@@ -9,7 +9,6 @@ export default function LayoutClientWrapper({
 }: {
   children: ReactNode;
 }) {
-  // Qualsiasi logica client-only (es. message.config, effetto scroll, dark mode, ecc.)
   useEffect(() => {
     console.log("Layout montato lato client");
   }, []);

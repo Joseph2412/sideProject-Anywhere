@@ -1,7 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { PrismaClient } from "@repo/database";
-
-const prisma = new PrismaClient();
+import { prisma } from "../../libs/prisma";
 
 type CheckEmailRequest = {
   email: string;

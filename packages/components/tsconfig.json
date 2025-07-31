@@ -4,5 +4,5 @@
     "isolatedModules": true,
     "jsx": "react-jsx"
   },
-  "include": ["src/*", "src/providers/index.ts"]
+  "include": ["src/**/*", "src/providers/index.ts", "../../apps/host/app/components/providers/User.provider.tsx"]
 }

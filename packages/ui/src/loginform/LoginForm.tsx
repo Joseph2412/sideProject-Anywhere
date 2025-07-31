@@ -7,7 +7,7 @@ import { NibolInput } from "../inputs/Input";
 import { PrimaryButton } from "../buttons/PrimaryButton";
 import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
 import { useSetAtom } from "jotai";
-import { messageToast } from "../../../store/LayoutStore";
+import { messageToast } from "../store/LayoutStore";
 
 type LoginResponse = {
   message: string;
@@ -59,35 +59,31 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
       //  Salva il token
       localStorage.setItem("token", response.token);
 
-      // Verifica accesso a rotta protetta /dashboard
-      const res = await fetch("http://localhost:3001/dashboard", {
+      // Verifica accesso a rotta protetta
+      const res = await fetch("http://localhost:3001/user/profile", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${response.token}`,
         },
       });
 
-      const data = await res.json();
+      const userData = await res.json();
 
       if (!res.ok) {
-        throw new Error(
-          data.message || data.error || "Accesso negato alla dashboard",
-        );
+        throw new Error(userData.message || userData.error || "Accesso Negato");
       }
 
       // Login e accesso riusciti
       setMessage({
         type: "success",
         message: "Login effettuato!",
-        description: "Accesso alla dashboard OK",
+        description: "Accesso Area Personale OK",
         duration: 3,
         placement: "bottomRight",
       });
-      console.log("Accesso a dashboard:", data);
 
+      console.log("Accesso Zona Privata:", userData);
       onLoginSuccess?.({ name: response.user.name });
-
-      // (Opzionale) puoi fare redirect qui con useRouter
     } catch (err) {
       if (err instanceof Error) {
         form.setFields([

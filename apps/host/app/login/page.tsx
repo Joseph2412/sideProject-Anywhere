@@ -13,7 +13,7 @@ export default function LoginPage() {
         <LoginForm
           onLoginSuccess={({ name }) => {
             setTimeout(() => {
-              router.push(`/dashboard?name=${encodeURIComponent(name)}`);
+              router.push(`/private?name=${encodeURIComponent(name)}`);
             }, 300);
           }}
           onGoToSignup={() => router.replace("/signup")}

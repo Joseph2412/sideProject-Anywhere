@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { messageToast, ToastPayload } from "../../../store/LayoutStore";
+import { messageToast, ToastPayload } from "../../../ui/src/store/LayoutStore";
 import { useAtom } from "jotai";
 import { notification } from "antd";
 

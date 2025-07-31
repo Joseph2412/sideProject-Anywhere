@@ -1,9 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { RestorePasswordPayload } from "@repo/types/src/auth/auth";
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@repo/database";
-
-const prisma = new PrismaClient();
+import { prisma } from "../../libs/prisma";
 
 export const restorePasswordHandler = async (
   request: FastifyRequest<{ Body: RestorePasswordPayload }>,

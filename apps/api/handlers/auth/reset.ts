@@ -1,8 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { PrismaClient } from "@repo/database";
 import crypto from "crypto";
-
-const prisma = new PrismaClient();
+import { prisma } from "../../libs/prisma";
 
 export const resetPasswordHandler = async (
   request: FastifyRequest<{ Body: { email: string } }>, //Non creo un Payload: Tanto mando solo 1 Dato

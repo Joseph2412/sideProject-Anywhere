@@ -7,7 +7,7 @@
       }
     ],
     "typeRoots": ["./node_modules/@types", "./types"],
-    "baseUrl": "."
+    "baseUrl": ".",
   },
   "include": [
     "**/*.ts",
