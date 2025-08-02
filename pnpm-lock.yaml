@@ -238,6 +238,9 @@ importers:
       antd:
         specifier: 5.13.0
         version: 5.13.0(react-dom@18.0.0(react@18.0.0))(react@18.0.0)
+      next:
+        specifier: '*'
+        version: 15.4.5(react-dom@18.0.0(react@18.0.0))(react@18.0.0)
       react:
         specifier: 18.0.0
         version: 18.0.0

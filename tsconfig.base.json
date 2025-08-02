@@ -5,7 +5,7 @@
       "@repo/database/*": ["packages/database/*"],
       "@repo/database": ["packages/database"],
       "@types/*": ["packages/types/*"],
-      "@ui/*": ["packages/ui/*"],
+      "@ui/*": ["packages/ui/src/*"],
       "@components/*": ["packages/components/*"]
     },
     "lib": ["DOM", "ES2020"]

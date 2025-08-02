@@ -25,7 +25,7 @@ type SignupResponse = {
 };
 
 const userSignup = async (payload: SignupPayload): Promise<SignupResponse> => {
-  const res = await fetch("http://localhost:3001/signup", {
+  const res = await fetch("http://localhost:3001/auth/signup", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -83,7 +83,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <img src="Logo.svg" alt="Nibol" className={styles.logo} />
+        <img src="/Logo.svg" alt="Nibol" className={styles.logo} />
         <Divider />
 
         <div className={styles.title}>
@@ -199,7 +199,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
           onClick={onGoToLogin}
           className={`${styles.register} ${styles.registerWrapper}`}
         >
-          Non hai un account? Registrati
+          Sei già Registrato? Accedi!
         </Button>
       </div>
     </div>

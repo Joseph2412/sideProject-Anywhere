@@ -7,7 +7,7 @@ import { NibolInput } from "../inputs/Input";
 import { PrimaryButton } from "../buttons/PrimaryButton";
 import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
 import { useSetAtom } from "jotai";
-import { messageToast } from "../store/LayoutStore";
+import { messageToast } from "../../store/LayoutStore";
 
 type LoginResponse = {
   message: string;
@@ -24,7 +24,7 @@ const userLogin = async (
   email: string,
   password: string,
 ): Promise<LoginResponse> => {
-  const res = await fetch(endPoint + "/login", {
+  const res = await fetch(endPoint + "/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -58,6 +58,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
 
       //  Salva il token
       localStorage.setItem("token", response.token);
+      document.cookie = `token=${response.token}; path=/`;
 
       // Verifica accesso a rotta protetta
       const res = await fetch("http://localhost:3001/user/profile", {
@@ -112,7 +113,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
     try {
       setLoading(true);
 
-      const res = await fetch(`${endPoint}/resetPassword`, {
+      const res = await fetch(`${endPoint}/auth/resetPassword`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -163,7 +164,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
     <>
       <div className={styles.container}>
         <div className={styles.card}>
-          <img src="Logo.svg" alt="Nibol" className={styles.logo} />
+          <img src="/Logo.svg" alt="Nibol" className={styles.logo} />
           <Divider />
           <div className={styles.title}>
             <b>Accedi per gestire il tuo locale su Nibol</b>

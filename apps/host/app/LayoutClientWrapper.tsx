@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect } from "react";
-import { ConfigProvider } from "antd";
+import { ConfigProvider, App as AntdApp } from "antd";
 import theme from "../theme/theme";
 
 export default function LayoutClientWrapper({
@@ -13,5 +13,9 @@ export default function LayoutClientWrapper({
     console.log("Layout montato lato client");
   }, []);
 
-  return <ConfigProvider theme={theme}>{children}</ConfigProvider>;
+  return (
+    <ConfigProvider theme={theme}>
+      <AntdApp>{children}</AntdApp>
+    </ConfigProvider>
+  );
 }

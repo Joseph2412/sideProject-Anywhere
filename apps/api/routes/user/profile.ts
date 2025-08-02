@@ -2,9 +2,9 @@ import { FastifyInstance } from "fastify";
 import { profileHandler } from "../../handlers/user/profile";
 import { profileSchema } from "../../schemas/authSchema";
 
-export async function profileRoutes(fastify: FastifyInstance) {
+export async function profileRoute(fastify: FastifyInstance) {
   fastify.get(
-    "/user/profile",
+    "/profile",
     { preHandler: fastify.authenticate, schema: profileSchema },
     profileHandler,
   );

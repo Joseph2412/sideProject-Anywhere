@@ -1,4 +1,5 @@
 import { atom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
 
 export type ToastPayload = {
   type?: "success" | "error" | "info" | "warning";
@@ -16,3 +17,15 @@ export type AuthUser = {
   role: "USER" | "HOST";
 };
 export const authUserAtom = atom<AuthUser | null>(null);
+
+// Tipi Validi per i TabSelezionati
+export type TabKey = "calendar" | "gestione" | "orari" | "aggiungi" | "profilo";
+
+// Titolo Dinamico HEADER
+export const pageTitleAtom = atom<string>("Selected Tab");
+
+// Tab Selezionato di Default + Persistenza al Refresh
+export const selectedTabAtom = atomWithStorage<TabKey>(
+  "selectedTab",
+  "calendar",
+);

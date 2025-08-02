@@ -19,7 +19,7 @@ export const UserProvider = ({ children }: Props) => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      logout();
+      setLoading(false);
       return;
     }
 

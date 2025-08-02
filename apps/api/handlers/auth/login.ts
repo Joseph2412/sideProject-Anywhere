@@ -1,8 +1,9 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { User } from "@repo/database";
+import { PrismaClient, User } from "@repo/database";
 import bcrypt from "bcrypt";
 import { UserLogin } from "@repo/types/src/user/user";
-import { prisma } from "../../libs/prisma";
+
+const Prisma = new PrismaClient();
 
 export const loginHandler = async (
   request: FastifyRequest,

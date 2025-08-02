@@ -5,6 +5,8 @@ import fastify, { FastifyInstance } from "fastify";
 import fastifyJwt from "@fastify/jwt";
 import cors from "@fastify/cors";
 import { decorateAuth } from "./plugins/auth";
+import { authRoutes } from "./routes/auth";
+import { userRoute } from "./routes/user";
 
 //Ricorda di importare prisma in ogni handler senza istanziarlo sempre
 
@@ -32,9 +34,11 @@ server.setErrorHandler((error, request, reply) => {
       details: (error as any).validation,
     });
   }
-
   reply.send(error);
 });
+
+server.register(authRoutes, { prefix: "/auth" });
+server.register(userRoute, { prefix: "/user" });
 
 server.listen({ port: 3001 }, (err, address) => {
   if (err) {
