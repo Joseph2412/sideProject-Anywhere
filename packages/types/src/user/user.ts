@@ -1,4 +1,4 @@
-import { User } from "@repo/database";
+import { User } from '@repo/database';
 
 // esempio di tipo derivato da User di Prisma
-export type UserLogin = Pick<User, "email" | "password">;
+export type UserLogin = Pick<User, 'email' | 'password'>;

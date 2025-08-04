@@ -1,4 +1,4 @@
-import { Role } from "@repo/database";
+import { Role } from '@repo/database';
 
 export interface SignupPayload {
   email: string;

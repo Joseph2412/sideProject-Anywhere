@@ -1,20 +1,11 @@
-"use client";
+'use client';
 
-import { Menu, Layout, Avatar } from "antd";
-import {
-  CalendarOutlined,
-  ShopOutlined,
-  UserOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
-import { useLogout } from "../../../../../apps/host/app/hooks/useLogout";
-import { useSetAtom } from "jotai";
-import {
-  selectedTabAtom,
-  pageTitleAtom,
-  TabKey,
-} from "../../store/LayoutStore";
-import { useState } from "react";
+import { Menu, Layout, Avatar } from 'antd';
+import { CalendarOutlined, ShopOutlined, UserOutlined, PlusOutlined } from '@ant-design/icons';
+import { useLogout } from '../../../../../apps/host/app/hooks/useLogout';
+import { useSetAtom } from 'jotai';
+import { selectedTabAtom, pageTitleAtom, TabKey } from '../../store/LayoutStore';
+import { useState } from 'react';
 
 const { Sider } = Layout;
 
@@ -30,15 +21,15 @@ export default function Sidebar() {
   const [openKeys, setOpenKeys] = useState<string[]>([]);
 
   // Stato locale per evidenziare il tab selezionato nel Menu (in alternativa a usare direttamente selectedTabAtom)
-  const [localSelectedKey, setLocalSelectedKey] = useState<string>("calendar");
+  const [localSelectedKey, setLocalSelectedKey] = useState<string>('calendar');
 
   // Mappa delle chiavi tab → titolo da mostrare nell'intestazione
   const keyToTitleMap: Record<string, string> = {
-    calendar: "Calendario",
-    gestione: "Gestione Locale",
-    orari: "Orari",
-    aggiungi: "Aggiungi pacchetto",
-    profilo: "Profilo",
+    calendar: 'Calendario',
+    gestione: 'Gestione Locale',
+    orari: 'Orari',
+    aggiungi: 'Aggiungi pacchetto',
+    profilo: 'Profilo',
   };
 
   // Gestisce l'apertura dei dropdown (SubMenu). Limita l'apertura multipla.
@@ -47,15 +38,9 @@ export default function Sidebar() {
   };
 
   // Gestione del click su ogni voce di menu
-  const handleMenuClick = ({
-    key,
-    keyPath,
-  }: {
-    key: string;
-    keyPath: string[];
-  }) => {
+  const handleMenuClick = ({ key, keyPath }: { key: string; keyPath: string[] }) => {
     // Se si clicca su "logout", esegue il logout e interrompe il flusso
-    if (key === "logout") {
+    if (key === 'logout') {
       logout();
       return;
     }
@@ -75,7 +60,7 @@ export default function Sidebar() {
   };
 
   return (
-    <Sider width={220} style={{ background: "#fff", height: "100vh" }}>
+    <Sider width={220} style={{ background: '#fff', height: '100vh' }}>
       {/* Header della sidebar (logo + nome coworking) */}
       <div style={{ padding: 16 }}>
         <Avatar
@@ -118,7 +103,7 @@ export default function Sidebar() {
       </Menu>
 
       {/* Footer della sidebar (dati utente attivo) */}
-      <div style={{ position: "absolute", bottom: 16, paddingLeft: 16 }}>
+      <div style={{ position: 'absolute', bottom: 16, paddingLeft: 16 }}>
         <Avatar src="/utente.jpg" />
         <br />
         <small>Marco Cattaneo</small>

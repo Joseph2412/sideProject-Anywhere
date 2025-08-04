@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { Form, Button, Divider } from "antd";
-import { useState } from "react";
-import styles from "./LoginForm.module.css";
-import { NibolInput } from "../inputs/Input";
-import { PrimaryButton } from "../buttons/PrimaryButton";
-import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
-import { useSetAtom } from "jotai";
-import { messageToast } from "../../store/LayoutStore";
+import { Form, Button, Divider } from 'antd';
+import { useState } from 'react';
+import styles from './LoginForm.module.css';
+import { NibolInput } from '../inputs/Input';
+import { PrimaryButton } from '../buttons/PrimaryButton';
+import { GoogleLoginButton } from '../buttons/GoogleLoginButton';
+import { useSetAtom } from 'jotai';
+import { messageToast } from '../../store/LayoutStore';
 
 type LoginResponse = {
   message: string;
@@ -18,21 +18,18 @@ type LoginResponse = {
     email: string;
   };
 };
-const endPoint = "http://localhost:3001";
+const endPoint = 'http://localhost:3001';
 
-const userLogin = async (
-  email: string,
-  password: string,
-): Promise<LoginResponse> => {
-  const res = await fetch(endPoint + "/auth/login", {
-    method: "POST",
+const userLogin = async (email: string, password: string): Promise<LoginResponse> => {
+  const res = await fetch(endPoint + '/auth/login', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
-    credentials: "include",
+    credentials: 'include',
     body: JSON.stringify({ email, password }),
   });
-  console.log("Risposta BackEnd", res);
+  console.log('Risposta BackEnd', res);
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.message || data.error);
@@ -57,12 +54,12 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
       const response = await userLogin(values.email, values.password);
 
       //  Salva il token
-      localStorage.setItem("token", response.token);
+      localStorage.setItem('token', response.token);
       document.cookie = `token=${response.token}; path=/`;
 
       // Verifica accesso a rotta protetta
-      const res = await fetch("http://localhost:3001/user/profile", {
-        method: "GET",
+      const res = await fetch('http://localhost:3001/user/profile', {
+        method: 'GET',
         headers: {
           Authorization: `Bearer ${response.token}`,
         },
@@ -71,25 +68,25 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
       const userData = await res.json();
 
       if (!res.ok) {
-        throw new Error(userData.message || userData.error || "Accesso Negato");
+        throw new Error(userData.message || userData.error || 'Accesso Negato');
       }
 
       // Login e accesso riusciti
       setMessage({
-        type: "success",
-        message: "Login effettuato!",
-        description: "Accesso Area Personale OK",
+        type: 'success',
+        message: 'Login effettuato!',
+        description: 'Accesso Area Personale OK',
         duration: 3,
-        placement: "bottomRight",
+        placement: 'bottomRight',
       });
 
-      console.log("Accesso Zona Privata:", userData);
+      console.log('Accesso Zona Privata:', userData);
       onLoginSuccess?.({ name: response.user.name });
     } catch (err) {
       if (err instanceof Error) {
         form.setFields([
           {
-            name: "password",
+            name: 'password',
             errors: [err.message],
           },
         ]);
@@ -103,7 +100,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
     let email: string;
 
     try {
-      const values = await form.validateFields(["email"]);
+      const values = await form.validateFields(['email']);
       email = values.email;
     } catch {
       // Validazione fallita → blocca qui, NON mostrare toast
@@ -114,9 +111,9 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
       setLoading(true);
 
       const res = await fetch(`${endPoint}/auth/resetPassword`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email }),
       });
@@ -124,35 +121,34 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
       const data = await res.json();
 
       if (!res.ok) {
-        console.warn("Reset password fallita:", data);
+        console.warn('Reset password fallita:', data);
         setMessage({
-          type: "error",
-          message: "Errore durante il reset password",
-          description:
-            data.message || data.error || "Email non Presente in Database.",
+          type: 'error',
+          message: 'Errore durante il reset password',
+          description: data.message || data.error || 'Email non Presente in Database.',
           duration: 4,
-          placement: "bottomRight",
+          placement: 'bottomRight',
         });
         return;
       }
 
       setMessage({
-        type: "success",
-        message: "Email inviata!",
+        type: 'success',
+        message: 'Email inviata!',
         description: `Abbiamo inviato una mail all'indirizzo ${email} con le istruzioni per resettare la tua Password. Controlla la SPAM per sicurezza!`,
         duration: 4,
-        placement: "bottomRight",
+        placement: 'bottomRight',
       });
     } catch (err) {
-      console.error("Errore Reset Password:", err);
+      console.error('Errore Reset Password:', err);
 
       if (err instanceof Error) {
         setMessage({
-          type: "error",
+          type: 'error',
           message: "Errore durante l'invio dell'email",
           description: err.message,
           duration: 4,
-          placement: "bottomRight",
+          placement: 'bottomRight',
         });
       }
     } finally {
@@ -170,7 +166,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
             <b>Accedi per gestire il tuo locale su Nibol</b>
           </div>
 
-          <Form form={form} layout="vertical" style={{ width: "100%" }}>
+          <Form form={form} layout="vertical" style={{ width: '100%' }}>
             <NibolInput
               validateTrigger="onSubmit"
               label="Email"
@@ -180,8 +176,8 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
               style={{ height: 32 }}
               className={styles.input}
               rules={[
-                { required: true, message: "Inserisci la tua email" },
-                { type: "email", message: "Email non valida" },
+                { required: true, message: 'Inserisci la tua email' },
+                { type: 'email', message: 'Email non valida' },
               ]}
             />
 
@@ -192,7 +188,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
               hideAsterisk={true}
               className={styles.input}
               style={{ height: 32 }}
-              rules={[{ required: true, message: "Inserisci la password" }]}
+              rules={[{ required: true, message: 'Inserisci la password' }]}
               password
             />
 
@@ -207,7 +203,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
               <Divider
                 plain
                 className={styles.orDivider}
-                style={{ marginTop: "0px", marginBottom: "8px" }}
+                style={{ marginTop: '0px', marginBottom: '8px' }}
               >
                 OR
               </Divider>
@@ -218,11 +214,11 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
 
         <div
           style={{
-            marginTop: "8px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0px", // spazio tra i due pulsanti
+            marginTop: '8px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0px', // spazio tra i due pulsanti
           }}
         >
           <Button

@@ -20,8 +20,24 @@ model User {
   name     String?
   role     Role
 
-  resetToken   String?  //Codice a 6 cifre. To Do: Token per Reset
-  resetTokenExpiry   DateTime?  //Scade entro X minuti
+  profile   UserProfile?
+}
+
+model UserProfile {
+  id          Int    @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  avatarUrl   String? //String di URLs su S3 
+  preferences Json? //Riferimento a sezione NOTIFICHE del Componente Profio
+
+  coworkingVenue   CoworkingVenue? @relation(fields: [coworkingVenueId], references: [id])
+  coworkingVenueId Int?
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) //Idea: Sezione Profilo "Sei Nostro Cliente da..."/"Data Iscrizione...." . Comuqnue utile per Analisi db
+  updatedAt DateTime @updatedAt //Idea: "Data Ultima Modifica" Su Sezione Profilo. Utile per Behavior Insight Su db
 }
 
 enum Role {
@@ -29,6 +45,82 @@ enum Role {
   HOST
 }
 
-//Abbiamo due tipologie di Utenti, Specifichiamolo
+//Modelli Componenti Locale, Pacchetti e Piani
 
-//Richiama nello schema il types
+model CoworkingVenue {
+  id           Int           @id @default(autoincrement())
+  name         String
+  address      String        @db.VarChar(200)
+  openingHours OpeningHour[]
+  services     String[]
+  description  String        @db.VarChar(200)
+  photos       String[] //URLs di S3
+  packages     Package[] //1 Locale ha tanti pacchetti
+  UserProfile  UserProfile[]
+}
+
+model Package {
+  id               Int             @id @default(autoincrement())
+  title            String          @db.VarChar(200)
+  description      String?         @db.VarChar(200)
+  squareMetres     Int
+  capacity         Int
+  services         String[]
+  type             typeCoworking //Può essere 1 di questi 3 typeCoworking
+  plans            Plan[] //Un pacchetto può avere + Piani = Orario, Giornaliero, Settimanale, Mensile ed Annuale
+  photos           String[] //Array di URLs S3
+  CoworkingVenue   CoworkingVenue? @relation(fields: [coworkingVenueId], references: [id])
+  coworkingVenueId Int?
+}
+
+model Plan {
+  id        Int       @id @default(autoincrement())
+  name      String
+  rate      PlansRate
+  price     Int
+  isEnabled Boolean   @default(false)
+  package   Package   @relation(fields: [packageId], references: [id])
+  packageId Int
+}
+
+enum PlansRate {
+  HOURLY
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum typeCoworking {
+  SALA
+  DESK
+  SALA_MEETING
+}
+
+enum WeekDay {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+model OpeningHour {
+  id       Int             @id @default(autoincrement())
+  day      WeekDay
+  close    String
+  isClosed Boolean         @default(false)
+  venue    CoworkingVenue  @relation(fields: [venueId], references: [id])
+  venueId  Int
+  periods  OpeningPeriod[]
+}
+
+model OpeningPeriod {
+  id            Int         @id @default(autoincrement())
+  start         String
+  end           String
+  openingHour   OpeningHour @relation(fields: [openingHourId], references: [id])
+  openingHourId Int
+}

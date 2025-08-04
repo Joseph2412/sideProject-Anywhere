@@ -1,4 +1,4 @@
-import { PrismaClient } from "@repo/database";
+import { PrismaClient } from '@repo/database';
 
 const globalPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -7,5 +7,5 @@ const globalPrisma = globalThis as unknown as {
 export const prisma =
   globalPrisma.prisma ??
   new PrismaClient({
-    log: ["error", "warn"],
+    log: ['error', 'warn'],
   });

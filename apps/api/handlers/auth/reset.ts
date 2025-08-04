@@ -1,10 +1,10 @@
-import { FastifyReply, FastifyRequest } from "fastify";
-import crypto from "crypto";
-import { prisma } from "../../libs/prisma";
+import { FastifyReply, FastifyRequest } from 'fastify';
+import crypto from 'crypto';
+import { prisma } from '../../libs/prisma';
 
 export const resetPasswordHandler = async (
   request: FastifyRequest<{ Body: { email: string } }>, //Non creo un Payload: Tanto mando solo 1 Dato
-  reply: FastifyReply,
+  reply: FastifyReply
 ) => {
   const { email } = request.body;
 
@@ -16,7 +16,7 @@ export const resetPasswordHandler = async (
     return reply.code(500).send({ message: `L'email ${email} Non Esiste` });
   }
 
-  const token = crypto.randomBytes(32).toString("hex");
+  const token = crypto.randomBytes(32).toString('hex');
   const expires = new Date(Date.now() + 15 * 60 * 1000); //scade in 15 minuti
 
   await prisma.user.update({

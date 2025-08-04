@@ -32,3 +32,6 @@
   margin: 5px; 
 }
 
+.ant-menu-submenu-selected > .ant-menu-submenu-title {
+  color: black !important;
+}

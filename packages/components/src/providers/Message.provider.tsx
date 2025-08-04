@@ -1,16 +1,12 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { useEffect, useState } from "react";
-import { messageToast, ToastPayload } from "../../../ui/src/store/LayoutStore";
-import { useAtom } from "jotai";
-import { notification } from "antd";
+import * as React from 'react';
+import { useEffect, useState } from 'react';
+import { messageToast, ToastPayload } from '../../../ui/src/store/LayoutStore';
+import { useAtom } from 'jotai';
+import { notification } from 'antd';
 
-export function MessageProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}): React.ReactElement {
+export function MessageProvider({ children }: { children: React.ReactNode }): React.ReactElement {
   const [toast, setToast] = useAtom<ToastPayload | false>(messageToast);
 
   const [isHydrated, setIsHydrated] = useState(false);
@@ -28,11 +24,11 @@ export function MessageProvider({
   useEffect(() => {
     if (toast && isHydrated) {
       api.open({
-        type: toast.type || "info",
+        type: toast.type || 'info',
         message: toast.message,
-        description: toast.description || "",
+        description: toast.description || '',
         duration: toast.duration ?? 3,
-        placement: toast.placement || "bottomRight",
+        placement: toast.placement || 'bottomRight',
         onClose: () => {
           setToast(false);
         },
