@@ -3,15 +3,14 @@
   background: #ffff;
   border-bottom: 1px solid #f0f0f0;
   padding: 16px 24px;
-  grid-area:header;
+  grid-area: header;
 }
 
 .layout-container {
   display: grid;
   grid-template-columns: 220px 1fr;
   grid-template-rows: auto 1fr;
-  grid-template-areas:
-    "sidebar main";
+  grid-template-areas: 'sidebar main';
   height: 100vh;
 }
 
@@ -25,12 +24,13 @@
   display: grid;
   grid-template-rows: auto 1fr;
   grid-template-areas:
-    "header"  
-  "main";
+    'header'
+    'main';
 }
 
 .main-content {
   grid-area: main;
   padding: 24px;
   overflow-y: auto;
+  /* border:; */
 }

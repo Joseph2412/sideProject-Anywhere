@@ -12,7 +12,9 @@ import Calendar from '@repo/ui/components/calendar/calendar';
 import { ProfileForm } from '@repo/ui/components/account/profile';
 import AddBundle from '@repo/ui/components/bundle/bundle';
 import Venue from '@repo/ui/components/venue/venue';
+import Packages from '@repo/ui/components/bundle/packages';
 import { MessageProvider } from '../../../../../packages/components/src/providers/Message.provider';
+import { PreferencesForm } from '@repo/ui/components/preferences/PreferencesForm';
 
 export default function InternalLayout() {
   const selectedTab = useAtomValue(selectedTabAtom);
@@ -28,6 +30,10 @@ export default function InternalLayout() {
         return <AddBundle />;
       case 'profilo':
         return <ProfileForm />;
+      case 'preferenze':
+        return <PreferencesForm />;
+      case 'pacchetti':
+        return <Packages />;
       default:
         return <div style={{ padding: 24 }}>Benvenuto nella tua area privata</div>;
     }

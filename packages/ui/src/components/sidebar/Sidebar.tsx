@@ -1,9 +1,15 @@
 'use client';
 
 import { Menu, Layout, Avatar } from 'antd';
-import { CalendarOutlined, ShopOutlined, UserOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  CalendarOutlined,
+  ShopOutlined,
+  UserOutlined,
+  PlusOutlined,
+  TagOutlined,
+} from '@ant-design/icons';
 import { useLogout } from '../../../../../apps/host/app/hooks/useLogout';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { selectedTabAtom, pageTitleAtom, TabKey } from '../../store/LayoutStore';
 import { useState } from 'react';
 
@@ -14,14 +20,11 @@ export default function Sidebar() {
   const logout = useLogout();
 
   // Lettura e aggiornamento dello stato globale con Jotai
-  const setSelectedTab = useSetAtom(selectedTabAtom); // Setter per selectedTabAtom
+  const [selectedTab, setSelectedTab] = useAtom(selectedTabAtom); // Setter per selectedTabAtom
   const setPageTitle = useSetAtom(pageTitleAtom); // Setter per il titolo dinamico in Header
 
   // Stato locale per gestire i dropdown (SubMenu) aperti nella sidebar
   const [openKeys, setOpenKeys] = useState<string[]>([]);
-
-  // Stato locale per evidenziare il tab selezionato nel Menu (in alternativa a usare direttamente selectedTabAtom)
-  const [localSelectedKey, setLocalSelectedKey] = useState<string>('calendar');
 
   // Mappa delle chiavi tab → titolo da mostrare nell'intestazione
   const keyToTitleMap: Record<string, string> = {
@@ -30,6 +33,8 @@ export default function Sidebar() {
     orari: 'Orari',
     aggiungi: 'Aggiungi pacchetto',
     profilo: 'Profilo',
+    preferenze: 'Notifiche',
+    pacchetti: 'Pacchetti',
   };
 
   // Gestisce l'apertura dei dropdown (SubMenu). Limita l'apertura multipla.
@@ -50,7 +55,6 @@ export default function Sidebar() {
     if (title) {
       setPageTitle(title); // Aggiorna il titolo in Header
       setSelectedTab(key as TabKey); // Aggiorna l'atomo globale per il contenuto dinamico
-      setLocalSelectedKey(key); // Evidenzia localmente il tab cliccato
     }
 
     // Se la voce cliccata NON è dentro un SubMenu (quindi keyPath.length === 1), chiude i dropdown
@@ -74,7 +78,7 @@ export default function Sidebar() {
       {/* Menu principale della sidebar */}
       <Menu
         mode="inline"
-        selectedKeys={[localSelectedKey]} // Evidenziazione della voce attiva
+        selectedKeys={[selectedTab]} // Evidenziazione della voce attiva
         openKeys={openKeys} // Dropdown attualmente aperti
         onOpenChange={handleOpenChange} // Gestione apertura dropdown
         onClick={handleMenuClick} // Gestione click su ogni voce
@@ -83,6 +87,7 @@ export default function Sidebar() {
         <Menu.Item key="calendar" icon={<CalendarOutlined />}>
           Calendario
         </Menu.Item>
+        <div style={{ height: 1, background: '#f0f0f0', margin: '12px 16px' }} />
 
         {/* Dropdown "Locale" con voci annidate */}
         <Menu.SubMenu key="locale" icon={<ShopOutlined />} title="Locale">
@@ -90,14 +95,18 @@ export default function Sidebar() {
           <Menu.Item key="orari">Orari</Menu.Item>
         </Menu.SubMenu>
 
+        <div style={{ height: 1, background: '#f0f0f0', margin: '12px 16px' }} />
+        <Menu.SubMenu key="pacchetti" icon={<TagOutlined />} title="Pacchetti"></Menu.SubMenu>
         {/* Voce singola fuori da dropdown */}
         <Menu.Item key="aggiungi" icon={<PlusOutlined />}>
           Aggiungi pacchetto
         </Menu.Item>
+        <div style={{ height: 1, background: '#f0f0f0', margin: '12px 16px' }} />
 
         {/* Dropdown "Account" con voce "profilo" e logout */}
         <Menu.SubMenu key="account" icon={<UserOutlined />} title="Account">
           <Menu.Item key="profilo">Profilo</Menu.Item>
+          <Menu.Item key="preferenze">Notifiche</Menu.Item>
           <Menu.Item key="logout">Logout</Menu.Item>
         </Menu.SubMenu>
       </Menu>

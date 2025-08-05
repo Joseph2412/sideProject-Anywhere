@@ -2,15 +2,25 @@
 
 import { Typography } from 'antd';
 import { useAtomValue } from 'jotai';
-import { pageTitleAtom } from '../../store/LayoutStore';
+import { selectedTabAtom } from '../../store/LayoutStore';
 import styles from './Header.module.css';
 
 type HeaderProps = {
   className?: string;
 };
 
+const keyToTitleMap: Record<string, string> = {
+  calendar: 'Calendario',
+  gestione: 'Gestione Locale',
+  orari: 'Orari',
+  aggiungi: 'Aggiungi pacchetto',
+  profilo: 'Profilo',
+  preferenze: 'Notifiche',
+};
+
 export default function Header({ className }: HeaderProps) {
-  const pageTitle = useAtomValue(pageTitleAtom);
+  const selectedTab = useAtomValue(selectedTabAtom);
+  const pageTitle = keyToTitleMap[selectedTab] ?? 'Benvenuto';
 
   return (
     <header className={className ?? styles.header}>

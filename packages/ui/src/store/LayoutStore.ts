@@ -2,11 +2,12 @@ import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
 export type ToastPayload = {
-  type?: 'success' | 'error' | 'info' | 'warning';
-  message: string;
-  description?: string;
-  duration?: number;
-  placement?: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
+  type?: 'success' | 'error' | 'info' | 'warning'; //Tipo del messagio
+  message: string; //Titolo Del Messaggio
+  description?: string; //Descrizione Testuale
+  duration?: number; //Durata in secondi
+  placement?: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'; //Dove mettere Toast
+  showOnce?: boolean; //Opzione Custom OPZIONALE per messaggi da Mostrare una sola volta
 };
 export const messageToast = atom<ToastPayload | false>(false);
 
@@ -19,7 +20,14 @@ export type AuthUser = {
 export const authUserAtom = atom<AuthUser | null>(null);
 
 // Tipi Validi per i TabSelezionati in Sidebar
-export type TabKey = 'calendar' | 'gestione' | 'orari' | 'aggiungi' | 'profilo';
+export type TabKey =
+  | 'calendar'
+  | 'gestione'
+  | 'orari'
+  | 'aggiungi'
+  | 'profilo'
+  | 'preferenze'
+  | 'pacchetti';
 
 // Titolo Dinamico HEADER
 export const pageTitleAtom = atom<string>('Selected Tab');
@@ -36,6 +44,6 @@ export type UserProfile = {
   lastName: string;
   email: string; //
   avatarUrl: string;
-  preferences?: Record<string, unknown>; //Todo: Implementare le preferences e Tipizzare successivamente le preferenze
+  preferences?: Record<string, unknown>;
 };
 export const userProfileAtom = atom<UserProfile | null>(null);

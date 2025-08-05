@@ -1,4 +1,4 @@
-import { Form, Button, Upload, Avatar, Space, message, Row, Col } from 'antd';
+import { Form, Button, Upload, Avatar, Space, message, Row, Col, Card } from 'antd';
 import { UploadOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
 import { NibolInput } from '../inputs/Input';
 import { useState } from 'react';
@@ -79,92 +79,99 @@ export const ProfileForm = () => {
   const handleRemoveAvatar = () => setAvatarUrl(null); //quando un domani averemo S3, richiamiamo path del file e lo leviamo.
 
   return (
-    <Form form={form} layout="vertical" style={{ width: '100%' }} onFinish={onFinish}>
-      <Form.Item label="Foto profilo">
-        <Space>
-          <Avatar size={64} icon={!avatarUrl && <UserOutlined />} src={avatarUrl ?? undefined} />
-          <Upload showUploadList={false} beforeUpload={() => false} onChange={handleAvatarChange}>
+    <Form
+      form={form}
+      layout="vertical"
+      style={{ width: '100%', borderRadius: 8 }}
+      onFinish={onFinish}
+    >
+      <Card>
+        <Form.Item label="Foto profilo">
+          <Space>
+            <Avatar size={64} icon={!avatarUrl && <UserOutlined />} src={avatarUrl ?? undefined} />
+            <Upload showUploadList={false} beforeUpload={() => false} onChange={handleAvatarChange}>
+              <Button
+                icon={<UploadOutlined />}
+                className={styles.buttonUpload}
+                style={{
+                  height: 32,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                Carica
+              </Button>
+            </Upload>
+            {avatarUrl && (
+              <Button icon={<DeleteOutlined />} danger onClick={handleRemoveAvatar}>
+                Rimuovi
+              </Button>
+            )}
+          </Space>
+        </Form.Item>
+
+        <Row gutter={[0, 0]}>
+          <Col span={12}>
+            <Form.Item rules={[{ required: true, message: 'Inserisci il nome' }]}>
+              <NibolInput
+                validateTrigger="onSubmit"
+                label="Nome"
+                name="firstName"
+                hideAsterisk={true}
+                required={true}
+                style={{ height: 32, width: '100%' }}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item rules={[{ required: true, message: 'Inserisci il cognome' }]}>
+              <NibolInput
+                validateTrigger="onSubmit"
+                label="Cognome"
+                name="lastName"
+                hideAsterisk={true}
+                required={true}
+                style={{ height: 32, width: '100%' }}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Form.Item>
+          <NibolInput
+            label="Email"
+            name="email"
+            disabled
+            style={{ height: 32, width: '49%' }}
+            hideAsterisk={true}
+          />
+          <div style={{ color: '#8c8c8c', fontSize: 12, marginTop: 4 }}>
+            Per modificare la mail, scrivi a support@nibol.com.
+          </div>
+        </Form.Item>
+        <Form.Item>
+          <Space>
             <Button
-              icon={<UploadOutlined />}
-              className={styles.buttonUpload}
-              style={{
-                height: 32,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+              htmlType="button"
+              onClick={() => {
+                if (profile) {
+                  form.setFieldsValue({
+                    firstName: profile.firstName,
+                    lastName: profile.lastName,
+                  });
+                }
               }}
+              className={styles.secondary}
             >
-              Carica
+              Annulla
             </Button>
-          </Upload>
-          {avatarUrl && (
-            <Button icon={<DeleteOutlined />} danger onClick={handleRemoveAvatar}>
-              Rimuovi
+            <Button type="primary" htmlType="submit" loading={loading} className={styles.save}>
+              Salva
             </Button>
-          )}
-        </Space>
-      </Form.Item>
-
-      <Row gutter={[0, 0]}>
-        <Col span={12}>
-          <Form.Item rules={[{ required: true, message: 'Inserisci il nome' }]}>
-            <NibolInput
-              validateTrigger="onSubmit"
-              label="Nome"
-              name="firstName"
-              hideAsterisk={true}
-              required={true}
-              style={{ height: 32, width: '100%' }}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item rules={[{ required: true, message: 'Inserisci il cognome' }]}>
-            <NibolInput
-              validateTrigger="onSubmit"
-              label="Cognome"
-              name="lastName"
-              hideAsterisk={true}
-              required={true}
-              style={{ height: 32, width: '100%' }}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Form.Item>
-        <NibolInput
-          label="Email"
-          name="email"
-          disabled
-          style={{ height: 32, width: 605 }}
-          hideAsterisk={true}
-        />
-        <div style={{ color: '#8c8c8c', fontSize: 12, marginTop: 4 }}>
-          Per modificare la mail, scrivi a support@nibol.com.
-        </div>
-      </Form.Item>
-      <Form.Item>
-        <Space>
-          <Button
-            htmlType="button"
-            onClick={() => {
-              if (profile) {
-                form.setFieldsValue({
-                  firstName: profile.firstName,
-                  lastName: profile.lastName,
-                });
-              }
-            }}
-            className={styles.secondary}
-          >
-            Annulla
-          </Button>
-          <Button type="primary" htmlType="submit" loading={loading} className={styles.save}>
-            Salva
-          </Button>
-        </Space>
-      </Form.Item>
+          </Space>
+        </Form.Item>
+      </Card>
     </Form>
   );
 };
