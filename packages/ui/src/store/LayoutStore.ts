@@ -23,7 +23,7 @@ export const authUserAtom = atom<AuthUser | null>(null);
 export type TabKey =
   | 'calendar'
   | 'gestione'
-  | 'orari'
+  | 'pagamenti'
   | 'aggiungi'
   | 'profilo'
   | 'preferenze'

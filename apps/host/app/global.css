@@ -1,4 +1,3 @@
-
 /* Override FONT FAMILY */
 .ant-form,
 .ant-form-item-label > label,
@@ -11,7 +10,6 @@
 .ant-input::placeholder {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
-
 
 /* CheckBox con Colore Custom */
 .ant-checkbox-inner {
@@ -29,9 +27,15 @@
 }
 
 .ant-form-item {
-  margin: 5px; 
+  margin: 5px;
 }
 
 .ant-menu-submenu-selected > .ant-menu-submenu-title {
   color: black !important;
+}
+
+/* Override NECESSARIO per Bottone UPLOAD Immagini */
+.ant-upload {
+  width: 270px !important;
+  height: 207px !important;
 }

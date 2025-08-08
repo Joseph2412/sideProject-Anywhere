@@ -11,7 +11,8 @@ import Header from '@repo/ui/components/header/Header';
 import Calendar from '@repo/ui/components/calendar/calendar';
 import { ProfileForm } from '@repo/ui/components/account/profile';
 import AddBundle from '@repo/ui/components/bundle/bundle';
-import Venue from '@repo/ui/components/venue/venue';
+import { Venue } from '@repo/ui/components/venue/venue';
+import Payments from '@repo/ui/components/payments/payments';
 import Packages from '@repo/ui/components/bundle/packages';
 import { MessageProvider } from '../../../../../packages/components/src/providers/Message.provider';
 import { PreferencesForm } from '@repo/ui/components/preferences/PreferencesForm';
@@ -24,8 +25,8 @@ export default function InternalLayout() {
         return <Calendar />;
       case 'gestione':
         return <Venue />;
-      case 'orari':
-        return <Venue />;
+      case 'pagamenti':
+        return <Payments />;
       case 'aggiungi':
         return <AddBundle />;
       case 'profilo':

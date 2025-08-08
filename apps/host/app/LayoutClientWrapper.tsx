@@ -3,6 +3,11 @@
 import { ReactNode, useEffect } from 'react';
 import { ConfigProvider, App as AntdApp } from 'antd';
 import theme from '../theme/theme';
+import dayjs from 'dayjs';
+import itIt from 'antd/locale/it_IT';
+import 'dayjs/locale/it';
+
+dayjs.locale('it');
 
 export default function LayoutClientWrapper({ children }: { children: ReactNode }) {
   useEffect(() => {
@@ -10,7 +15,7 @@ export default function LayoutClientWrapper({ children }: { children: ReactNode 
   }, []);
 
   return (
-    <ConfigProvider theme={theme}>
+    <ConfigProvider theme={theme} locale={itIt}>
       <AntdApp>{children}</AntdApp>
     </ConfigProvider>
   );

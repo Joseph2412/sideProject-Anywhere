@@ -11,8 +11,8 @@ type HeaderProps = {
 
 const keyToTitleMap: Record<string, string> = {
   calendar: 'Calendario',
-  gestione: 'Gestione Locale',
-  orari: 'Orari',
+  gestione: 'Generali',
+  pagamenti: 'Pagamenti',
   aggiungi: 'Aggiungi pacchetto',
   profilo: 'Profilo',
   preferenze: 'Notifiche',

@@ -16,11 +16,12 @@ datasource db {
 model User {
   id       Int     @id @default(autoincrement())
   email    String  @unique
-  password String
+  password String  
   name     String?
   role     Role
-
   profile   UserProfile?
+
+  @@index([role])
 }
 
 model UserProfile {
@@ -38,8 +39,12 @@ model UserProfile {
 
   createdAt DateTime @default(now()) //Idea: Sezione Profilo "Sei Nostro Cliente da..."/"Data Iscrizione...." . Comuqnue utile per Analisi db
   updatedAt DateTime @updatedAt //Idea: "Data Ultima Modifica" Su Sezione Profilo. Utile per Behavior Insight Su db
+
+  @@index([coworkingVenueId])
+  @@index([createdAt])
 }
 
+//Enum per USER
 enum Role {
   USER
   HOST
@@ -57,6 +62,9 @@ model CoworkingVenue {
   photos       String[] //URLs di S3
   packages     Package[] //1 Locale ha tanti pacchetti
   UserProfile  UserProfile[]
+  closingPeriods ClosingPeriod[]
+
+  @@index([name])
 }
 
 model Package {
@@ -71,6 +79,10 @@ model Package {
   photos           String[] //Array di URLs S3
   CoworkingVenue   CoworkingVenue? @relation(fields: [coworkingVenueId], references: [id])
   coworkingVenueId Int?
+
+  @@index([coworkingVenueId])
+  @@index([type])
+  @@index([capacity])
 }
 
 model Plan {
@@ -81,6 +93,11 @@ model Plan {
   isEnabled Boolean   @default(false)
   package   Package   @relation(fields: [packageId], references: [id])
   packageId Int
+
+  @@index([packageId, isEnabled])
+  @@index([packageId])
+  @@index([price])
+  @@unique([packageId, name, rate])
 }
 
 enum PlansRate {
@@ -94,7 +111,6 @@ enum PlansRate {
 enum typeCoworking {
   SALA
   DESK
-  SALA_MEETING
 }
 
 enum WeekDay {
@@ -109,18 +125,133 @@ enum WeekDay {
 
 model OpeningHour {
   id       Int             @id @default(autoincrement())
-  day      WeekDay
-  close    String
+  day      WeekDay 
+  close    String         
   isClosed Boolean         @default(false)
   venue    CoworkingVenue  @relation(fields: [venueId], references: [id])
   venueId  Int
   periods  OpeningPeriod[]
+
+  @@index([venueId])
+  @@unique([venueId, day])
 }
 
 model OpeningPeriod {
   id            Int         @id @default(autoincrement())
-  start         String
-  end           String
+  start         DateTime
+  end           DateTime
   openingHour   OpeningHour @relation(fields: [openingHourId], references: [id])
   openingHourId Int
+
+  @@index([openingHourId])
+  @@index([openingHourId, start, end])
 }
+
+model ClosingPeriod {
+  id Int @id @default(autoincrement())
+  start DateTime
+  end DateTime
+  venue CoworkingVenue @relation(fields: [venueId], references: [id])
+  venueId Int
+  isEnable Boolean  @default(true)
+
+  @@index([venueId])
+  @@index([venueId, start, end])
+}
+
+model PaymentInfo {
+
+  id Int @id @default(autoincrement())
+  companyName String
+  address String
+  iban String @unique @db.VarChar(34)
+  bicSwift String @db.VarChar(11)
+  countryCode CountryCode
+  currencyCode CurrencyCode
+
+  @@index([currencyCode])
+  @@index([countryCode]) 
+  //Grandi enum richiedono Indici
+}
+
+enum CountryCode {
+  AD // Andorra
+  AL // Albania
+  AM // Armenia
+  AT // Austria
+  AZ // Azerbaigian
+  BA // Bosnia ed Erzegovina
+  BE // Belgio
+  BG // Bulgaria
+  BY // Bielorussia
+  CH // Svizzera
+  CY // Cipro
+  CZ // Repubblica Ceca
+  DE // Germania
+  DK // Danimarca
+  EE // Estonia
+  ES // Spagna
+  FI // Finlandia
+  FR // Francia
+  GB // Regno Unito
+  GE // Georgia
+  GR // Grecia (codice ISO: GR, non EL)
+  HR // Croazia
+  HU // Ungheria
+  IE // Irlanda
+  IS // Islanda
+  IT // Italia
+  LI // Liechtenstein
+  LT // Lituania
+  LU // Lussemburgo
+  LV // Lettonia
+  MC // Monaco
+  MD // Moldavia
+  ME // Montenegro
+  MK // Macedonia del Nord
+  MT // Malta
+  NL // Paesi Bassi
+  NO // Norvegia
+  PL // Polonia
+  PT // Portogallo
+  RO // Romania
+  RS // Serbia
+  RU // Russia
+  SE // Svezia
+  SI // Slovenia
+  SK // Slovacchia
+  SM // San Marino
+  TR // Turchia
+  UA // Ucraina
+  VA // Città del Vaticano
+}
+
+enum CurrencyCode {
+  EUR // Euro
+  ALL // Lek albanese
+  AMD // Dram armeno
+  AZN // Manat azero
+  BAM // Marco convertibile bosniaco
+  BGN // Lev bulgaro
+  BYN // Rublo bielorusso
+  CHF // Franco svizzero
+  CZK // Corona ceca
+  DKK // Corona danese
+  GEL // Lari georgiano
+  GBP // Sterlina britannica
+  HUF // Fiorino ungherese
+  ISK // Corona islandese
+  MDL // Leu moldavo
+  MKD // Denar macedone
+  NOK // Corona norvegese
+  PLN // Zloty polacco
+  RON // Leu rumeno
+  RUB // Rublo russo
+  RSD // Dinaro serbo
+  SEK // Corona svedese
+  TRY // Lira turca
+  UAH // Grivnia ucraina
+}
+
+//Si, non ha tanto Senso avere tutti questi Codici per Nazioni e Valuta, Ma possiamo sempre levarli.
+//Vedila come un'augurio che Nibol arrivi dovunque

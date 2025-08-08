@@ -1,0 +1,17 @@
+.clickableTag {
+  border-style: dashed;
+  border-width: 1px;
+  border-color: #d9d9d9;
+  cursor: pointer;
+  padding: 1px, 8px;
+  min-width: 80px; /* sufficiente per “Aria condizionata” */
+  max-width: 100%; /* non sforare container */
+  text-wrap: balance;
+  height: 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  white-space: nowrap; /* evita a capo singole parole */
+  overflow: hidden; /* taglia se troppo lungo */
+  text-overflow: ellipsis; /* ... se esce fuori */
+}

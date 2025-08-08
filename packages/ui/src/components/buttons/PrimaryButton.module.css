@@ -1,14 +1,14 @@
 .primary {
-  background-color: #00063e !important;
+  background-color: #00063e;
   border-color: #d6d7e6 !important;
   font-weight: 500;
   color: #d6d7e6 !important;
+  width: auto !important;
   margin-bottom: 0px;
-  height: 40px;
+  height: 32px !important;
   border-radius: 6px;
   padding: 4px 15px;
   font-size: 14px;
-
   margin-bottom: 0px;
   display: flex;
   align-items: center;

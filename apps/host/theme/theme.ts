@@ -20,7 +20,7 @@ const theme: ThemeConfig = {
       borderRadius: 6,
       fontWeight: 500,
       fontSize: 14,
-      controlHeight: 40,
+      controlHeight: 32,
     },
     Typography: {
       fontFamily: 'Plus Jakarta Sans, sans-serif',

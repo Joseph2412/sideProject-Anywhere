@@ -30,7 +30,7 @@ export default function Sidebar() {
   const keyToTitleMap: Record<string, string> = {
     calendar: 'Calendario',
     gestione: 'Gestione Locale',
-    orari: 'Orari',
+    pagamenti: 'Pagamenti',
     aggiungi: 'Aggiungi pacchetto',
     profilo: 'Profilo',
     preferenze: 'Notifiche',
@@ -91,8 +91,8 @@ export default function Sidebar() {
 
         {/* Dropdown "Locale" con voci annidate */}
         <Menu.SubMenu key="locale" icon={<ShopOutlined />} title="Locale">
-          <Menu.Item key="gestione">Gestione Locale</Menu.Item>
-          <Menu.Item key="orari">Orari</Menu.Item>
+          <Menu.Item key="gestione">Generali</Menu.Item>
+          <Menu.Item key="pagamenti">Pagamenti</Menu.Item>
         </Menu.SubMenu>
 
         <div style={{ height: 1, background: '#f0f0f0', margin: '12px 16px' }} />
