@@ -1,123 +1,28 @@
-import { Form, Button, Upload, Avatar, Space, message, Row, Col, Card } from 'antd';
-import { UploadOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
+import { Form, Button, Space, Row, Col, Card, Select } from 'antd';
 import { NibolInput } from '../../../inputs/Input';
-import { useState } from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { useEffect } from 'react';
-import { authUserAtom, userProfileAtom } from '../../store/LayoutStore';
-import { useUserProfile } from '../../../../../apps/host/app/hooks/useUserProfile';
-import { messageToast } from '../../store/LayoutStore';
 import styles from './payments.module.css';
-import { UploadChangeParam, UploadFile } from 'antd/es/upload';
 
-export const ProfileForm = () => {
+export const PaymentsForm = () => {
   const [form] = Form.useForm();
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null); //Provvisorio: Imposta Atomo Jotai.
-  const [loading, setLoading] = useState(false); //Stato di Loading in base a step
-
-  const profile = useAtomValue(userProfileAtom); //Richiamo i dati di UserProfile
-  const user = useAtomValue(authUserAtom); //Da qui richiamo solo USER EMAIL
-  const reaload = useUserProfile();
-  const setMessage = useSetAtom(messageToast);
-
-  const onFinish = async (values: { firstName: string; lastName: string }) => {
-    setLoading(true);
-    try {
-      const res = await fetch('http://localhost:3001/user/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (!res.ok) throw new Error();
-
-      await reaload();
-      console.log('Prova Toast. PROFILO AGGIORNATO Deve partire il toast');
-
-      setMessage({
-        type: 'success',
-        message: 'Profilo Aggiornato con successo!',
-        description: 'Profilo Aggiornato',
-        duration: 3,
-        placement: 'bottomRight',
-      });
-    } catch {
-      message.error("Errore durante l'aggiornamento");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAvatarChange = (info: UploadChangeParam<UploadFile>) => {
-    //Al momento Any. Next passare oggetto con tutte le info
-
-    const file = info.file.originFileObj;
-
-    if (file) {
-      //Controllo che file esiste
-      const reader = new FileReader();
-      reader.onload = () => setAvatarUrl(reader.result as string);
-      reader.readAsDataURL(file); //Tutto questo varrà poi con integrazione S3. Per Ora DUMMY IMAGE
-    } //TODO: Implementa Questa funzione. Aspetta Integrazione con S3
-  };
-
-  useEffect(() => {
-    if (profile && user) {
-      //Se abbiamo Profilo
-      //Ridondante? si ma serve per far star zitto Typescript
-      form.setFieldsValue({
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        email: user.email, //Sennò segnalava il "Possibile NULL"
-      }); //Setto i valori del Form con firstName, lastName ed Email (ma disabled)
-    }
-  }, [profile, form, user]);
-
-  const handleRemoveAvatar = () => setAvatarUrl(null); //quando un domani averemo S3, richiamiamo path del file e lo leviamo.
 
   return (
     <Form
       form={form}
       layout="vertical"
       style={{ width: '100%', borderRadius: 8 }}
-      onFinish={onFinish}
+      //onFinish={onFinish}
     >
-      <Card>
-        <Form.Item label="Foto profilo">
-          <Space>
-            <Avatar size={64} icon={!avatarUrl && <UserOutlined />} src={avatarUrl ?? undefined} />
-            <Upload showUploadList={false} beforeUpload={() => false} onChange={handleAvatarChange}>
-              <Button
-                icon={<UploadOutlined />}
-                className={styles.buttonUpload}
-                style={{
-                  height: 32,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                Carica
-              </Button>
-            </Upload>
-            {avatarUrl && (
-              <Button icon={<DeleteOutlined />} danger onClick={handleRemoveAvatar}>
-                Rimuovi
-              </Button>
-            )}
-          </Space>
-        </Form.Item>
-
+      <Card
+        bodyStyle={{ paddingTop: 10, paddingBottom: 10, paddingLeft: 15, paddingRight: 15 }}
+        style={{ marginBottom: 20 }}
+      >
         <Row gutter={[0, 0]}>
           <Col span={12}>
-            <Form.Item rules={[{ required: true, message: 'Inserisci il nome' }]}>
+            <Form.Item rules={[{ required: true, message: 'Ragione Sociale Richiesta' }]}>
               <NibolInput
                 validateTrigger="onSubmit"
-                label="Nome"
-                name="firstName"
+                label="Ragione Sociale"
+                name="companyName"
                 hideAsterisk={true}
                 required={true}
                 style={{ height: 32, width: '100%' }}
@@ -125,10 +30,36 @@ export const ProfileForm = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item rules={[{ required: true, message: 'Inserisci il cognome' }]}>
+            <Form.Item rules={[{ required: true, message: `Inserisci L'indirizzo` }]}>
               <NibolInput
                 validateTrigger="onSubmit"
-                label="Cognome"
+                label="Indirizzo"
+                name="address"
+                hideAsterisk={true}
+                required={true}
+                style={{ height: 32, width: '100%' }}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={[0, 0]}>
+          <Col span={12}>
+            <Form.Item rules={[{ required: true, message: `Inserisci L'iban` }]}>
+              <NibolInput
+                validateTrigger="onSubmit"
+                label="IBAN"
+                name="iban"
+                hideAsterisk={true}
+                required={true}
+                style={{ height: 32, width: '100%' }}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item rules={[{ required: true, message: 'Inserisci il COdice BIC/SWIFT' }]}>
+              <NibolInput
+                validateTrigger="onSubmit"
+                label="BIC/SWIFT"
                 name="lastName"
                 hideAsterisk={true}
                 required={true}
@@ -137,40 +68,51 @@ export const ProfileForm = () => {
             </Form.Item>
           </Col>
         </Row>
-
-        <Form.Item>
-          <NibolInput
-            label="Email"
-            name="email"
-            disabled
-            style={{ height: 32, width: '49%' }}
-            hideAsterisk={true}
-          />
-          <div style={{ color: '#8c8c8c', fontSize: 12, marginTop: 4 }}>
-            Per modificare la mail, scrivi a support@nibol.com.
-          </div>
-        </Form.Item>
-        <Form.Item>
+        <Row gutter={[0, 0]}>
+          <Col span={12}>
+            <Form.Item name="countryCode" label="Paese">
+              <Select
+                mode="tags"
+                style={{ height: 32, width: '100%' }}
+                // options={availableServices.map(service => ({ label: service, value: service }))} da integrare: Codici PAESE
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item name="currencyCode" label="Valuta">
+              <Select
+                mode="tags"
+                style={{ height: 32, width: '100%' }}
+                // options={availableServices.map(service => ({ label: service, value: service }))} da integrare: Codici VALUTE
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Form.Item style={{ marginTop: 15 }}>
           <Space>
-            <Button
-              htmlType="button"
-              onClick={() => {
-                if (profile) {
-                  form.setFieldsValue({
-                    firstName: profile.firstName,
-                    lastName: profile.lastName,
-                  });
-                }
-              }}
-              className={styles.secondary}
-            >
+            <Button htmlType="button" className={styles.secondary}>
               Annulla
             </Button>
-            <Button type="primary" htmlType="submit" loading={loading} className={styles.save}>
+            <Button type="primary" htmlType="submit" className={styles.save}>
               Salva
             </Button>
           </Space>
         </Form.Item>
+      </Card>
+
+      <Card bodyStyle={{ paddingTop: 10, paddingBottom: 10, paddingLeft: 15 }}>
+        <div style={{ color: '#8c8c8c', fontSize: 12, marginBottom: 8 }}>
+          Informazioni Per emissione Fattura
+        </div>
+
+        <div>
+          <p style={{ fontSize: 12, margin: 0 }}>Nibol S.R.L</p>
+          <p style={{ fontSize: 12, margin: 0 }}>P.IVA: IT10683870967</p>
+          <p style={{ fontSize: 12, margin: 0 }}>Via Alfredo Campanini 4. 20121, Milano(MI)</p>
+          <p style={{ fontSize: 12, margin: 0 }}>SDIT9K4ZHO</p>
+          <p style={{ fontSize: 12, margin: 0 }}>billing@nibol.com</p>
+          <p style={{ fontSize: 12, margin: 0 }}>PEC: nibol@pec.it</p>
+        </div>
       </Card>
     </Form>
   );
