@@ -10,37 +10,20 @@ export const VenueDetailsForm = () => {
   return (
     <Form layout="vertical" style={{ width: '100%', borderRadius: 8 }} form={form}>
       <Card>
-        <Form.Item label="Foto profilo">
-          <Space>
+        <Form.Item
+          label="Logo"
+          className={styles.profileUpload}
+          help="Formato 1:1, dimensione suggerita 400px x 400px"
+        >
+          <div className={styles.profileContainer}>
             <Avatar size={64} />
-            <Upload showUploadList={false} beforeUpload={() => false}>
-              <Button
-                // icon={<UploadOutlined />}
-                // className={styles.buttonUpload}
-                style={{
-                  height: 32,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                Carica
-              </Button>
-            </Upload>
-
-            <Button
-              icon={<DeleteOutlined />}
-              style={{
-                height: 32,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '0 12px',
-              }}
-            >
-              Rimuovi
-            </Button>
-          </Space>
+            <div className={styles.buttonColumn}>
+              <Upload showUploadList={false} beforeUpload={() => false}>
+                <Button>Carica</Button>
+              </Upload>
+              <Button icon={<DeleteOutlined />}>Rimuovi</Button>
+            </div>
+          </div>
         </Form.Item>
 
         <Row gutter={[0, 0]}>

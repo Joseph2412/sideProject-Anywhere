@@ -46,4 +46,5 @@ export type UserProfile = {
   avatarUrl: string;
   preferences?: Record<string, unknown>;
 };
+
 export const userProfileAtom = atom<UserProfile | null>(null);

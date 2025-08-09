@@ -53,7 +53,7 @@ export const VenueClosingDays: React.FC = () => {
     <Form form={form} layout="vertical">
       <Card>
         <Row>
-          <PrimaryButton style={{ width: 50 }}>Importa Festività Nazionali</PrimaryButton>
+          <PrimaryButton style={{ width: 'auto' }}>Importa Festività Nazionali</PrimaryButton>
         </Row>
         <Divider></Divider>
         <Col>

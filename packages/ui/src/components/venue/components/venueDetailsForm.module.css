@@ -15,3 +15,15 @@
   overflow: hidden; /* taglia se troppo lungo */
   text-overflow: ellipsis; /* ... se esce fuori */
 }
+
+.profileContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* spazio tra avatar e colonna pulsanti */
+}
+
+.buttonColumn {
+  display: flex;
+  flex-direction: row;
+  gap: 8px; /* spazio verticale tra i due bottoni */
+}

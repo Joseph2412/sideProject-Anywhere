@@ -33,9 +33,3 @@
 .ant-menu-submenu-selected > .ant-menu-submenu-title {
   color: black !important;
 }
-
-/* Override NECESSARIO per Bottone UPLOAD Immagini */
-.ant-upload {
-  width: 270px !important;
-  height: 207px !important;
-}

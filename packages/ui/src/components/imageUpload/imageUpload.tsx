@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { Card, message, Upload } from 'antd';
 import type { GetProp, UploadProps } from 'antd';
+import styles from './imageUpload.module.css';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -49,9 +50,10 @@ export const ImageUpload: React.FC = () => {
   );
 
   return (
-    <Card>
+    <Card className={styles.upload207}>
       <Upload
         maxCount={12}
+        className={styles.upload207}
         name="venuePhotos"
         listType="picture-card"
         showUploadList={false}

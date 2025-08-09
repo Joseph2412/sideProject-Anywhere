@@ -1,0 +1,5 @@
+.upload207 :global(.ant-upload),
+.upload207 :global(.ant-upload-select-picture-card) {
+  width: 207px !important;
+  height: 207px !important;
+}

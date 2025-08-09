@@ -207,7 +207,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
               >
                 OR
               </Divider>
-              <GoogleLoginButton className={styles.googleButton} />
+              <GoogleLoginButton className={styles.googleButton} disabled={loading} />
             </Form.Item>
           </Form>
         </div>
@@ -224,6 +224,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
           <Button
             type="text"
             onClick={onGoToSignup}
+            disabled={loading}
             className={`${styles.register} ${styles.registerWrapper}`}
           >
             Non hai un account? Registrati
@@ -231,6 +232,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
           <Button
             type="text"
             onClick={handleResetPassword}
+            disabled={loading}
             className={`${styles.register} ${styles.registerWrapper}`}
             style={{ marginTop: 4 }}
           >

@@ -178,7 +178,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
               htmlType="submit"
               loading={loading}
               disabled={loading}
-              style={{ height: 32, marginTop: 10 }}
+              style={{ height: 32, marginTop: 10, width: '100%' }}
             />
           </Form.Item>
         </Form>
@@ -192,6 +192,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
         <Button
           type="text"
           onClick={onGoToLogin}
+          disabled={loading}
           className={`${styles.register} ${styles.registerWrapper}`}
         >
           Sei già Registrato? Accedi!
