@@ -1,6 +1,6 @@
 import { Checkbox, TimePicker, Typography, Row, Col, Space, Button } from 'antd';
 import dayjs from 'dayjs';
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { DayOpeningState, OpeningPeriod } from './openingHours.types';
 
@@ -49,6 +49,15 @@ export const DayOpeningHours: React.FC<Props> = ({
       [dayKey]: { ...prev[dayKey]!, periods: updated },
     }));
   };
+
+  useEffect(() => {
+    if (!isClosed && periods.length === 0) {
+      setOpeningHoursState(prev => ({
+        ...prev,
+        [dayKey]: { ...prev[dayKey]!, periods: [[null, null]] },
+      }));
+    }
+  });
 
   return (
     <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>

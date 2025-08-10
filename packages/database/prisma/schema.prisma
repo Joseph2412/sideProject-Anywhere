@@ -58,11 +58,12 @@ model CoworkingVenue {
   address      String        @db.VarChar(200)
   openingHours OpeningHour[]
   services     String[]
-  description  String        @db.VarChar(200)
+  description  String?        @db.VarChar(200)
   photos       String[] //URLs di S3
   packages     Package[] //1 Locale ha tanti pacchetti
   UserProfile  UserProfile[]
   closingPeriods ClosingPeriod[]
+  avatarURL  String?
 
   @@index([name])
 }
