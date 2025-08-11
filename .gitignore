@@ -41,3 +41,7 @@ yarn-error.log*
 
 #File Prettier
 .prettierrc
+
+
+#RuleLog
+rule.txt

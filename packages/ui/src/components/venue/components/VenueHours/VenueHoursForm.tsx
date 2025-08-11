@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Divider, Button, Space } from 'antd';
-import { DayOpeningState, weekDays } from './openingHours.types';
+import { OpeningHourData, weekDays } from './openingHours.types';
 import { DayOpeningHours } from './DayOpeningHours';
 
+// ✅ Usa il nuovo tipo invece di DayOpeningState
 export const VenueHoursForm: React.FC = () => {
-  const [openingHoursState, setOpeningHoursState] = useState<Record<string, DayOpeningState>>({});
+  const [openingHoursState, setOpeningHoursState] = useState<Record<string, OpeningHourData>>({});
   const [initialOpeningHoursState, setInitialOpeningHoursState] = useState<
-    Record<string, DayOpeningState>
+    Record<string, OpeningHourData>
   >({});
 
   useEffect(() => {
-    const dataFromDb: Record<string, DayOpeningState> = weekDays.reduce(
+    const dataFromDb: Record<string, OpeningHourData> = weekDays.reduce(
       (acc, day) => {
         acc[day.value] = {
           isClosed: false,
@@ -18,12 +19,19 @@ export const VenueHoursForm: React.FC = () => {
         };
         return acc;
       },
-      {} as Record<string, DayOpeningState>
+      {} as Record<string, OpeningHourData>
     );
 
     setOpeningHoursState(dataFromDb);
     setInitialOpeningHoursState(dataFromDb);
   }, []);
+
+  const handleUpdateDay = (dayKey: string, data: OpeningHourData) => {
+    setOpeningHoursState(prev => ({
+      ...prev,
+      [dayKey]: data,
+    }));
+  };
 
   return (
     <Form layout="vertical">
@@ -32,18 +40,13 @@ export const VenueHoursForm: React.FC = () => {
           <DayOpeningHours
             day={day.label}
             dayKey={day.value}
-            isClosed={openingHoursState[day.value]?.isClosed ?? false}
-            periods={openingHoursState[day.value]?.periods ?? []}
-            setOpeningHoursState={setOpeningHoursState}
-            onToggleClosed={() => {
-              setOpeningHoursState(prev => ({
-                ...prev,
-                [day.value]: {
-                  isClosed: !prev[day.value]?.isClosed,
-                  periods: prev[day.value]?.periods ?? [],
-                },
-              }));
-            }}
+            openingHourData={
+              openingHoursState[day.value] || {
+                isClosed: true,
+                periods: [],
+              }
+            }
+            onUpdateDay={handleUpdateDay}
           />
           <Divider />
         </div>

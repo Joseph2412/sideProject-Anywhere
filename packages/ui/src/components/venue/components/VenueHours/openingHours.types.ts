@@ -18,3 +18,13 @@ export const weekDays = [
 ] as const;
 
 export type WeekDay = (typeof weekDays)[number]['value'];
+
+export type OpeningHourData = {
+  id?: number;
+  isClosed: boolean;
+  periods: {
+    id?: number;
+    start: string | null;
+    end: string | null;
+  }[];
+};
