@@ -5,8 +5,8 @@ import fastify, { FastifyInstance } from 'fastify';
 import fastifyJwt from '@fastify/jwt';
 import cors from '@fastify/cors';
 import { decorateAuth } from './plugins/auth';
-import { authRoutes } from './routes/auth';
-import { userRoute } from './routes/user';
+import { authRoutes } from './routes/auth/authRoutes';
+import { userRoute } from './routes/user/userRoutes';
 import { venueDetailsRoute } from './routes/venues/venues';
 
 //Ricorda di importare prisma in ogni handler senza istanziarlo sempre

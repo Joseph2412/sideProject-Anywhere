@@ -2,23 +2,27 @@
 
 import { useAtomValue } from 'jotai';
 import { selectedTabAtom } from '@repo/ui/store/LayoutStore';
-import { UserProvider } from '../../components/providers/User.provider';
+import { UserProvider } from '../../components/providers/UserAuthProvider';
 import style from './style.module.css';
 import LayoutClientWrapper from 'app/LayoutClientWrapper';
 
-import Sidebar from '@repo/ui/components/sidebar/Sidebar';
-import Header from '@repo/ui/components/header/Header';
-import Calendar from '@repo/ui/components/calendar/calendar';
-import { ProfileForm } from '@repo/ui/components/account/profile';
-import AddBundle from '@repo/ui/components/bundle/bundle';
-import { Venue } from '@repo/ui/components/venue/venue';
-import { PaymentsForm } from '@repo/ui/components/venue/components/Payments/payments';
-import Packages from '@repo/ui/components/bundle/packages';
-import { MessageProvider } from '../../../../../packages/components/src/providers/Message.provider';
-import { PreferencesForm } from '@repo/ui/components/preferences/PreferencesForm';
+import {
+  Sidebar,
+  Header,
+  Calendar,
+  ProfileForm,
+  AddBundleForm,
+  Venue,
+  PaymentsForm,
+  PackagesList,
+  PreferencesForm,
+  MessageProvider,
+} from '@repo/components';
+import { useLogout } from '../../hooks/useLogout';
 
 export default function InternalLayout() {
   const selectedTab = useAtomValue(selectedTabAtom);
+  const logout = useLogout();
   const renderContent = () => {
     switch (selectedTab) {
       case 'calendar':
@@ -28,13 +32,13 @@ export default function InternalLayout() {
       case 'pagamenti':
         return <PaymentsForm />;
       case 'aggiungi':
-        return <AddBundle />;
+        return <AddBundleForm />;
       case 'profilo':
         return <ProfileForm />;
       case 'preferenze':
         return <PreferencesForm />;
       case 'pacchetti':
-        return <Packages />;
+        return <PackagesList />;
       default:
         return <div style={{ padding: 24 }}>Benvenuto nella tua area privata</div>;
     }
@@ -45,7 +49,7 @@ export default function InternalLayout() {
         <UserProvider>
           <div className={style['layout-container']}>
             {/* Sidebar a sinistra */}
-            <Sidebar />
+            <Sidebar onLogout={logout} />
 
             {/* Contenuto principale */}
             <div className={style['content-container']}>
