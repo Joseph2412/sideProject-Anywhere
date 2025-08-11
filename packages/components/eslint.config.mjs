@@ -1,8 +1,8 @@
-import { nextJsConfig } from "@repo/eslint-config/next-js";
+import { config } from "@repo/eslint-config/react-internal";
 
 /** @type {import("eslint").Linter.Config} */
 export default [
-  ...nextJsConfig,
+  ...config,
   {
     rules: {
       // Allow React component names (PascalCase functions)

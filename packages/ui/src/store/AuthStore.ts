@@ -1,7 +1,4 @@
-import { User } from '@repo/database';
-
-// esempio di tipo derivato da User di Prisma
-export type UserLogin = Pick<User, 'email' | 'password'>;
+import { atom } from 'jotai';
 
 export type AuthUser = {
   id: number;
@@ -17,3 +14,6 @@ export type UserProfile = {
   avatarUrl: string;
   preferences?: Record<string, unknown>;
 };
+
+export const authUserAtom = atom<AuthUser | null>(null);
+export const userProfileAtom = atom<UserProfile | null>(null);

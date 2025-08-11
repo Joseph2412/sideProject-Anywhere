@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
-import LoginForm from '@repo/ui/components/loginform/LoginForm';
+import { LoginForm } from '@repo/components';
 import { useRouter } from 'next/navigation';
-import { MessageProvider } from '../../../../packages/components/src/providers/Message.provider';
+import { MessageProvider } from '@repo/components';
 
 export default function LoginPage() {
   const router = useRouter();
