@@ -15,6 +15,7 @@ export const updateVenueOpeningHoursSchema = {
             },
             periods: {
               type: 'array',
+              uniqueItems: true, //Niente Duplicati Identici
               items: {
                 type: 'object',
                 required: ['start', 'end'],

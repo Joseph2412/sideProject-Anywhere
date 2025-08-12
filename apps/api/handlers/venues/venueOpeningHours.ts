@@ -78,8 +78,6 @@ export const updateVenueOpeningHoursHandler = async (
     for (const hour of openingHours) {
       const { day, isClosed, periods } = hour;
 
-      // ... (keep existing imports)
-
       await prisma.openingHour.upsert({
         where: { venueId_day: { venueId: firstVenue.id, day: day as WeekDay } },
         update: {
