@@ -10,7 +10,7 @@ export type AuthUser = {
   role: 'USER' | 'HOST';
 };
 
-export type UserProfile = {
+export type HostProfile = {
   firstName: string;
   lastName: string;
   email: string;

@@ -30,7 +30,7 @@ export const profileHandler = async (request: FastifyRequest, reply: FastifyRepl
       name: user.name ?? 'Utente',
     },
     profile: {
-      //Ritorniamo due cose: L'utente per autenticazione, l'userProfile per form e Componente User
+      //Ritorniamo due cose: L'utente per autenticazione, l'hostProfile per form e Componente User
       firstName: user.profile.firstName,
       lastName: user.profile.lastName,
       avatarUrl: user.profile.avatarUrl,
@@ -63,7 +63,7 @@ export const updateProfileHandler = async (request: FastifyRequest, reply: Fasti
     }
 
     // 2. Eseguo l'update
-    const updatedProfile = await prisma.userProfile.update({
+    const updatedProfile = await prisma.hostProfile.update({
       where: { id: user.profile.id },
       data: { firstName, lastName },
     });

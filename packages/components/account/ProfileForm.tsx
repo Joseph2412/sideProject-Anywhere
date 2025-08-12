@@ -3,8 +3,8 @@ import { UploadOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons'
 import { NibolInput } from '../inputs/Input';
 import { useState, useEffect } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { authUserAtom, userProfileAtom, messageToast } from '@repo/ui/store/LayoutStore';
-import { useUserProfile } from '@repo/hooks';
+import { authUserAtom, hostProfileAtom, messageToast } from '@repo/ui/store/LayoutStore';
+import { useHostProfile } from '@repo/hooks';
 import styles from './profile.module.css';
 import { UploadChangeParam, UploadFile } from 'antd/es/upload';
 
@@ -13,11 +13,11 @@ export const ProfileForm = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null); //Provvisorio: Imposta Atomo Jotai.
   const [loading, setLoading] = useState(false); //Stato di Loading in base a step
 
-  const profile = useAtomValue(userProfileAtom); //Richiamo i dati di UserProfile
+  const profile = useAtomValue(hostProfileAtom); //Richiamo i dati di HostProfile
   const user = useAtomValue(authUserAtom); //Da qui richiamo solo USER EMAIL
   const setUser = useSetAtom(authUserAtom);
-  const setProfile = useSetAtom(userProfileAtom);
-  const reaload = useUserProfile(setUser, setProfile);
+  const setProfile = useSetAtom(hostProfileAtom);
+  const reaload = useHostProfile(setUser, setProfile);
   const setMessage = useSetAtom(messageToast);
 
   const onFinish = async (values: { firstName: string; lastName: string }) => {

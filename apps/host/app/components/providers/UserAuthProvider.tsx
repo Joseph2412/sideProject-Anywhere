@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { useRouter } from 'next/navigation';
-import { authUserAtom, userProfileAtom } from '@repo/ui/store/LayoutStore';
-import { useUserProfile } from '@repo/hooks';
+import { authUserAtom, hostProfileAtom } from '@repo/ui/store/LayoutStore';
+import { useHostProfile } from '@repo/hooks';
 import { useLogout } from '../../hooks/useLogout';
 
 type Props = {
@@ -12,15 +12,15 @@ type Props = {
 
 export const UserProvider = ({ children }: Props) => {
   const authUser = useAtomValue(authUserAtom);
-  const userProfile = useAtomValue(userProfileAtom);
+  const hostProfile = useAtomValue(hostProfileAtom);
 
   const setUser = useSetAtom(authUserAtom);
-  const setUserProfile = useSetAtom(userProfileAtom);
+  const setHostProfile = useSetAtom(hostProfileAtom);
 
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const logout = useLogout();
-  const reloadProfile = useUserProfile(setUser, setUserProfile);
+  const reloadProfile = useHostProfile(setUser, setHostProfile);
 
   useEffect(() => {
     const token = localStorage.getItem('token'); //FIX ToDo: Token non in localStorage ma in Cookie
@@ -30,7 +30,7 @@ export const UserProvider = ({ children }: Props) => {
       return;
     }
 
-    if (authUser && userProfile) {
+    if (authUser && hostProfile) {
       //Se abbiamo già in memoria gli Atomi dell'utente e del suo Profilo, no Ricarica
       setLoading(false);
       return;
@@ -43,7 +43,7 @@ export const UserProvider = ({ children }: Props) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [router, setUser, logout, authUser, userProfile, setUserProfile, reloadProfile]);
+  }, [router, setUser, logout, authUser, hostProfile, setHostProfile, reloadProfile]);
 
   if (loading) return <div>Caricamento profilo...</div>;
 

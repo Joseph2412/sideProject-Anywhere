@@ -9,7 +9,6 @@ export const venueDetailsSchema = {
       description: { type: 'string', minLength: 1 },
       services: { type: 'array', items: { type: 'string' } },
       avatarURL: { type: 'string' },
-      // ...aggiungi altri campi se servono...
     },
     additionalProperties: false,
   },

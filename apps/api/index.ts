@@ -8,6 +8,7 @@ import { decorateAuth } from './plugins/auth';
 import { authRoutes } from './routes/auth/authRoutes';
 import { userRoute } from './routes/user/userRoutes';
 import { venueDetailsRoute } from './routes/venues/venues';
+import { venueOpeningHoursRoute } from './routes/venues/venues';
 
 //Ricorda di importare prisma in ogni handler senza istanziarlo sempre
 
@@ -42,6 +43,7 @@ server.setErrorHandler((error, request, reply) => {
 server.register(authRoutes, { prefix: '/auth' });
 server.register(userRoute, { prefix: '/user' });
 server.register(venueDetailsRoute, { prefix: '/api' });
+server.register(venueOpeningHoursRoute, { prefix: '/api' });
 
 server.listen({ port: 3001 }, (err, address) => {
   if (err) {

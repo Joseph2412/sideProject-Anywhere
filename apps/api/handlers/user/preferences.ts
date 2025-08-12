@@ -4,7 +4,7 @@ import { prisma } from '../../libs/prisma';
 export const getPreferencesHandler = async (request: FastifyRequest, reply: FastifyReply) => {
   const userId = request.user.id;
 
-  const profile = await prisma.userProfile.findUnique({
+  const profile = await prisma.hostProfile.findUnique({
     where: { userId },
     select: { preferences: true },
   });
@@ -16,7 +16,7 @@ export const updatePreferencesHandler = async (request: FastifyRequest, reply: F
   const userId = request.user.id;
   const preferences = request.body as Record<string, any>;
 
-  const updated = await prisma.userProfile.update({
+  const updated = await prisma.hostProfile.update({
     where: { userId },
     data: { preferences },
   });

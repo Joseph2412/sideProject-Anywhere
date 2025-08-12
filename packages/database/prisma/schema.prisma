@@ -19,12 +19,12 @@ model User {
   password String  
   name     String?
   role     Role
-  profile   UserProfile?
+  profile   HostProfile?
 
   @@index([role])
 }
 
-model UserProfile {
+model HostProfile {
   id          Int    @id @default(autoincrement())
   firstName   String
   lastName    String
@@ -61,7 +61,7 @@ model CoworkingVenue {
   description  String?        @db.VarChar(200)
   photos       String[] //URLs di S3
   packages     Package[] //1 Locale ha tanti pacchetti
-  UserProfile  UserProfile[]
+  HostProfile  HostProfile[]
   closingPeriods ClosingPeriod[]
   avatarURL  String?
 
@@ -144,7 +144,7 @@ model OpeningPeriod {
   openingHourId Int
 
   @@index([openingHourId])
-  @@index([openingHourId, start, end])
+  @@unique([openingHourId, start, end])
 }
 
 model ClosingPeriod {

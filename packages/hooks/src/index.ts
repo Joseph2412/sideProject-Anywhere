@@ -1,5 +1,5 @@
 // Authentication hooks
-export * from './useUserProfile';
+export * from './useHostProfile';
 
 // Shared types
 export type * from './types';
