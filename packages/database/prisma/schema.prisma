@@ -31,16 +31,14 @@ model HostProfile {
   avatarUrl   String? //String di URLs su S3 
   preferences Json? //Riferimento a sezione NOTIFICHE del Componente Profio
 
-  coworkingVenue   CoworkingVenue? @relation(fields: [coworkingVenueId], references: [id])
-  coworkingVenueId Int?
+  coworkingVenue   CoworkingVenue? 
 
-  userId Int  @unique
   user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
 
   createdAt DateTime @default(now()) //Idea: Sezione Profilo "Sei Nostro Cliente da..."/"Data Iscrizione...." . Comuqnue utile per Analisi db
   updatedAt DateTime @updatedAt //Idea: "Data Ultima Modifica" Su Sezione Profilo. Utile per Behavior Insight Su db
 
-  @@index([coworkingVenueId])
   @@index([createdAt])
 }
 
@@ -61,7 +59,10 @@ model CoworkingVenue {
   description  String?        @db.VarChar(200)
   photos       String[] //URLs di S3
   packages     Package[] //1 Locale ha tanti pacchetti
-  HostProfile  HostProfile[]
+  
+  hostProfile  HostProfile @relation(fields: [hostProfileId], references: [id])
+  hostProfileId Int @unique
+
   closingPeriods ClosingPeriod[]
   avatarURL  String?
 

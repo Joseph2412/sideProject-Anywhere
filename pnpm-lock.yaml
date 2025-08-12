@@ -62,6 +62,9 @@ importers:
       fastify:
         specifier: ^5.4.0
         version: 5.4.0
+      fastify-plugin:
+        specifier: ^5.0.1
+        version: 5.0.1
     devDependencies:
       '@types/bcrypt':
         specifier: ^6.0.0

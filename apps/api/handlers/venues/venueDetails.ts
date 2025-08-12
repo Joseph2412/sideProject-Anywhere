@@ -2,67 +2,95 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { prisma } from '../../libs/prisma';
 
 export const getVenueDetailsHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-  // SICUREZZA: Filtra per utente autenticato
-  const userId = request.user.id;
+  const prof = await prisma.hostProfile.findUnique({
+    where: { userId: request.user.id },
+    select: { id: true },
+  });
+  if (!prof) {
+    return reply.code(404).send({ message: 'HostProfile not found for current user' });
+  }
 
-  const venue = await prisma.coworkingVenue.findFirst({
-    where: {
-      HostProfile: {
-        some: {
-          userId: userId,
-        },
-      },
-    },
-    orderBy: { id: 'asc' },
-    take: 1,
+  const venue = await prisma.coworkingVenue.findUnique({
+    where: { hostProfileId: prof.id },
     select: {
       id: true,
       name: true,
       address: true,
       description: true,
-      openingHours: true,
       services: true,
+      photos: true,
       avatarURL: true,
+      openingHours: {
+        orderBy: [{ day: 'asc' }],
+        select: {
+          id: true,
+          day: true,
+          isClosed: true,
+          periods: {
+            orderBy: [{ start: 'asc' }],
+            select: { id: true, start: true, end: true },
+          },
+        },
+      },
     },
   });
 
-  if (!venue) {
-    return reply.code(404).send({ message: 'Venue non trovato o non autorizzato' });
-  }
+  if (!venue) return reply.code(404).send({ venue: null });
 
   return reply.code(200).send({ venue });
 };
 
 export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-  const { name, address, description, services, avatarURL } = request.body as {
+  const { name, address, description, services, avatarURL, photos } = request.body as {
     name: string;
     address: string;
-    description: string;
+    description?: string | null;
     services?: string[];
-    avatarURL?: string;
+    avatarURL?: string | null;
+    photos?: string[];
   };
 
-  // SICUREZZA: Filtra per utente autenticato
-  const userId = request.user.id;
+  if (!name || !address) {
+    return reply.code(400).send({ message: 'name and address are required' });
+  }
 
-  // Trova il primo record dell'utente autenticato
-  const firstVenue = await prisma.coworkingVenue.findFirst({
-    where: {
-      HostProfile: {
-        some: {
-          userId: userId,
-        },
-      },
-    },
-    orderBy: { id: 'asc' },
-    take: 1,
+  // Lookup profilo host dal token
+  const prof = await prisma.hostProfile.findUnique({
+    where: { userId: request.user.id },
+    select: { id: true },
   });
+  if (!prof) {
+    return reply.code(404).send({ message: 'HostProfile not found for current user' });
+  }
 
-  // Usa upsert per creare o aggiornare il primo venue
   const venue = await prisma.coworkingVenue.upsert({
-    where: { id: firstVenue?.id || 0 }, // Usa l'id del primo venue se esiste, altrimenti 0 (che non esisterà)
-    update: { name, address, description, services, avatarURL },
-    create: { name, address, description, services, avatarURL },
+    where: { hostProfileId: prof.id },
+    create: {
+      hostProfileId: prof.id,
+      name,
+      address,
+      description: description ?? null,
+      services: services ?? [],
+      photos: photos ?? [],
+      avatarURL: avatarURL ?? null,
+    },
+    update: {
+      name,
+      address,
+      description: description ?? null,
+      services: services ?? [],
+      photos: photos ?? [],
+      avatarURL: avatarURL ?? null,
+    },
+    select: {
+      id: true,
+      name: true,
+      address: true,
+      description: true,
+      services: true,
+      photos: true,
+      avatarURL: true,
+    },
   });
 
   return reply.code(200).send({ venue });

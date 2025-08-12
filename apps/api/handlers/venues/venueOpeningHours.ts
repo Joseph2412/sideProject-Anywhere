@@ -10,10 +10,8 @@ export const getVenueOpeningHoursHandler = async (request: FastifyRequest, reply
 
     const venue = await prisma.coworkingVenue.findFirst({
       where: {
-        HostProfile: {
-          some: {
-            userId: userId,
-          },
+        hostProfile: {
+          userId: userId,
         },
       },
       select: {
@@ -56,15 +54,12 @@ export const updateVenueOpeningHoursHandler = async (
   };
 
   try {
-    // SICUREZZA: Filtra per utente autenticato
     const userId = request.user.id;
 
     const firstVenue = await prisma.coworkingVenue.findFirst({
       where: {
-        HostProfile: {
-          some: {
-            userId: userId,
-          },
+        hostProfile: {
+          userId: userId,
         },
       },
       orderBy: { id: 'asc' },

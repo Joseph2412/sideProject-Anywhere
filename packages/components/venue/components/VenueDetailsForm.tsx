@@ -32,8 +32,12 @@ export const VenueDetailsForm = () => {
       .then(res => res.json())
       .then(data => {
         console.log('Venue GET:', data.venue); // <-- Debug
-        setVenueDetails(data.venue);
-        form.setFieldsValue({ ...data.venue, avatarUrl: data.venue.avatarURL });
+        if (data.venue) {
+          form.setFieldsValue({ ...data.venue, avatarUrl: data.venue.avatarURL || '' });
+          setVenueDetails(data.venue);
+        } else {
+          console.error('Venue non trovato');
+        }
       });
   }, [form, setVenueDetails]);
 
