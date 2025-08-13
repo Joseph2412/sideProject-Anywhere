@@ -73,23 +73,12 @@ model OpenDays {
   id       Int             @id @default(autoincrement())
   day      WeekDay       
   isClosed Boolean         @default(false)
+  periods  String[]        // Array di stringhe: ["09:00-12:00", "14:00-18:00"] 
   venue    CoworkingVenue  @relation(fields: [venueId], references: [id])
   venueId  Int
-  periods  OpeningPeriod[] //Un giorno può avere + Periodi di Apertura
   
   @@index([venueId])
   @@unique([venueId, day])
-}
-
-model OpeningPeriod {
-  id            Int         @id @default(autoincrement())
-  start         String
-  end           String
-  openingDays  OpenDays @relation(fields: [openingDaysId], references: [id])
-  openingDaysId Int
-
-  @@index([openingDaysId])
-  @@unique([openingDaysId, start, end])
 }
 
 model Package {

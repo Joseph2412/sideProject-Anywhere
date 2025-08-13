@@ -1,175 +1,129 @@
-import { Checkbox, TimePicker, Typography, Row, Col, Space, Button } from 'antd';
-import dayjs from 'dayjs';
-import React, { useEffect } from 'react';
+import React from 'react';
+import { Checkbox, TimePicker, Button, Space, Typography, Row, Col } from 'antd';
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
+import dayjs from 'dayjs';
+import { parsePeriodString, formatPeriodString } from './openingHours.types';
 
-type OpeningDayData = {
-  id?: number;
-  isClosed: boolean;
-  periods: {
-    id?: number;
-    start: string | null;
-    end: string | null;
-  }[];
-};
-
-type Props = {
+interface DayOpeningHoursProps {
   day: string;
   dayKey: string;
-  openingDayData: OpeningDayData;
-  onUpdateDay: (dayKey: string, data: OpeningDayData) => void;
-};
-
-export const DayOpeningHours: React.FC<Props> = ({ day, dayKey, openingDayData, onUpdateDay }) => {
-  const { isClosed = true, periods = [] } = openingDayData || {};
-
-  const dayjsPeriods = periods.map(period => {
-    if (!period.start || !period.end) {
-      return [null, null];
-    }
-    return [dayjs(period.start, 'HH:mm'), dayjs(period.end, 'HH:mm')];
-  });
-
-  const isPeriodEmpty = (index: number) => {
-    const period = periods[index];
-    return !period || !period.start || !period.end;
+  openingDayData: {
+    isClosed: boolean;
+    periods: string[];
   };
+  onUpdateDay: (dayKey: string, data: { isClosed: boolean; periods: string[] }) => void;
+}
 
-  const handleRemove = (index: number) => {
-    const updatedPeriods = [...periods];
-    updatedPeriods.splice(index, 1);
+export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
+  day,
+  dayKey,
+  openingDayData,
+  onUpdateDay,
+}) => {
+  const { isClosed, periods } = openingDayData;
 
-    onUpdateDay(dayKey, {
-      ...openingDayData,
-      periods: updatedPeriods,
-    });
-  };
-
-  const handleChange = (index: number, value: [dayjs.Dayjs, dayjs.Dayjs] | null) => {
-    if (!value) return;
-
-    const updatedPeriods = [...periods];
-    updatedPeriods[index] = {
-      ...updatedPeriods[index],
-      start: value[0].format('HH:mm'),
-      end: value[1].format('HH:mm'),
-    };
-
-    onUpdateDay(dayKey, {
-      ...openingDayData,
-      periods: updatedPeriods,
-    });
-  };
-
+  // 🎯 Pattern del checkbox che NASCONDE ma non elimina
   const handleToggleClosed = (e: CheckboxChangeEvent) => {
     const isChecked = e.target.checked;
 
     onUpdateDay(dayKey, {
-      ...openingDayData,
       isClosed: isChecked,
-      periods: isChecked ? [] : periods,
+      periods: periods, // 🎯 MANTIENI sempre i periodi esistenti
     });
   };
 
-  useEffect(() => {
-    if (!isClosed && periods.length === 0) {
-      onUpdateDay(dayKey, {
-        ...openingDayData,
-        periods: [{ start: null, end: null }],
-      });
-    }
-  }, [isClosed, periods.length, onUpdateDay, dayKey, openingDayData]);
+  const handleAddPeriod = () => {
+    const newPeriods = [...periods, '09:00-18:00'];
+    onUpdateDay(dayKey, {
+      isClosed: false, // 🎯 Quando aggiungi un periodo, apri automaticamente
+      periods: newPeriods,
+    });
+  };
+
+  const handleRemovePeriod = (index: number) => {
+    const newPeriods = periods.filter((_, i) => i !== index);
+    onUpdateDay(dayKey, {
+      isClosed,
+      periods: newPeriods,
+    });
+  };
+
+  const handlePeriodChange = (index: number, timeStrings: [string, string] | null) => {
+    if (!timeStrings || !timeStrings[0] || !timeStrings[1]) return;
+
+    const newPeriods = [...periods];
+    newPeriods[index] = formatPeriodString(timeStrings[0], timeStrings[1]);
+
+    onUpdateDay(dayKey, {
+      isClosed,
+      periods: newPeriods,
+    });
+  };
 
   return (
     <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
-      <Col>
+      <Col flex="auto">
         <div style={{ marginBottom: 6 }}>
           <Typography.Text strong>{day}</Typography.Text>
         </div>
 
+        {/* 🎯 Mostra i periodi SOLO se NON è chiuso */}
         {!isClosed && (
           <Space direction="vertical" size="middle">
-            {dayjsPeriods.map((dayjsPeriod, index) => (
-              <Space key={index} direction="vertical" size="small">
-                <Typography.Text>Dalle - Alle</Typography.Text>
-                <Space align="center">
-                  <TimePicker.RangePicker
-                    format="HH:mm"
-                    value={
-                      dayjsPeriod[0] && dayjsPeriod[1] ? [dayjsPeriod[0], dayjsPeriod[1]] : null
-                    }
-                    onChange={value => {
-                      if (value && value[0] && value[1]) {
-                        handleChange(index, [value[0], value[1]]);
-                      } else {
-                        handleChange(index, null);
-                      }
-                    }}
-                  />
+            {periods.map((period, index) => {
+              const parsed = parsePeriodString(period);
+              const timeRange = parsed ? [parsed.start, parsed.end] : null;
 
-                  {isPeriodEmpty(index) ? (
-                    <Button
-                      onClick={() => {
-                        handleChange(index, [dayjs('09:00', 'HH:mm'), dayjs('18:00', 'HH:mm')]);
-                      }}
-                    >
-                      Aggiungi periodo
-                    </Button>
-                  ) : (
-                    <Button onClick={() => handleRemove(index)}>Rimuovi</Button>
-                  )}
-                </Space>
-              </Space>
-            ))}
-
-            {/* ✅ Nuova logica: se ci sono periodi compilati, mostra TimePicker vuoto */}
-            {periods.some(period => period.start && period.end) && (
-              <Space direction="vertical" size="small">
-                <Typography.Text>Dalle - Alle</Typography.Text>
-                <Space align="center">
-                  <TimePicker.RangePicker
-                    format="HH:mm"
-                    value={null}
-                    onChange={value => {
-                      if (value && value[0] && value[1]) {
-                        // Aggiungi nuovo periodo direttamente
-                        const newPeriod = {
-                          start: value[0].format('HH:mm'),
-                          end: value[1].format('HH:mm'),
-                        };
-
-                        onUpdateDay(dayKey, {
-                          ...openingDayData,
-                          periods: [...periods, newPeriod],
-                        });
-                      }
-                    }}
-                  />
-
-                  <Button
-                    onClick={() => {
-                      // Aggiungi periodo con orari default
-                      const newPeriod = {
-                        start: '09:00',
-                        end: '18:00',
-                      };
-
-                      onUpdateDay(dayKey, {
-                        ...openingDayData,
-                        periods: [...periods, newPeriod],
-                      });
+              return (
+                <div key={index} style={{ width: '100%' }}>
+                  {/* 🎯 Label sopra il TimePicker */}
+                  <Typography.Text
+                    style={{
+                      fontSize: '12px',
+                      display: 'block',
+                      marginBottom: '4px',
                     }}
                   >
-                    Aggiungi periodo
-                  </Button>
-                </Space>
-              </Space>
-            )}
+                    Dalle - Alle
+                  </Typography.Text>
+                  <Space key={index} align="center">
+                    <TimePicker.RangePicker
+                      format="HH:mm"
+                      value={
+                        timeRange
+                          ? [dayjs(timeRange[0], 'HH:mm'), dayjs(timeRange[1], 'HH:mm')]
+                          : null
+                      }
+                      onChange={(_, timeStrings) =>
+                        handlePeriodChange(index, timeStrings as [string, string])
+                      }
+                    />
+                    <Button
+                      type="text"
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={() => handleRemovePeriod(index)}
+                    />
+                  </Space>
+                </div>
+              );
+            })}
+
+            <Button
+              type="dashed"
+              onClick={handleAddPeriod}
+              icon={<PlusOutlined />}
+              style={{ width: '100%' }}
+            >
+              Aggiungi periodo
+            </Button>
           </Space>
         )}
       </Col>
 
       <Col>
+        {/* Stesso pattern checkbox del tuo codebase */}
         <Checkbox checked={isClosed} onChange={handleToggleClosed}>
           Chiuso
         </Checkbox>

@@ -7,24 +7,22 @@ export const updateVenueOpeningDaysSchema = {
         type: 'array',
         items: {
           type: 'object',
-          required: ['day'],
+          required: ['day', 'isClosed'],
           properties: {
             day: {
               type: 'string',
               enum: ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'],
             },
+            isClosed: { type: 'boolean' },
             periods: {
               type: 'array',
               items: {
-                type: 'object',
-                properties: {
-                  start: { type: ['string', 'null'], pattern: '^([01]\\d|2[0-3]):([0-5]\\d)$' }, // HH:mm format
-                  end: { type: ['string', 'null'], pattern: '^([01]\\d|2[0-3]):([0-5]\\d)$' }, // HH:mm format
-                },
+                type: 'string',
+                pattern: '^([01]?\\d|2[0-3]):([0-5]\\d)-([01]?\\d|2[0-3]):([0-5]\\d)$', // HH:mm-HH:mm format
               },
             },
-            isClosed: { type: 'boolean' },
           },
+          additionalProperties: false,
         },
       },
     },

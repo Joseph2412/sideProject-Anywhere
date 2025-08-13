@@ -1,17 +1,10 @@
 import { atomWithStorage } from 'jotai/utils';
 
-export type OpeningPeriod = {
-  id: number;
-  start: string;
-  end: string;
-};
-
 export type OpeningDay = {
   id: number;
   day: string;
-  close: string;
   isClosed: boolean;
-  periods: OpeningPeriod[];
+  periods: string[]; // 🎯 Ora è array di stringhe: ["09:00-12:00", "14:00-18:00"]
 };
 
 export type ClosingPeriod = {

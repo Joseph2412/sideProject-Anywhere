@@ -26,10 +26,7 @@ export const getVenueDetailsHandler = async (request: FastifyRequest, reply: Fas
           id: true,
           day: true,
           isClosed: true,
-          periods: {
-            orderBy: [{ start: 'asc' }],
-            select: { id: true, start: true, end: true },
-          },
+          periods: true, // 🎯 Ora è semplicemente String[], non una relazione
         },
       },
     },

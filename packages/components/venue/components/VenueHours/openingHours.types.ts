@@ -1,30 +1,35 @@
-import { Dayjs } from 'dayjs';
-
-export type OpeningPeriod = [Dayjs | null, Dayjs | null];
-
-export type DayOpeningState = {
-  isClosed: boolean;
-  periods: OpeningPeriod[];
-};
+export interface OpeningDayData {
+  day: string; // "MONDAY", "TUESDAY", etc.
+  isClosed: boolean; // Boolean diretto dal checkbox
+  periods: string[]; // ["09:00-12:00", "14:00-18:00"] - vuoto se isClosed = true
+}
 
 export const weekDays = [
-  { label: 'Lunedì', value: 'MONDAY' },
-  { label: 'Martedì', value: 'TUESDAY' },
-  { label: 'Mercoledì', value: 'WEDNESDAY' },
-  { label: 'Giovedì', value: 'THURSDAY' },
-  { label: 'Venerdì', value: 'FRIDAY' },
-  { label: 'Sabato', value: 'SATURDAY' },
-  { label: 'Domenica', value: 'SUNDAY' },
-] as const;
+  { value: 'MONDAY', label: 'Lunedì' },
+  { value: 'TUESDAY', label: 'Martedì' },
+  { value: 'WEDNESDAY', label: 'Mercoledì' },
+  { value: 'THURSDAY', label: 'Giovedì' },
+  { value: 'FRIDAY', label: 'Venerdì' },
+  { value: 'SATURDAY', label: 'Sabato' },
+  { value: 'SUNDAY', label: 'Domenica' },
+];
 
-export type WeekDay = (typeof weekDays)[number]['value'];
+// Utility per validazione
+export const isValidTimePeriod = (period: string): boolean => {
+  const regex = /^([01]?\d|2[0-3]):([0-5]\d)-([01]?\d|2[0-3]):([0-5]\d)$/;
+  return regex.test(period);
+};
 
-export type OpeningDayData = {
-  id?: number;
-  isClosed: boolean;
-  periods: {
-    id?: number;
-    start: string | null;
-    end: string | null;
-  }[];
+// Utility per parsing
+export const parsePeriodString = (period: string): { start: string; end: string } | null => {
+  const [start, end] = period.split('-');
+  if (start && end) {
+    return { start, end };
+  }
+  return null;
+};
+
+// Utility per formattazione
+export const formatPeriodString = (start: string, end: string): string => {
+  return `${start}-${end}`;
 };

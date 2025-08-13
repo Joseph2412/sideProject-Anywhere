@@ -3,32 +3,26 @@ import { prisma } from '../../libs/prisma';
 import { WeekDay } from '@repo/database';
 
 export const getVenueOpeningDaysHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-  console.log('GET /venues/opening-days chiamato');
   try {
-    // SICUREZZA: Filtra per utente autenticato
     const userId = request.user.id;
 
     const venue = await prisma.coworkingVenue.findFirst({
-      where: {
-        hostProfile: {
-          userId: userId,
-        },
-      },
-      select: {
-        id: true,
-        openingDays: {
-          include: {
-            periods: true,
-          },
-        },
-      },
+      where: { hostProfile: { userId } },
+      include: { openingDays: true },
     });
 
     if (!venue) {
-      return reply.code(404).send({ message: 'Venue non trovato o non autorizzato' });
+      return reply.code(404).send({ message: 'Venue non trovato' });
     }
 
-    return reply.code(200).send({ openingDays: venue.openingDays });
+    // Dati già nel formato perfetto!
+    const openingDays = venue.openingDays.map(day => ({
+      day: day.day,
+      isClosed: day.isClosed, // Boolean diretto
+      periods: day.periods, // Array stringhe diretto
+    }));
+
+    return reply.code(200).send({ openingDays });
   } catch (error) {
     console.error(error);
     return reply.code(500).send({ message: 'Internal Server Error' });
@@ -39,79 +33,90 @@ export const updateVenueOpeningDaysHandler = async (
   request: FastifyRequest,
   reply: FastifyReply
 ) => {
-  console.log('Dati ricevuti dal front-end:', request.body);
+  console.log('=== UPDATE VENUE OPENING DAYS ===');
+  console.log('Request body:', JSON.stringify(request.body, null, 2));
 
   const { openingDays } = request.body as {
-    openingDays: {
-      day: string;
-      isClosed: boolean;
-      periods: {
-        id?: number;
-        start: string;
-        end: string;
-      }[];
-    }[];
+    openingDays: { day: string; isClosed: boolean; periods: string[] }[];
   };
+
+  console.log('Extracted openingDays:', JSON.stringify(openingDays, null, 2));
 
   try {
     const userId = request.user.id;
+    console.log('User ID:', userId);
 
-    const firstVenue = await prisma.coworkingVenue.findFirst({
-      where: {
-        hostProfile: {
-          userId: userId,
-        },
-      },
-      orderBy: { id: 'asc' },
-      take: 1,
+    const venue = await prisma.coworkingVenue.findFirst({
+      where: { hostProfile: { userId } },
     });
 
-    if (!firstVenue) {
-      return reply.code(404).send({ message: 'Venue non trovato o non autorizzato' });
+    console.log('Found venue:', venue?.id);
+
+    if (!venue) {
+      console.log('No venue found for user:', userId);
+      return reply.code(404).send({ message: 'Venue non trovato' });
     }
 
-    for (const day of openingDays) {
-      const { day, isClosed, periods } = day;
+    // Validazione e pulizia
+    const validatedOpeningDays = openingDays.map(dayData => {
+      console.log(
+        `Processing day: ${dayData.day}, isClosed: ${dayData.isClosed}, periods:`,
+        dayData.periods
+      );
 
-      await prisma.openDays.upsert({
-        where: { venueId_day: { venueId: firstVenue.id, day: day as WeekDay } },
-        update: {
-          isClosed,
-          periods: {
-            upsert: periods.map(period => ({
-              where: { id: period.id || 0 }, // Usa l'ID se esiste, altrimenti un valore inesistente
-              update: {
-                start: period.start,
-                end: period.end,
-              },
-              create: {
-                start: period.start,
-                end: period.end,
-              },
-            })),
+      const result = {
+        day: dayData.day,
+        isClosed: Boolean(dayData.isClosed), // Assicura boolean
+        periods: dayData.periods.filter(period => {
+          const isValid = /^([01]?\d|2[0-3]):([0-5]\d)-([01]?\d|2[0-3]):([0-5]\d)$/.test(period);
+          console.log(`Period ${period} is valid: ${isValid}`);
+          return isValid;
+        }), // 🎯 SALVA sempre i periodi, indipendentemente da isClosed
+      };
+
+      console.log(`Validated result for ${dayData.day}:`, result);
+      return result;
+    });
+
+    console.log('All validated opening days:', JSON.stringify(validatedOpeningDays, null, 2));
+
+    // Salvataggio ultra-semplice
+    console.log('Starting database transaction...');
+    await prisma.$transaction(
+      validatedOpeningDays.map(dayData => {
+        console.log(`Creating upsert for day: ${dayData.day}`);
+        return prisma.openDays.upsert({
+          where: {
+            venueId_day: {
+              venueId: venue.id,
+              day: dayData.day as WeekDay,
+            },
           },
-        },
-        create: {
-          venueId: firstVenue.id,
-          day: day as WeekDay,
-          isClosed,
-          periods: {
-            create: periods.map(period => ({
-              start: period.start,
-              end: period.end,
-            })),
+          update: {
+            isClosed: dayData.isClosed, // Boolean diretto
+            periods: dayData.periods, // Array stringhe diretto
           },
-        },
-      });
-    }
-    return reply.code(200).send({ message: 'Orari di apertura aggiornati con successo.' });
+          create: {
+            venueId: venue.id,
+            day: dayData.day as WeekDay,
+            isClosed: dayData.isClosed, // Boolean diretto
+            periods: dayData.periods, // Array stringhe diretto
+          },
+        });
+      })
+    );
+
+    console.log('Database transaction completed successfully');
+    return reply.code(200).send({
+      message: 'Orari di apertura aggiornati con successo.',
+      success: true,
+    });
   } catch (error) {
-    console.error(error);
+    console.error('Error in updateVenueOpeningDaysHandler:', error);
     return reply.code(500).send({
-      error: 'Validation Failed',
-      details: error,
-      where: (error as any)?.validationContext ?? 'body', //Puoi eliminarli volendo
       message: "Errore durante l'aggiornamento degli orari di apertura.",
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };
