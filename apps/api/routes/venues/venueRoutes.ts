@@ -1,8 +1,9 @@
 import { FastifyInstance } from 'fastify';
 
-import { venueDetailsRoute, venueOpeningHoursRoute } from './venues';
+import { venueDetailsRoute, venueOpeningDaysRoute, venueClosingPeriods } from './venues';
 
 export async function venuesRoutes(fastify: FastifyInstance) {
   venueDetailsRoute(fastify);
-  venueOpeningHoursRoute(fastify);
+  venueOpeningDaysRoute(fastify);
+  venueClosingPeriods(fastify);
 }

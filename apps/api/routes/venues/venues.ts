@@ -13,6 +13,11 @@ import {
   getVenueOpeningDaysHandler,
   updateVenueOpeningDaysHandler,
 } from '../../handlers/venues/venueOpeningDays';
+import {
+  getVenueClosingPeriodsHandler,
+  updateVenueClosingPeriodsHandler,
+} from '../../handlers/venues/venueClosingPeriods'; // Corretto percorso
+import { updateVenueClosingPeriodsSchema } from '../../schemas/venueClosingPeriodsSchema';
 
 export async function venueDetailsRoute(fastify: FastifyInstance) {
   fastify.get('/venues', { preHandler: fastify.authenticate }, getVenueDetailsHandler);
@@ -40,4 +45,16 @@ export async function venueOpeningDaysRoute(fastify: FastifyInstance) {
   );
 }
 
+export async function venueClosingPeriods(fastify: FastifyInstance) {
+  fastify.get(
+    '/venues/closing-periods',
+    { preHandler: fastify.authenticate },
+    getVenueClosingPeriodsHandler
+  );
+  fastify.put(
+    '/venues/closing-periods',
+    { preHandler: fastify.authenticate, schema: updateVenueClosingPeriodsSchema },
+    updateVenueClosingPeriodsHandler
+  );
+}
 //Un domani, se aggiungi la gestione di più locali, dovrai modificare questi endpoint per supportare la selezione del locale specifico espondendo endpoint /venues/:id

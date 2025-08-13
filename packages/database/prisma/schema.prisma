@@ -148,6 +148,7 @@ model ClosingPeriod {
 
   @@index([venueId])
   @@index([venueId, start, end])
+  @@unique([venueId, start, end])
 }
 
 model PaymentInfo {

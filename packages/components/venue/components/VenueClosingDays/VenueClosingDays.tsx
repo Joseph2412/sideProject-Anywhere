@@ -1,61 +1,108 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Switch, Button, DatePicker, Form, Row, Col, Divider, Card } from 'antd';
 import { PrimaryButton } from '../../../buttons/PrimaryButton';
 import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import { useSetAtom } from 'jotai';
+import { messageToast } from '@repo/ui/store/ToastStore';
 
 type ClosingPeriod = {
   isEnabled: boolean;
-  dates?: [Dayjs, Dayjs]; // il RangePicker produce una tupla di Dayjs
+  dates?: [Dayjs, Dayjs];
 };
-
-// type ClosedDaysState = {
-//   isClosed: boolean;
-//   periods: ClosingPeriod[];
-// };
 
 type FormValues = {
   periods: ClosingPeriod[];
 };
 
-// type Props = {
-//   day: string;
-//   dayKey: string;
-//   periods: ClosingPeriod[];
-//   onToggleDisabled: (e: SwitchChangeEventHandler) => void;
-//   setClosedDaysState: React.Dispatch<React.SetStateAction<Record<string, ClosedDaysState>>>;
-// };
-
-// const handleAdd = (index: number) => {
-//   const updated = [...periods]; //Ripesca i precedenti periodi di chiusura
-//   updated[index] = [dayjs('09:00', 'HH:mm'), dayjs('18:00', 'HH:mm')];
-//   setClosingDaysState(prev: => ({
-//     ...prev, //Dati Precedenti
-//     [dayKey]: { ...prev[dayKey]!, periods: updated },
-//   }));
-// };
-
-// const handleRemove = (index: number) => {
-//   //hook per levare periodi di chiusura
-//   const updated = [...periods];
-//   updated.splice(index, 1);
-//   setClosingDaysState(prev => ({
-//     ...prev,
-//     [dayKey]: { ...prev[dayKey]!, periods: updated },
-//   }));
-// };
-
 export const VenueClosingDays: React.FC = () => {
+  const [originalPeriods, setOriginalPeriods] = useState<ClosingPeriod[]>([]);
   const [form] = Form.useForm<FormValues>();
   const { RangePicker } = DatePicker;
   const addRef = useRef<((payload?: ClosingPeriod) => void) | null>(null);
 
+  // Hook per impostare i messaggi toast
+  const setMessageToast = useSetAtom(messageToast);
+
+  useEffect(() => {
+    fetch('http://localhost:3001/api/venues/closing-periods', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        const formatted = data.closingPeriods.map((p: any) => ({
+          isEnabled: p.isClosed,
+          dates: [dayjs(p.start), dayjs(p.end)],
+        }));
+        form.setFieldsValue({ periods: formatted });
+        setOriginalPeriods(formatted);
+      })
+      .catch((err: Error) => {
+        console.error('Errore durante il fetch:', err);
+      });
+  }, [form]);
+
+  const handleSave = async () => {
+    const values = form.getFieldsValue();
+
+    const closingPeriods = values.periods
+      .filter((p: ClosingPeriod) => p.dates && p.isEnabled)
+      .map((p: ClosingPeriod) => ({
+        isClosed: p.isEnabled,
+        start: p.dates![0].toISOString(),
+        end: p.dates![1].toISOString(),
+      }));
+
+    try {
+      await fetch('http://localhost:3001/api/venues/closing-periods', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`, // Aggiungi il token
+        },
+        body: JSON.stringify({ closingPeriods }),
+      });
+
+      // Mostra un messaggio di successo
+      setMessageToast({
+        type: 'success',
+        message: 'Successo',
+        description: 'Periodi di chiusura salvati con successo.',
+        duration: 3,
+        placement: 'bottomRight',
+      });
+
+      setOriginalPeriods(values.periods);
+    } catch (err) {
+      // Mostra un messaggio di errore
+      setMessageToast({
+        type: 'error',
+        message: 'Errore',
+        description: 'Errore durante il salvataggio dei periodi di chiusura.',
+        duration: 3,
+        placement: 'bottomRight',
+      });
+    }
+  };
+
+  const handleCancel = () => {
+    form.setFieldsValue({ periods: originalPeriods });
+  };
+
   return (
-    <Form form={form} layout="vertical">
+    <Form form={form} layout="vertical" onFinish={handleSave}>
       <Card>
         <Row>
           <PrimaryButton style={{ width: 'auto' }}>Importa Festività Nazionali</PrimaryButton>
         </Row>
-        <Divider></Divider>
+        <Divider />
         <Col>
           <Form.List name="periods">
             {(fields, { add, remove }) => {
@@ -64,8 +111,8 @@ export const VenueClosingDays: React.FC = () => {
               return (
                 <div>
                   {fields.map(({ key, name, ...restField }) => (
-                    <Form.Item key={key} label="Periodo Dal-Al" style={{ marginBottom: 0 }}>
-                      <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Form.Item key={key} label="Periodo Dal - Al" style={{ marginBottom: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <Form.Item
                           {...restField}
                           name={[name, 'isEnabled']}
@@ -74,19 +121,22 @@ export const VenueClosingDays: React.FC = () => {
                         >
                           <Switch />
                         </Form.Item>
-                        <Form.Item
-                          noStyle
-                          dependencies={[['periods', name, 'isEnabled']]} // osserva solo questo campo
-                        >
+                        <Form.Item noStyle dependencies={[['periods', name, 'isEnabled']]}>
                           {({ getFieldValue }) => {
                             const enabled = getFieldValue(['periods', name, 'isEnabled']);
-
                             return (
                               <Form.Item
                                 {...restField}
                                 name={[name, 'dates']}
                                 rules={
-                                  enabled ? [{ required: true, message: 'Seleziona una Data' }] : []
+                                  enabled
+                                    ? [
+                                        {
+                                          required: true,
+                                          message: 'Seleziona un intervallo di date',
+                                        },
+                                      ]
+                                    : []
                                 }
                               >
                                 <RangePicker disabled={!enabled} />
@@ -102,6 +152,7 @@ export const VenueClosingDays: React.FC = () => {
               );
             }}
           </Form.List>
+
           <Row
             style={{
               marginTop: 15,
@@ -111,11 +162,11 @@ export const VenueClosingDays: React.FC = () => {
             }}
           >
             <div style={{ display: 'flex', gap: 15 }}>
-              <Button onClick={() => form.resetFields()}>Annulla</Button>
+              <Button onClick={handleCancel}>Annulla</Button>
               <PrimaryButton htmlType="submit">Salva</PrimaryButton>
             </div>
             <Col>
-              <Button onClick={() => addRef.current?.({ isEnabled: false })}>Aggiungi</Button>
+              <Button onClick={() => addRef.current?.({ isEnabled: true })}>Aggiungi</Button>
             </Col>
           </Row>
         </Col>
