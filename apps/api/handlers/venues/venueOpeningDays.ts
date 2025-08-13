@@ -2,8 +2,8 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { prisma } from '../../libs/prisma';
 import { WeekDay } from '@repo/database';
 
-export const getVenueOpeningHoursHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-  console.log('GET /venues/opening-hours chiamato');
+export const getVenueOpeningDaysHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+  console.log('GET /venues/opening-days chiamato');
   try {
     // SICUREZZA: Filtra per utente autenticato
     const userId = request.user.id;
@@ -16,7 +16,7 @@ export const getVenueOpeningHoursHandler = async (request: FastifyRequest, reply
       },
       select: {
         id: true,
-        openingHours: {
+        openingDays: {
           include: {
             periods: true,
           },
@@ -28,21 +28,21 @@ export const getVenueOpeningHoursHandler = async (request: FastifyRequest, reply
       return reply.code(404).send({ message: 'Venue non trovato o non autorizzato' });
     }
 
-    return reply.code(200).send({ openingHours: venue.openingHours });
+    return reply.code(200).send({ openingDays: venue.openingDays });
   } catch (error) {
     console.error(error);
     return reply.code(500).send({ message: 'Internal Server Error' });
   }
 };
 
-export const updateVenueOpeningHoursHandler = async (
+export const updateVenueOpeningDaysHandler = async (
   request: FastifyRequest,
   reply: FastifyReply
 ) => {
   console.log('Dati ricevuti dal front-end:', request.body);
 
-  const { openingHours } = request.body as {
-    openingHours: {
+  const { openingDays } = request.body as {
+    openingDays: {
       day: string;
       isClosed: boolean;
       periods: {
@@ -70,10 +70,10 @@ export const updateVenueOpeningHoursHandler = async (
       return reply.code(404).send({ message: 'Venue non trovato o non autorizzato' });
     }
 
-    for (const hour of openingHours) {
-      const { day, isClosed, periods } = hour;
+    for (const day of openingDays) {
+      const { day, isClosed, periods } = day;
 
-      await prisma.openingHour.upsert({
+      await prisma.openDays.upsert({
         where: { venueId_day: { venueId: firstVenue.id, day: day as WeekDay } },
         update: {
           isClosed,
@@ -107,8 +107,11 @@ export const updateVenueOpeningHoursHandler = async (
     return reply.code(200).send({ message: 'Orari di apertura aggiornati con successo.' });
   } catch (error) {
     console.error(error);
-    return reply
-      .code(500)
-      .send({ message: "Errore durante l'aggiornamento degli orari di apertura." });
+    return reply.code(500).send({
+      error: 'Validation Failed',
+      details: error,
+      where: (error as any)?.validationContext ?? 'body', //Puoi eliminarli volendo
+      message: "Errore durante l'aggiornamento degli orari di apertura.",
+    });
   }
 };

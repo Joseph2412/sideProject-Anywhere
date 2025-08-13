@@ -54,7 +54,6 @@ model CoworkingVenue {
   id           Int           @id @default(autoincrement())
   name         String
   address      String        @db.VarChar(200)
-  openingHours OpeningHour[]
   services     String[]
   description  String?        @db.VarChar(200)
   photos       String[] //URLs di S3
@@ -65,8 +64,32 @@ model CoworkingVenue {
 
   closingPeriods ClosingPeriod[]
   avatarURL  String?
-
+  openingDays OpenDays[]
+  
   @@index([name])
+}
+
+model OpenDays {
+  id       Int             @id @default(autoincrement())
+  day      WeekDay       
+  isClosed Boolean         @default(false)
+  venue    CoworkingVenue  @relation(fields: [venueId], references: [id])
+  venueId  Int
+  periods  OpeningPeriod[] //Un giorno può avere + Periodi di Apertura
+  
+  @@index([venueId])
+  @@unique([venueId, day])
+}
+
+model OpeningPeriod {
+  id            Int         @id @default(autoincrement())
+  start         String
+  end           String
+  openingDays  OpenDays @relation(fields: [openingDaysId], references: [id])
+  openingDaysId Int
+
+  @@index([openingDaysId])
+  @@unique([openingDaysId, start, end])
 }
 
 model Package {
@@ -125,28 +148,6 @@ enum WeekDay {
   SUNDAY
 }
 
-model OpeningHour {
-  id       Int             @id @default(autoincrement())
-  day      WeekDay       
-  isClosed Boolean         @default(false)
-  venue    CoworkingVenue  @relation(fields: [venueId], references: [id])
-  venueId  Int
-  periods  OpeningPeriod[]
-
-  @@index([venueId])
-  @@unique([venueId, day])
-}
-
-model OpeningPeriod {
-  id            Int         @id @default(autoincrement())
-  start         String
-  end           String
-  openingHour   OpeningHour @relation(fields: [openingHourId], references: [id])
-  openingHourId Int
-
-  @@index([openingHourId])
-  @@unique([openingHourId, start, end])
-}
 
 model ClosingPeriod {
   id Int @id @default(autoincrement())

@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Divider, Button, Space, message, Spin } from 'antd';
-import { OpeningHourData, weekDays } from './openingHours.types';
+import { OpeningDayData, weekDays } from './openingHours.types';
 import { DayOpeningHours } from './DayOpeningHours';
 
 export const VenueHoursForm: React.FC = () => {
-  const [openingHoursState, setOpeningHoursState] = useState<Record<string, OpeningHourData>>({});
-  const [initialOpeningHoursState, setInitialOpeningHoursState] = useState<
-    Record<string, OpeningHourData>
+  const [openingDaysState, setOpeningDaysState] = useState<Record<string, OpeningDayData>>({});
+  const [initialOpeningDaysState, setInitialOpeningDaysState] = useState<
+    Record<string, OpeningDayData>
   >({});
 
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchOpeningHours = async () => {
+    const fetchOpeningDays = async () => {
       setLoading(true);
       try {
-        const res = await fetch('http://localhost:3001/api/venues/opening-hours', {
+        const res = await fetch('http://localhost:3001/api/venues/opening-days', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -27,16 +27,16 @@ export const VenueHoursForm: React.FC = () => {
         const data = await res.json();
         const formattedData = weekDays.reduce(
           (acc, day) => {
-            acc[day.value] = data.openingHours.find((hour: any) => hour.day === day.value) || {
+            acc[day.value] = data.openingDays.find((hour: any) => hour.day === day.value) || {
               isClosed: true,
               periods: [],
             };
             return acc;
           },
-          {} as Record<string, OpeningHourData>
+          {} as Record<string, OpeningDayData>
         );
-        setOpeningHoursState(formattedData);
-        setInitialOpeningHoursState(formattedData);
+        setOpeningDaysState(formattedData);
+        setInitialOpeningDaysState(formattedData);
       } catch (error) {
         console.error(error);
         message.error('Errore nel recupero degli orari di apertura');
@@ -44,20 +44,20 @@ export const VenueHoursForm: React.FC = () => {
         setLoading(false);
       }
     };
-    fetchOpeningHours();
+    fetchOpeningDays();
   }, []);
 
   const handleSave = async () => {
     try {
-      console.log('Dati inviati al backend:', openingHoursState);
+      console.log('Dati inviati al backend:', openingDaysState);
 
       // Trasforma i dati per includere la proprietà 'day'
-      const formattedOpeningHours = Object.entries(openingHoursState).map(([dayKey, data]) => ({
+      const formattedOpeningDays = Object.entries(openingDaysState).map(([dayKey, data]) => ({
         day: dayKey,
         ...data,
       }));
 
-      console.log('Dati formattati per il backend:', formattedOpeningHours);
+      console.log('Dati formattati per il backend:', formattedOpeningDays);
 
       const res = await fetch('http://localhost:3001/api/venues/opening-hours', {
         method: 'PUT',
@@ -65,7 +65,7 @@ export const VenueHoursForm: React.FC = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify({ openingHours: formattedOpeningHours }),
+        body: JSON.stringify({ openingDays: formattedOpeningDays }),
       });
 
       const data = await res.json();
@@ -76,15 +76,15 @@ export const VenueHoursForm: React.FC = () => {
       }
 
       message.success('Orari di apertura salvati con successo!');
-      setInitialOpeningHoursState(openingHoursState);
+      setInitialOpeningDaysState(openingDaysState);
     } catch (error) {
       console.error(error);
       message.error('Errore durante il salvataggio degli orari di apertura.');
     }
   };
 
-  const handleUpdateDay = (dayKey: string, data: OpeningHourData) => {
-    setOpeningHoursState(prev => ({
+  const handleUpdateDay = (dayKey: string, data: OpeningDayData) => {
+    setOpeningDaysState(prev => ({
       ...prev,
       [dayKey]: data,
     }));
@@ -101,8 +101,8 @@ export const VenueHoursForm: React.FC = () => {
           <DayOpeningHours
             day={day.label}
             dayKey={day.value}
-            openingHourData={
-              openingHoursState[day.value] || {
+            openingDayData={
+              openingDaysState[day.value] || {
                 isClosed: true,
                 periods: [],
               }
@@ -114,7 +114,7 @@ export const VenueHoursForm: React.FC = () => {
       ))}
 
       <Space style={{ marginTop: 24 }}>
-        <Button onClick={() => setOpeningHoursState(initialOpeningHoursState)}>Annulla</Button>
+        <Button onClick={() => setOpeningDaysState(initialOpeningDaysState)}>Annulla</Button>
         <Button type="primary" onClick={handleSave}>
           Salva
         </Button>

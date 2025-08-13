@@ -7,12 +7,12 @@ import {
 
 import { updateVenueDetailsSchema } from './../../schemas/venueDetailsSchema';
 
-import { updateVenueOpeningHoursSchema } from '../../schemas/venueOpeningHoursSchema';
+import { updateVenueOpeningDaysSchema } from '../../schemas/venueOpeningDaysSchema';
 
 import {
-  getVenueOpeningHoursHandler,
-  updateVenueOpeningHoursHandler,
-} from '../../handlers/venues/venueOpeningHours';
+  getVenueOpeningDaysHandler,
+  updateVenueOpeningDaysHandler,
+} from '../../handlers/venues/venueOpeningDays';
 
 export async function venueDetailsRoute(fastify: FastifyInstance) {
   fastify.get('/venues', { preHandler: fastify.authenticate }, getVenueDetailsHandler);
@@ -27,16 +27,16 @@ export async function venueDetailsRoute(fastify: FastifyInstance) {
   );
 }
 
-export async function venueOpeningHoursRoute(fastify: FastifyInstance) {
+export async function venueOpeningDaysRoute(fastify: FastifyInstance) {
   fastify.get(
-    '/venues/opening-hours',
+    '/venues/opening-days',
     { preHandler: fastify.authenticate },
-    getVenueOpeningHoursHandler
+    getVenueOpeningDaysHandler
   );
   fastify.put(
-    '/venues/opening-hours',
-    { preHandler: fastify.authenticate, schema: updateVenueOpeningHoursSchema },
-    updateVenueOpeningHoursHandler
+    '/venues/opening-days',
+    { preHandler: fastify.authenticate, schema: updateVenueOpeningDaysSchema },
+    updateVenueOpeningDaysHandler
   );
 }
 

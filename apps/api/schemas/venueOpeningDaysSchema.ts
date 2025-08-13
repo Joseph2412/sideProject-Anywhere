@@ -1,13 +1,13 @@
-export const updateVenueOpeningHoursSchema = {
+export const updateVenueOpeningDaysSchema = {
   body: {
     type: 'object',
-    required: ['openingHours'],
+    required: ['openingDays'],
     properties: {
-      openingHours: {
+      openingDays: {
         type: 'array',
         items: {
           type: 'object',
-          required: ['day', 'periods'],
+          required: ['day'],
           properties: {
             day: {
               type: 'string',
@@ -15,13 +15,11 @@ export const updateVenueOpeningHoursSchema = {
             },
             periods: {
               type: 'array',
-              uniqueItems: true, //Niente Duplicati Identici
               items: {
                 type: 'object',
-                required: ['start', 'end'],
                 properties: {
-                  start: { type: 'string', pattern: '^([01]\\d|2[0-3]):([0-5]\\d)$' }, // HH:mm format
-                  end: { type: 'string', pattern: '^([01]\\d|2[0-3]):([0-5]\\d)$' }, // HH:mm format
+                  start: { type: ['string', 'null'], pattern: '^([01]\\d|2[0-3]):([0-5]\\d)$' }, // HH:mm format
+                  end: { type: ['string', 'null'], pattern: '^([01]\\d|2[0-3]):([0-5]\\d)$' }, // HH:mm format
                 },
               },
             },

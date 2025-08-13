@@ -56,6 +56,26 @@ CREATE TABLE "public"."CoworkingVenue" (
 );
 
 -- CreateTable
+CREATE TABLE "public"."OpenDays" (
+    "id" SERIAL NOT NULL,
+    "day" "public"."WeekDay" NOT NULL,
+    "isClosed" BOOLEAN NOT NULL DEFAULT false,
+    "venueId" INTEGER NOT NULL,
+
+    CONSTRAINT "OpenDays_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."OpeningPeriod" (
+    "id" SERIAL NOT NULL,
+    "start" TEXT NOT NULL,
+    "end" TEXT NOT NULL,
+    "openingDaysId" INTEGER NOT NULL,
+
+    CONSTRAINT "OpeningPeriod_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "public"."Package" (
     "id" SERIAL NOT NULL,
     "title" VARCHAR(200) NOT NULL,
@@ -80,26 +100,6 @@ CREATE TABLE "public"."Plan" (
     "packageId" INTEGER NOT NULL,
 
     CONSTRAINT "Plan_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "public"."OpeningHour" (
-    "id" SERIAL NOT NULL,
-    "day" "public"."WeekDay" NOT NULL,
-    "isClosed" BOOLEAN NOT NULL DEFAULT false,
-    "venueId" INTEGER NOT NULL,
-
-    CONSTRAINT "OpeningHour_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "public"."OpeningPeriod" (
-    "id" SERIAL NOT NULL,
-    "start" TEXT NOT NULL,
-    "end" TEXT NOT NULL,
-    "openingHourId" INTEGER NOT NULL,
-
-    CONSTRAINT "OpeningPeriod_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -145,6 +145,18 @@ CREATE UNIQUE INDEX "CoworkingVenue_hostProfileId_key" ON "public"."CoworkingVen
 CREATE INDEX "CoworkingVenue_name_idx" ON "public"."CoworkingVenue"("name");
 
 -- CreateIndex
+CREATE INDEX "OpenDays_venueId_idx" ON "public"."OpenDays"("venueId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "OpenDays_venueId_day_key" ON "public"."OpenDays"("venueId", "day");
+
+-- CreateIndex
+CREATE INDEX "OpeningPeriod_openingDaysId_idx" ON "public"."OpeningPeriod"("openingDaysId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "OpeningPeriod_openingDaysId_start_end_key" ON "public"."OpeningPeriod"("openingDaysId", "start", "end");
+
+-- CreateIndex
 CREATE INDEX "Package_coworkingVenueId_idx" ON "public"."Package"("coworkingVenueId");
 
 -- CreateIndex
@@ -164,18 +176,6 @@ CREATE INDEX "Plan_price_idx" ON "public"."Plan"("price");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Plan_packageId_name_rate_key" ON "public"."Plan"("packageId", "name", "rate");
-
--- CreateIndex
-CREATE INDEX "OpeningHour_venueId_idx" ON "public"."OpeningHour"("venueId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "OpeningHour_venueId_day_key" ON "public"."OpeningHour"("venueId", "day");
-
--- CreateIndex
-CREATE INDEX "OpeningPeriod_openingHourId_idx" ON "public"."OpeningPeriod"("openingHourId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "OpeningPeriod_openingHourId_start_end_key" ON "public"."OpeningPeriod"("openingHourId", "start", "end");
 
 -- CreateIndex
 CREATE INDEX "ClosingPeriod_venueId_idx" ON "public"."ClosingPeriod"("venueId");
@@ -199,16 +199,16 @@ ALTER TABLE "public"."HostProfile" ADD CONSTRAINT "HostProfile_userId_fkey" FORE
 ALTER TABLE "public"."CoworkingVenue" ADD CONSTRAINT "CoworkingVenue_hostProfileId_fkey" FOREIGN KEY ("hostProfileId") REFERENCES "public"."HostProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "public"."OpenDays" ADD CONSTRAINT "OpenDays_venueId_fkey" FOREIGN KEY ("venueId") REFERENCES "public"."CoworkingVenue"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."OpeningPeriod" ADD CONSTRAINT "OpeningPeriod_openingDaysId_fkey" FOREIGN KEY ("openingDaysId") REFERENCES "public"."OpenDays"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "public"."Package" ADD CONSTRAINT "Package_coworkingVenueId_fkey" FOREIGN KEY ("coworkingVenueId") REFERENCES "public"."CoworkingVenue"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Plan" ADD CONSTRAINT "Plan_packageId_fkey" FOREIGN KEY ("packageId") REFERENCES "public"."Package"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."OpeningHour" ADD CONSTRAINT "OpeningHour_venueId_fkey" FOREIGN KEY ("venueId") REFERENCES "public"."CoworkingVenue"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."OpeningPeriod" ADD CONSTRAINT "OpeningPeriod_openingHourId_fkey" FOREIGN KEY ("openingHourId") REFERENCES "public"."OpeningHour"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."ClosingPeriod" ADD CONSTRAINT "ClosingPeriod_venueId_fkey" FOREIGN KEY ("venueId") REFERENCES "public"."CoworkingVenue"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

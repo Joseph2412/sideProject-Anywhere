@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import React, { useEffect } from 'react';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 
-type OpeningHourData = {
+type OpeningDayData = {
   id?: number;
   isClosed: boolean;
   periods: {
@@ -16,12 +16,12 @@ type OpeningHourData = {
 type Props = {
   day: string;
   dayKey: string;
-  openingHourData: OpeningHourData;
-  onUpdateDay: (dayKey: string, data: OpeningHourData) => void;
+  openingDayData: OpeningDayData;
+  onUpdateDay: (dayKey: string, data: OpeningDayData) => void;
 };
 
-export const DayOpeningHours: React.FC<Props> = ({ day, dayKey, openingHourData, onUpdateDay }) => {
-  const { isClosed = true, periods = [] } = openingHourData || {};
+export const DayOpeningHours: React.FC<Props> = ({ day, dayKey, openingDayData, onUpdateDay }) => {
+  const { isClosed = true, periods = [] } = openingDayData || {};
 
   const dayjsPeriods = periods.map(period => {
     if (!period.start || !period.end) {
@@ -40,7 +40,7 @@ export const DayOpeningHours: React.FC<Props> = ({ day, dayKey, openingHourData,
     updatedPeriods.splice(index, 1);
 
     onUpdateDay(dayKey, {
-      ...openingHourData,
+      ...openingDayData,
       periods: updatedPeriods,
     });
   };
@@ -56,7 +56,7 @@ export const DayOpeningHours: React.FC<Props> = ({ day, dayKey, openingHourData,
     };
 
     onUpdateDay(dayKey, {
-      ...openingHourData,
+      ...openingDayData,
       periods: updatedPeriods,
     });
   };
@@ -65,7 +65,7 @@ export const DayOpeningHours: React.FC<Props> = ({ day, dayKey, openingHourData,
     const isChecked = e.target.checked;
 
     onUpdateDay(dayKey, {
-      ...openingHourData,
+      ...openingDayData,
       isClosed: isChecked,
       periods: isChecked ? [] : periods,
     });
@@ -74,11 +74,11 @@ export const DayOpeningHours: React.FC<Props> = ({ day, dayKey, openingHourData,
   useEffect(() => {
     if (!isClosed && periods.length === 0) {
       onUpdateDay(dayKey, {
-        ...openingHourData,
+        ...openingDayData,
         periods: [{ start: null, end: null }],
       });
     }
-  }, [isClosed, periods.length, onUpdateDay, dayKey, openingHourData]);
+  }, [isClosed, periods.length, onUpdateDay, dayKey, openingDayData]);
 
   return (
     <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
@@ -139,7 +139,7 @@ export const DayOpeningHours: React.FC<Props> = ({ day, dayKey, openingHourData,
                         };
 
                         onUpdateDay(dayKey, {
-                          ...openingHourData,
+                          ...openingDayData,
                           periods: [...periods, newPeriod],
                         });
                       }
@@ -155,7 +155,7 @@ export const DayOpeningHours: React.FC<Props> = ({ day, dayKey, openingHourData,
                       };
 
                       onUpdateDay(dayKey, {
-                        ...openingHourData,
+                        ...openingDayData,
                         periods: [...periods, newPeriod],
                       });
                     }}

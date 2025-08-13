@@ -20,7 +20,7 @@ export const getVenueDetailsHandler = async (request: FastifyRequest, reply: Fas
       services: true,
       photos: true,
       avatarURL: true,
-      openingHours: {
+      openingDays: {
         orderBy: [{ day: 'asc' }],
         select: {
           id: true,

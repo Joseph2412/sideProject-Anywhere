@@ -6,7 +6,7 @@ export type OpeningPeriod = {
   end: string;
 };
 
-export type OpeningHour = {
+export type OpeningDay = {
   id: number;
   day: string;
   close: string;
@@ -41,7 +41,7 @@ export type VenueDetails = {
   services: string[];
   avatarURL?: string;
   photos: string[];
-  openingHours: OpeningHour[];
+  openingDays: OpeningDay[];
   closingPeriods: ClosingPeriod[];
   packages: Package[];
 };
