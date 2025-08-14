@@ -9,7 +9,8 @@
     "check-types": "turbo run check-types",
     "database:generate": "cd packages/database && npm run generate && cd -",
     "backend": "cd apps/api && pnpm run dev",
-    "frontend": "cd apps/host && pnpm run dev"
+    "frontend": "cd apps/host && pnpm run dev",
+    "studio": "cd packages/database && pnpm prisma studio"
   },
   "devDependencies": {
     "@types/react": "18.0.37",

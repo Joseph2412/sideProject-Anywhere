@@ -7,7 +7,8 @@ import { useSetAtom } from 'jotai';
 import { messageToast } from '@repo/ui/store/ToastStore';
 
 type ClosingPeriod = {
-  isEnabled: boolean;
+  id: number;
+  isClosed: boolean;
   dates?: [Dayjs, Dayjs];
 };
 
@@ -38,7 +39,7 @@ export const VenueClosingDays: React.FC = () => {
       })
       .then(data => {
         const formatted = data.closingPeriods.map((p: any) => ({
-          isEnabled: p.isClosed,
+          isClosed: p.isClosed,
           dates: [dayjs(p.start), dayjs(p.end)],
         }));
         form.setFieldsValue({ periods: formatted });
@@ -53,24 +54,39 @@ export const VenueClosingDays: React.FC = () => {
     const values = form.getFieldsValue();
 
     const closingPeriods = values.periods
-      .filter((p: ClosingPeriod) => p.dates && p.isEnabled)
+      .filter((p: ClosingPeriod) => p.dates)
       .map((p: ClosingPeriod) => ({
-        isClosed: p.isEnabled,
+        id: p.id,
+        isClosed: p.isClosed,
         start: p.dates![0].toISOString(),
         end: p.dates![1].toISOString(),
       }));
+
+    const originalPeriodsMapped = originalPeriods.map(p => ({
+      id: p.id,
+      isClosed: p.isClosed,
+      start: p.dates![0].toISOString(),
+      end: p.dates![1].toISOString(),
+    }));
+
+    console.log('Request body:', {
+      closingPeriods,
+      originalPeriods: originalPeriodsMapped,
+    });
 
     try {
       await fetch('http://localhost:3001/api/venues/closing-periods', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`, // Aggiungi il token
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify({ closingPeriods }),
+        body: JSON.stringify({
+          closingPeriods,
+          originalPeriods: originalPeriodsMapped,
+        }),
       });
 
-      // Mostra un messaggio di successo
       setMessageToast({
         type: 'success',
         message: 'Successo',
@@ -81,7 +97,6 @@ export const VenueClosingDays: React.FC = () => {
 
       setOriginalPeriods(values.periods);
     } catch (err) {
-      // Mostra un messaggio di errore
       setMessageToast({
         type: 'error',
         message: 'Errore',
@@ -115,15 +130,15 @@ export const VenueClosingDays: React.FC = () => {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <Form.Item
                           {...restField}
-                          name={[name, 'isEnabled']}
+                          name={[name, 'isClosed']}
                           valuePropName="checked"
                           initialValue={false}
                         >
                           <Switch />
                         </Form.Item>
-                        <Form.Item noStyle dependencies={[['periods', name, 'isEnabled']]}>
+                        <Form.Item noStyle dependencies={[['periods', name, 'isClosed']]}>
                           {({ getFieldValue }) => {
-                            const enabled = getFieldValue(['periods', name, 'isEnabled']);
+                            const enabled = getFieldValue(['periods', name, 'isClosed']);
                             return (
                               <Form.Item
                                 {...restField}
@@ -166,7 +181,9 @@ export const VenueClosingDays: React.FC = () => {
               <PrimaryButton htmlType="submit">Salva</PrimaryButton>
             </div>
             <Col>
-              <Button onClick={() => addRef.current?.({ isEnabled: true })}>Aggiungi</Button>
+              <Button onClick={() => addRef.current?.({ id: Date.now(), isClosed: true })}>
+                Aggiungi
+              </Button>
             </Col>
           </Row>
         </Col>

@@ -144,7 +144,7 @@ model ClosingPeriod {
   end DateTime
   venue CoworkingVenue @relation(fields: [venueId], references: [id])
   venueId Int
-  isClosed Boolean  @default(true)
+  isClosed Boolean  
 
   @@index([venueId])
   @@index([venueId, start, end])
