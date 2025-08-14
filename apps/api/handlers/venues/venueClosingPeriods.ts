@@ -18,9 +18,9 @@ export const getVenueClosingPeriodsHandler = async (
     }
 
     const closingPeriods = venue.closingPeriods.map(period => ({
-      isClosed: period.isClosed, // Boolean diretto
-      start: period.start, // DateTime di Inizio
-      end: period.end, // DateTime di Fine
+      start: period.start ? period.start.toISOString() : undefined, // DateTime di Inizio
+      end: period.end ? period.end.toISOString() : undefined, // DateTime di Fine
+      singleDate: period.singleDate ? period.singleDate.toISOString() : undefined, // Data singola se presente
     }));
 
     return reply.code(200).send({ closingPeriods });
@@ -38,9 +38,9 @@ export const updateVenueClosingPeriodsHandler = async (
   const { closingPeriods } = request.body as {
     closingPeriods: {
       id?: number;
-      start: string;
-      end: string;
-      isClosed: boolean;
+      start?: string;
+      end?: string;
+      singleDate?: string;
     }[];
   };
 
@@ -49,7 +49,7 @@ export const updateVenueClosingPeriodsHandler = async (
 
     const venue = await prisma.coworkingVenue.findFirst({
       where: { hostProfile: { userId } },
-      include: { closingPeriods: true }, // Includi i periodi esistenti
+      include: { closingPeriods: true },
     });
 
     if (!venue) {
@@ -59,9 +59,9 @@ export const updateVenueClosingPeriodsHandler = async (
     // Recupera i periodi originali dal database
     const originalPeriods = venue.closingPeriods.map(period => ({
       id: period.id,
-      start: period.start.toISOString(),
-      end: period.end.toISOString(),
-      isClosed: period.isClosed,
+      start: period.start ? period.start.toISOString() : '',
+      end: period.end ? period.end.toISOString() : '',
+      singleDate: period.singleDate ? period.singleDate.toISOString() : undefined,
     }));
 
     // Determina i periodi da eliminare
@@ -96,10 +96,14 @@ export const updateVenueClosingPeriodsHandler = async (
       ...closingPeriods.map(periodData => {
         console.log('Upserting period:', {
           venueId: venue.id,
-          start: periodData.start,
-          end: periodData.end,
-          isClosed: periodData.isClosed,
+          start: periodData.start ? new Date(periodData.start) : undefined,
+          end: periodData.end ? new Date(periodData.end) : undefined,
+          singleDate: periodData.singleDate ? new Date(periodData.singleDate) : undefined,
         });
+
+        // Assicurati che le date siano valide per periodi di un giorno
+        const startDate = new Date(periodData.start!);
+        const endDate = new Date(periodData.end!);
 
         return prisma.closingPeriod.upsert({
           where: periodData.id
@@ -107,20 +111,20 @@ export const updateVenueClosingPeriodsHandler = async (
             : {
                 venueId_start_end: {
                   venueId: venue.id,
-                  start: periodData.start,
-                  end: periodData.end,
+                  start: startDate,
+                  end: endDate,
                 },
               },
           update: {
-            isClosed: periodData.isClosed,
-            start: periodData.start,
-            end: periodData.end,
+            start: startDate,
+            end: endDate,
+            singleDate: periodData.singleDate ? new Date(periodData.singleDate) : undefined,
           },
           create: {
             venueId: venue.id,
-            start: periodData.start,
-            end: periodData.end,
-            isClosed: periodData.isClosed,
+            start: startDate,
+            end: endDate,
+            singleDate: periodData.singleDate ? new Date(periodData.singleDate) : undefined,
           },
         });
       }),

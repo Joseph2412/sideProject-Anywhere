@@ -7,11 +7,11 @@ export const updateVenueClosingPeriodsSchema = {
         type: 'array',
         items: {
           type: 'object',
-          required: ['start', 'end', 'isClosed'],
+          required: ['start', 'end'],
           properties: {
             start: { type: 'string', format: 'date-time' }, // ISO 8601
             end: { type: 'string', format: 'date-time' },
-            isClosed: { type: 'boolean' },
+            singleDate: { type: 'string', format: 'date-time', nullable: true }, // ISO 8601, nullable if not present
           },
           additionalProperties: false,
         },

@@ -140,11 +140,10 @@ enum WeekDay {
 
 model ClosingPeriod {
   id Int @id @default(autoincrement())
-  start DateTime
-  end DateTime
+  start DateTime?
+  end DateTime?
   venue CoworkingVenue @relation(fields: [venueId], references: [id])
   venueId Int
-  isClosed Boolean  
 
   @@index([venueId])
   @@index([venueId, start, end])
@@ -158,92 +157,11 @@ model PaymentInfo {
   address String
   iban String @unique @db.VarChar(34)
   bicSwift String @db.VarChar(11)
-  countryCode CountryCode
-  currencyCode CurrencyCode
+  countryCode String @db.VarChar(2) //ISO 3166-1 alpha-2 code
+  currencyCode String @db.VarChar(3) //ISO 4217 code
 
-  @@index([currencyCode])
-  @@index([countryCode]) 
-  //Grandi enum richiedono Indici
 }
 
-enum CountryCode {
-  AD // Andorra
-  AL // Albania
-  AM // Armenia
-  AT // Austria
-  AZ // Azerbaigian
-  BA // Bosnia ed Erzegovina
-  BE // Belgio
-  BG // Bulgaria
-  BY // Bielorussia
-  CH // Svizzera
-  CY // Cipro
-  CZ // Repubblica Ceca
-  DE // Germania
-  DK // Danimarca
-  EE // Estonia
-  ES // Spagna
-  FI // Finlandia
-  FR // Francia
-  GB // Regno Unito
-  GE // Georgia
-  GR // Grecia (codice ISO: GR, non EL)
-  HR // Croazia
-  HU // Ungheria
-  IE // Irlanda
-  IS // Islanda
-  IT // Italia
-  LI // Liechtenstein
-  LT // Lituania
-  LU // Lussemburgo
-  LV // Lettonia
-  MC // Monaco
-  MD // Moldavia
-  ME // Montenegro
-  MK // Macedonia del Nord
-  MT // Malta
-  NL // Paesi Bassi
-  NO // Norvegia
-  PL // Polonia
-  PT // Portogallo
-  RO // Romania
-  RS // Serbia
-  RU // Russia
-  SE // Svezia
-  SI // Slovenia
-  SK // Slovacchia
-  SM // San Marino
-  TR // Turchia
-  UA // Ucraina
-  VA // Città del Vaticano
-}
-
-enum CurrencyCode {
-  EUR // Euro
-  ALL // Lek albanese
-  AMD // Dram armeno
-  AZN // Manat azero
-  BAM // Marco convertibile bosniaco
-  BGN // Lev bulgaro
-  BYN // Rublo bielorusso
-  CHF // Franco svizzero
-  CZK // Corona ceca
-  DKK // Corona danese
-  GEL // Lari georgiano
-  GBP // Sterlina britannica
-  HUF // Fiorino ungherese
-  ISK // Corona islandese
-  MDL // Leu moldavo
-  MKD // Denar macedone
-  NOK // Corona norvegese
-  PLN // Zloty polacco
-  RON // Leu rumeno
-  RUB // Rublo russo
-  RSD // Dinaro serbo
-  SEK // Corona svedese
-  TRY // Lira turca
-  UAH // Grivnia ucraina
-}
 
 //Si, non ha tanto Senso avere tutti questi Codici per Nazioni e Valuta, Ma possiamo sempre levarli.
 //Vedila come un'augurio che Nibol arrivi dovunque
