@@ -65,7 +65,8 @@ model CoworkingVenue {
   closingPeriods ClosingPeriod[]
   avatarURL  String?
   openingDays OpenDays[]
-  
+  paymentInfo PaymentInfo?
+
   @@index([name])
 }
 
@@ -159,9 +160,8 @@ model PaymentInfo {
   bicSwift String @db.VarChar(11)
   countryCode String @db.VarChar(2) //ISO 3166-1 alpha-2 code
   currencyCode String @db.VarChar(3) //ISO 4217 code
+  venue CoworkingVenue @relation(fields: [venueId], references: [id])
+  venueId Int @unique
 
 }
 
-
-//Si, non ha tanto Senso avere tutti questi Codici per Nazioni e Valuta, Ma possiamo sempre levarli.
-//Vedila come un'augurio che Nibol arrivi dovunque

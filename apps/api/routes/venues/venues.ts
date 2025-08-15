@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 
+//Import Handler e Schema per Dettagli Locale
 import {
   getVenueDetailsHandler,
   updateVenueDetailsHandler,
@@ -7,17 +8,27 @@ import {
 
 import { updateVenueDetailsSchema } from './../../schemas/venueDetailsSchema';
 
+//Import Handler e Schema per i Giorni di Apertura
 import { updateVenueOpeningDaysSchema } from '../../schemas/venueOpeningDaysSchema';
 
 import {
   getVenueOpeningDaysHandler,
   updateVenueOpeningDaysHandler,
 } from '../../handlers/venues/venueOpeningDays';
+
+//Import Handler e Schema per i Periodi di Chiusura
 import {
   getVenueClosingPeriodsHandler,
   updateVenueClosingPeriodsHandler,
-} from '../../handlers/venues/venueClosingPeriods'; // Corretto percorso
+} from '../../handlers/venues/venueClosingPeriods';
 import { updateVenueClosingPeriodsSchema } from '../../schemas/venueClosingPeriodsSchema';
+
+//Import Handler e Schema per Dettagli Pagamenti
+import {
+  getVenuePaymentsDetailsHandler,
+  updateVenuePaymentsDetailsHandler,
+} from './../../handlers/venues/venuePaymentsDetails';
+import { updateVenuePaymentsDetailsSchema } from '../../schemas/venuePaymentsDetailsSchema';
 
 export async function venueDetailsRoute(fastify: FastifyInstance) {
   fastify.get('/venues', { preHandler: fastify.authenticate }, getVenueDetailsHandler);
@@ -57,4 +68,18 @@ export async function venueClosingPeriods(fastify: FastifyInstance) {
     updateVenueClosingPeriodsHandler
   );
 }
+
+export async function venuePayments(fastify: FastifyInstance) {
+  fastify.get(
+    '/venues/payments',
+    { preHandler: fastify.authenticate },
+    getVenuePaymentsDetailsHandler
+  );
+  fastify.put(
+    '/venues/payments',
+    { preHandler: fastify.authenticate, schema: updateVenuePaymentsDetailsSchema },
+    updateVenuePaymentsDetailsHandler
+  );
+}
+
 //Un domani, se aggiungi la gestione di più locali, dovrai modificare questi endpoint per supportare la selezione del locale specifico espondendo endpoint /venues/:id

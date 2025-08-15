@@ -15,7 +15,6 @@ export const getVenueOpeningDaysHandler = async (request: FastifyRequest, reply:
       return reply.code(404).send({ message: 'Venue non trovato' });
     }
 
-    // Dati già nel formato perfetto!
     const openingDays = venue.openingDays.map(day => ({
       day: day.day,
       isClosed: day.isClosed, // Boolean diretto
@@ -71,7 +70,7 @@ export const updateVenueOpeningDaysHandler = async (
           const isValid = /^([01]?\d|2[0-3]):([0-5]\d)-([01]?\d|2[0-3]):([0-5]\d)$/.test(period);
           console.log(`Period ${period} is valid: ${isValid}`);
           return isValid;
-        }), // 🎯 SALVA sempre i periodi, indipendentemente da isClosed
+        }), //  SALVA sempre i periodi, indipendentemente da isClosed
       };
 
       console.log(`Validated result for ${dayData.day}:`, result);

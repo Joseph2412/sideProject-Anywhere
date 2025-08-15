@@ -14,7 +14,8 @@ import { venueAtom } from '@repo/ui/store/VenueDetails';
 
 export const VenueDetailsForm = () => {
   const [form] = Form.useForm();
-  const availableServices = ['WiFi', 'Stampante', 'Caffè', 'Reception', 'Parcheggio']; //Servizi Standard per tutti. HARDCODED is the Way.
+  const availableServices = ['WiFi', 'Stampante', 'Caffè', 'Reception', 'Parcheggio'];
+  //Servizi Standard per tutti. HARDCODED is the Way.
 
   const [loading, setLoading] = useState(false); //Stato LOADING
   const [venueDetails, setVenueDetails] = useAtom(venueAtom);

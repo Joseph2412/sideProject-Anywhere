@@ -5,12 +5,16 @@ import styles from './Payments.module.css';
 export const PaymentsForm = () => {
   const [form] = Form.useForm();
 
+  const onFinish = async (values: typeof form) => {
+    throw new Error('Function not implemented.');
+  };
+
   return (
     <Form
       form={form}
       layout="vertical"
       style={{ width: '100%', borderRadius: 8 }}
-      //onFinish={onFinish}
+      onFinish={onFinish}
     >
       <Card
         bodyStyle={{ paddingTop: 10, paddingBottom: 10, paddingLeft: 15, paddingRight: 15 }}

@@ -26,7 +26,7 @@ export const getVenueDetailsHandler = async (request: FastifyRequest, reply: Fas
           id: true,
           day: true,
           isClosed: true,
-          periods: true, // 🎯 Ora è semplicemente String[], non una relazione
+          periods: true, //
         },
       },
     },
