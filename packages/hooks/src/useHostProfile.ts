@@ -1,5 +1,12 @@
 import type { AuthUser, HostProfile } from './types';
 
+/**
+ * Hook personalizzato per ricaricare i dati del profilo utente e host
+ * Utilizza il pattern di dependency injection per evitare dipendenze circolari con gli atom Jotai
+ * @param setUser - Funzione setter per aggiornare l'atom dell'utente autenticato
+ * @param setProfile - Funzione setter per aggiornare l'atom del profilo host
+ * @returns Funzione asincrona che esegue il reload dei dati dal backend
+ */
 // These atoms will be passed as parameters to avoid circular dependency
 export const useHostProfile = (
   setUser: (user: AuthUser) => void,

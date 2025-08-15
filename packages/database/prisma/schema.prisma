@@ -20,6 +20,8 @@ model User {
   name     String?
   role     Role
   profile   HostProfile?
+  resetToken String? // Token per il reset della password
+  resetTokenExpires DateTime? // Data di scadenza del token
 
   @@index([role])
 }
@@ -158,7 +160,7 @@ model PaymentInfo {
   address String
   iban String @unique @db.VarChar(34)
   bicSwift String @db.VarChar(11)
-  countryCode String @db.VarChar(2) //ISO 3166-1 alpha-2 code
+  countryCode String @db.VarChar(3) //ISO 3166-1 alpha-2 code
   currencyCode String @db.VarChar(3) //ISO 4217 code
   venue CoworkingVenue @relation(fields: [venueId], references: [id])
   venueId Int @unique

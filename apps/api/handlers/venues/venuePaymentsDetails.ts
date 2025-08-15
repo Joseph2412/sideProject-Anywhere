@@ -26,7 +26,15 @@ export const getVenuePaymentsDetailsHandler = async (
       return reply.code(404).send({ error: 'Venue not found' });
     }
 
-    return reply.code(200).send({ paymentsDetails: venue.paymentInfo });
+    // Se non ci sono dati di pagamento, restituisci un oggetto vuoto
+    if (!venue.paymentInfo) {
+      return reply.code(200).send({});
+    }
+
+    // Restituisci i dati direttamente senza wrapper
+    const response = venue.paymentInfo;
+
+    return reply.code(200).send(response);
   } catch (error) {
     console.error("Errore dell'handler:", error);
     return reply.code(500).send({ error: 'Internal Server Error' });

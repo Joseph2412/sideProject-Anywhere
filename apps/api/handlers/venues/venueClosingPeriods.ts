@@ -20,7 +20,6 @@ export const getVenueClosingPeriodsHandler = async (
     const closingPeriods = venue.closingPeriods.map(period => ({
       start: period.start ? period.start.toISOString() : undefined, // DateTime di Inizio
       end: period.end ? period.end.toISOString() : undefined, // DateTime di Fine
-      singleDate: period.singleDate ? period.singleDate.toISOString() : undefined, // Data singola se presente
     }));
 
     return reply.code(200).send({ closingPeriods });
@@ -61,9 +60,7 @@ export const updateVenueClosingPeriodsHandler = async (
       id: period.id,
       start: period.start ? period.start.toISOString() : '',
       end: period.end ? period.end.toISOString() : '',
-      singleDate: period.singleDate ? period.singleDate.toISOString() : undefined,
     }));
-
     // Determina i periodi da eliminare
     const periodsToDelete = originalPeriods.filter(
       original =>
@@ -118,13 +115,11 @@ export const updateVenueClosingPeriodsHandler = async (
           update: {
             start: startDate,
             end: endDate,
-            singleDate: periodData.singleDate ? new Date(periodData.singleDate) : undefined,
           },
           create: {
             venueId: venue.id,
             start: startDate,
             end: endDate,
-            singleDate: periodData.singleDate ? new Date(periodData.singleDate) : undefined,
           },
         });
       }),

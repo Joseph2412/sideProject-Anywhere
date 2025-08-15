@@ -12,7 +12,7 @@ type Props = {
 };
 
 const CustomTab: React.FC<Props> = ({ tabs }) => {
-  return <Tabs defaultActiveKey={tabs[0]?.key} items={tabs} onChange={console.log} />;
+  return <Tabs defaultActiveKey={tabs[0]?.key} items={tabs} />;
 };
 
 export default CustomTab;

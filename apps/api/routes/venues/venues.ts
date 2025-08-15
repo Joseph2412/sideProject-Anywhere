@@ -72,7 +72,7 @@ export async function venueClosingPeriods(fastify: FastifyInstance) {
 export async function venuePayments(fastify: FastifyInstance) {
   fastify.get(
     '/venues/payments',
-    { preHandler: fastify.authenticate },
+    { preHandler: fastify.authenticate }, // Riabilitato
     getVenuePaymentsDetailsHandler
   );
   fastify.put(

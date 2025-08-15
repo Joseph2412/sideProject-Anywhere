@@ -21,7 +21,7 @@ export const updateVenueDetailsSchema = {
     properties: {
       name: { type: 'string', minLength: 1 },
       address: { type: 'string', minLength: 1 },
-      description: { type: 'string', minLength: 1 },
+      description: { type: 'string' },
       services: { type: 'array', items: { type: 'string' } },
       avatarURL: { type: 'string' }, //Mi aspetto arrivi ma non è required
     },

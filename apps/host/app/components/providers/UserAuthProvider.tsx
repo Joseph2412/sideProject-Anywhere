@@ -22,6 +22,12 @@ export const UserProvider = ({ children }: Props) => {
   const logout = useLogout();
   const reloadProfile = useHostProfile(setUser, setHostProfile);
 
+  /**
+   * useEffect per gestire l'autenticazione automatica al caricamento del provider
+   * Controlla la presenza del token, evita ricaricamenti inutili se i dati sono già presenti,
+   * e gestisce il logout automatico in caso di errore nel caricamento del profilo
+   * Dependencies: router, setUser, logout, authUser, hostProfile, setHostProfile, reloadProfile
+   */
   useEffect(() => {
     const token = localStorage.getItem('token'); //FIX ToDo: Token non in localStorage ma in Cookie
 

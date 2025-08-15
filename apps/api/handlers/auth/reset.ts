@@ -23,7 +23,7 @@ export const resetPasswordHandler = async (
     where: { email },
     data: {
       resetToken: token,
-      resetTokenExpiry: expires,
+      resetTokenExpires: expires,
     },
   });
 

@@ -14,8 +14,13 @@ import { venueAtom } from '@repo/ui/store/VenueDetails';
 
 export const VenueDetailsForm = () => {
   const [form] = Form.useForm();
+
+  /**
+   * Array dei servizi disponibili per tutte le venue
+   * Pattern: hardcoded values per consistenza e semplicità
+   * Uso: popola Select component per selezione servizi venue
+   */
   const availableServices = ['WiFi', 'Stampante', 'Caffè', 'Reception', 'Parcheggio'];
-  //Servizi Standard per tutti. HARDCODED is the Way.
 
   const [loading, setLoading] = useState(false); //Stato LOADING
   const [venueDetails, setVenueDetails] = useAtom(venueAtom);
@@ -23,6 +28,11 @@ export const VenueDetailsForm = () => {
 
   const setMessage = useSetAtom(messageToast);
 
+  /**
+   * useEffect per caricamento dati venue esistenti
+   * Pattern: fetch → setFieldsValue + atom sync per dual state management
+   * Mappatura: avatarURL → avatarUrl per compatibilità form
+   */
   //Richiamo Dati Sul Form
   useEffect(() => {
     fetch('http://localhost:3001/api/venues', {
@@ -32,7 +42,6 @@ export const VenueDetailsForm = () => {
     })
       .then(res => res.json())
       .then(data => {
-        console.log('Venue GET:', data.venue); // <-- Debug
         if (data.venue) {
           form.setFieldsValue({ ...data.venue, avatarUrl: data.venue.avatarURL || '' });
           setVenueDetails(data.venue);
@@ -122,7 +131,7 @@ export const VenueDetailsForm = () => {
           <Col span={12}>
             <Form.Item
               name="address"
-              rules={[{ required: true, message: `'Inserisci L'indirizzo del Locale'` }]}
+              rules={[{ required: true, message: "Inserisci L'indirizzo del Locale" }]}
             >
               <NibolInput
                 validateTrigger="onSubmit"
@@ -164,7 +173,6 @@ export const VenueDetailsForm = () => {
           ))}
         </div>
         <Form.Item style={{ marginTop: 20 }}>
-          {/* Aggiungere Border/Margin sopra sezione Pulsanti */}
           <Space>
             <Button
               htmlType="button"

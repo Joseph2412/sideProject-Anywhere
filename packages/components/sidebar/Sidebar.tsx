@@ -26,6 +26,12 @@ export default function Sidebar({ onLogout }: SidebarProps) {
   // Stato locale per gestire i dropdown (SubMenu) aperti nella sidebar
   const [openKeys, setOpenKeys] = useState<string[]>([]);
 
+  /**
+   * Mappa di traduzione chiave → titolo per la sincronizzazione tra sidebar e header
+   * Utilizzata per aggiornare dinamicamente il titolo nell'header quando si naviga
+   * Pattern: Record<string, string> per mapping deterministico delle route
+   * Collegata a: selectedTabAtom (stato globale) e setPageTitle (setter header)
+   */
   // Mappa delle chiavi tab → titolo da mostrare nell'intestazione
   const keyToTitleMap: Record<string, string> = {
     calendar: 'Calendario',
@@ -42,6 +48,12 @@ export default function Sidebar({ onLogout }: SidebarProps) {
     setOpenKeys(keys); // Lascia i dropdown aperti normalmente (senza chiuderli tra loro)
   };
 
+  /**
+   * Gestisce i click sulle voci del menu laterale
+   * Implementa la logica di navigazione: aggiorna stato globale, titoli e gestisce dropdown
+   * Pattern: keyPath.length per distinguere voci dirette da quelle annidate nei SubMenu
+   * Effetti: sincronizza selectedTabAtom, pageTitle e controlla apertura dropdown
+   */
   // Gestione del click su ogni voce di menu
   const handleMenuClick = ({ key, keyPath }: { key: string; keyPath: string[] }) => {
     // Se si clicca su "logout", esegue il logout e interrompe il flusso

@@ -13,6 +13,12 @@ export const metadata = {
   title: 'Nibol Login',
 };
 
+/**
+ * Layout principale dell'applicazione Next.js (Server Component)
+ * Architettura: Server Component che wrappa tutto in LayoutClientWrapper per funzionalità client
+ * Pattern: Separation of Concerns - server rendering + client interactivity separati
+ * Setup: Font Google Jakarta, CSS reset Antd, lingua italiana
+ */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="it">

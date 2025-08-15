@@ -25,6 +25,12 @@ export const PreferencesForm = () => {
   );
   const [isLoading, setIsLoading] = useState(true);
 
+  /**
+   * Gestisce il toggle di massa per gruppi di preferenze
+   * Pattern: forEach per aggiornamento bulk di multiple preferenze
+   * Logica: clona state → modifica gruppo → salva immediatamente
+   * Eccezione: push notifications non disponibili per alcune tipologie
+   */
   // Gestione del CheckBox Master
   const handleGroupToggle = (
     groupItems: NotificationType[],
@@ -60,6 +66,12 @@ export const PreferencesForm = () => {
     });
   };
 
+  /**
+   * useEffect per caricamento iniziale delle preferenze utente
+   * Pattern: GET → normalizzazione dati → reduce per struttura predefinita
+   * Normalizzazione: converte dati API in formato standardizzato con fallback
+   * Reduce: crea oggetto completo anche per preferenze non ancora salvate
+   */
   useEffect(() => {
     fetch(urlFetch, {
       method: 'GET',
@@ -73,10 +85,8 @@ export const PreferencesForm = () => {
         return res.json();
       })
       .then((data: { preferences: NotificationPreference } | null) => {
-        console.log('Dati di ritorno del DB', data);
         const normalized = NotificationItems.reduce((acc, item) => {
           const saved = data?.preferences?.[item.key];
-          console.log(`Key: ${item.key}`, '→ saved:', saved);
           acc[item.key] = {
             push: saved?.push ?? false,
             email: saved?.email ?? false,
@@ -85,7 +95,6 @@ export const PreferencesForm = () => {
         }, {} as NotificationPreference);
 
         setFormValues(normalized);
-        console.log('dati aggiornati', normalized);
       })
       .catch(() => {
         const fallback = NotificationItems.reduce((acc, item) => {

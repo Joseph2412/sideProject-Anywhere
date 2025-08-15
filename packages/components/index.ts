@@ -1,3 +1,10 @@
+/**
+ * Barrel export per il package @repo/components
+ * Pattern: Organizzazione modulare per categoria funzionale
+ * Vantaggi: Import centralizzati, tree-shaking ottimizzato, interfaccia pulita
+ * Uso: import { LoginForm, Header } from '@repo/components'
+ */
+
 // Providers
 export * from './src/providers';
 

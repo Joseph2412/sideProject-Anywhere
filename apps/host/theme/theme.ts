@@ -1,4 +1,4 @@
-import type { ThemeConfig } from 'antd';
+import { Select, type ThemeConfig } from 'antd';
 
 const theme: ThemeConfig = {
   token: {
@@ -35,6 +35,10 @@ const theme: ThemeConfig = {
       itemSelectedBg: '#00063e', // Usa lo stesso di colorPrimary
       itemSelectedColor: '#fff', // Colore del testo su tab attivo
       itemHoverColor: '#00063e', // Colore al passaggio mouse
+    },
+    Select: {
+      optionSelectedBg: '#00063e',
+      optionSelectedColor: '#fff',
     },
   },
 };

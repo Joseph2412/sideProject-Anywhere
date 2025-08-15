@@ -20,6 +20,12 @@ export const ProfileForm = () => {
   const reaload = useHostProfile(setUser, setProfile);
   const setMessage = useSetAtom(messageToast);
 
+  /**
+   * Gestisce il submit del form profilo utente
+   * Pattern: onFinish standard Antd con gestione loading, API call e reload state
+   * Flow: validazione → API PUT → reload dati globali → toast feedback
+   * Reload: ricarica automaticamente authUser e hostProfile dopo aggiornamento
+   */
   const onFinish = async (values: { firstName: string; lastName: string }) => {
     setLoading(true);
     try {
@@ -35,7 +41,6 @@ export const ProfileForm = () => {
       if (!res.ok) throw new Error();
 
       await reaload();
-      console.log('Prova Toast. PROFILO AGGIORNATO Deve partire il toast');
 
       setMessage({
         type: 'success',
@@ -51,6 +56,12 @@ export const ProfileForm = () => {
     }
   };
 
+  /**
+   * Gestisce l'upload e preview dell'avatar utente
+   * Pattern: FileReader per conversione file → base64 per preview immediato
+   * Preparazione: per futura integrazione S3, attualmente solo preview locale
+   * Flow: file selection → FileReader → setAvatarUrl per preview
+   */
   const handleAvatarChange = (info: UploadChangeParam<UploadFile>) => {
     //Al momento Any. Next passare oggetto con tutte le info
 
@@ -64,6 +75,12 @@ export const ProfileForm = () => {
     } //TODO: Implementa Questa funzione. Aspetta Integrazione con S3
   };
 
+  /**
+   * useEffect per sincronizzazione form con dati globali
+   * Pattern: pre-popolamento form quando authUser e hostProfile sono disponibili
+   * Trigger: si attiva quando profile, user o form cambiano
+   * Gestione null-safety: controlli espliciti per evitare errori TypeScript
+   */
   useEffect(() => {
     if (profile && user) {
       //Se abbiamo Profilo

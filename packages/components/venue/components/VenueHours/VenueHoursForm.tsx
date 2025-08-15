@@ -14,6 +14,12 @@ export const VenueHoursForm: React.FC = () => {
   const [saving, setSaving] = useState<boolean>(false);
   const [, setToastMessage] = useAtom(messageToast);
 
+  /**
+   * useEffect per caricamento orari di apertura venue
+   * Pattern: fetch → reduce per normalizzazione → deep copy per stato iniziale
+   * Normalizzazione: combina weekDays template con dati backend
+   * Deep copy: JSON.parse(JSON.stringify()) per stato iniziale immutabile
+   */
   useEffect(() => {
     const fetchOpeningDays = async () => {
       setLoading(true);
@@ -29,8 +35,12 @@ export const VenueHoursForm: React.FC = () => {
         }
 
         const data = await res.json();
-        console.log('Dati ricevuti dal backend:', data);
 
+        /**
+         * Normalizza i dati backend con template weekDays
+         * Pattern: reduce per creare oggetto completo con fallback values
+         * Logica: trova dati esistenti o usa defaults (isClosed: true, periods: [])
+         */
         // Mappa direttamente i dati con boolean e array stringhe
         const formattedData = weekDays.reduce(
           (acc, day) => {
@@ -64,16 +74,12 @@ export const VenueHoursForm: React.FC = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      console.log('Dati da inviare al backend:', openingDaysState);
-
-      // Trasforma in array per il backend - 🎯 INVIA sempre tutti i periodi
+      // Trasforma in array per il backend - INVIA sempre tutti i periodi
       const formattedOpeningDays = Object.values(openingDaysState).map(dayData => ({
         day: dayData.day,
         isClosed: dayData.isClosed, // Boolean diretto
-        periods: dayData.periods.filter(p => p.includes('-')), // 🎯 TUTTI i periodi validi
+        periods: dayData.periods.filter(p => p.includes('-')), // TUTTI i periodi validi
       }));
-
-      console.log('Dati formattati per il backend:', formattedOpeningDays);
 
       const res = await fetch('http://localhost:3001/api/venues/opening-days', {
         method: 'PUT',

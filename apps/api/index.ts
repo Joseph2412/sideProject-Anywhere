@@ -7,8 +7,12 @@ import cors from '@fastify/cors';
 import { decorateAuth } from './plugins/auth';
 import { authRoutes } from './routes/auth/authRoutes';
 import { userRoute } from './routes/user/userRoutes';
-import { venueClosingPeriods, venueDetailsRoute } from './routes/venues/venues';
-import { venueOpeningDaysRoute } from './routes/venues/venues';
+import {
+  venueClosingPeriods,
+  venueDetailsRoute,
+  venueOpeningDaysRoute,
+  venuePayments,
+} from './routes/venues/venues';
 
 //Ricorda di importare prisma in ogni handler senza istanziarlo sempre
 
@@ -40,16 +44,22 @@ server.setErrorHandler((error, request, reply) => {
   reply.send(error);
 });
 
+// Endpoint di test
+server.get('/ping', async (request, reply) => {
+  return { message: 'pong' };
+});
+
 server.register(authRoutes, { prefix: '/auth' });
 server.register(userRoute, { prefix: '/user' });
 server.register(venueDetailsRoute, { prefix: '/api' });
 server.register(venueOpeningDaysRoute, { prefix: '/api' });
 server.register(venueClosingPeriods, { prefix: '/api' });
+server.register(venuePayments, { prefix: '/api' });
 
 server.listen({ port: 3001 }, (err, address) => {
   if (err) {
     console.error(err);
     process.exit(1);
   }
-  console.log(`✅ Server listening at ${address}`);
+  console.log(`Server listening at ${address}`);
 });

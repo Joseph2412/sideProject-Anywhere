@@ -12,7 +12,6 @@ export const signupHandler = async (request: FastifyRequest, reply: FastifyReply
     role: Role;
   };
 
-  console.log('[SIGNUP BODY]', request.body);
   try {
     const existingUser: User | null = await prisma.user.findUnique({
       where: { email },

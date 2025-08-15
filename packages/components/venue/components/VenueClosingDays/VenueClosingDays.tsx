@@ -37,6 +37,14 @@ type Holiday = {
   countryCode: string;
 };
 
+/**
+ * Custom hook per gestire switch tra DatePicker singolo e RangePicker
+ * Pattern: custom hook per logica riutilizzabile di UI state + form sync
+ * Gestione: reset automatico campi opposti quando si cambia modalità
+ * @param form - Istanza del form Antd
+ * @param fieldName - Path del campo nel form per update specifico
+ * @param initialIsRange - Stato iniziale del toggle
+ */
 // Hook per gestire il toggle tra Singolo giorno o + Giorni
 const useDatePickerToggle = (
   form: any,
@@ -45,6 +53,10 @@ const useDatePickerToggle = (
 ) => {
   const [isRange, setIsRange] = useState(initialIsRange);
 
+  /**
+   * Gestisce il cambio di modalità picker con reset campi
+   * Pattern: conditional field reset per mantenere form state pulito
+   */
   const handleSwitchChange = (checked: boolean) => {
     setIsRange(checked);
 
@@ -105,6 +117,12 @@ export const VenueClosingDays: React.FC = () => {
         return res.json();
       })
       .then(data => {
+        /**
+         * Trasforma i dati dal backend nel formato utilizzato dal form
+         * Pattern: map() per convertire array API → formato UI component
+         * Logica: distingue tra giorno singolo e range di date usando dayjs.isSame()
+         * Spread operator condizionale per structure dinamica dell'oggetto
+         */
         const formatted = data.closingPeriods.map((p: any) => {
           const startDate = dayjs(p.start);
           const endDate = dayjs(p.end);
@@ -225,6 +243,12 @@ export const VenueClosingDays: React.FC = () => {
 
       const holidays: Holiday[] = await response.json();
 
+      /**
+       * Converte le festività da API esterna in formato ClosingPeriod
+       * Pattern: map() con index per generare ID univoci temporanei
+       * Trasformazione: Holiday[] → ClosingPeriod[] per compatibilità con il form
+       * ID generati: Date.now() + index per evitare collisioni durante l'import
+       */
       // Converte le festività in periodi di chiusura
       const holidayPeriods: ClosingPeriod[] = holidays.map((holiday, index) => {
         const holidayDate = dayjs(holiday.date);
