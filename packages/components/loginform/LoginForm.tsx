@@ -43,7 +43,7 @@ type LoginResponse = {
 // CONFIGURAZIONE ENDPOINT API
 // Indirizzo del nostro backend Fastify che gira su porta 3001
 // In produzione sarà sostituito con l'URL reale (es: https://api.nibol.com)
-const endPoint = 'http://localhost:3001';
+const endPoint = process.env.NEXT_PUBLIC_API_HOST;
 
 /**
  * FUNZIONE DI AUTENTICAZIONE UTENTE
@@ -211,7 +211,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
 
       // STEP 5: Verifica accesso area protetta per validare token
       // Questo assicura che il token funzioni prima di dichiarare successo
-      const res = await fetch('http://localhost:3001/user/profile', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/user/profile`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${response.token}`, // Standard JWT authentication

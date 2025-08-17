@@ -2,6 +2,7 @@
   "name": "anywhere",
   "private": true,
   "scripts": {
+    "dev": "turbo run dev",
     "build": "turbo run build",
     "commit": "pnpm lint && pnpm format && git add . && pnpm dlx git-cz",
     "lint": "turbo lint",

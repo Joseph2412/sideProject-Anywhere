@@ -105,7 +105,7 @@ export const VenueClosingDays: React.FC = () => {
   const setMessageToast = useSetAtom(messageToast);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/venues/closing-periods', {
+    fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/closing-periods`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
@@ -303,7 +303,7 @@ export const VenueClosingDays: React.FC = () => {
       }));
 
     try {
-      const response = await fetch('http://localhost:3001/api/venues/closing-periods', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/closing-periods`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -325,7 +325,7 @@ export const VenueClosingDays: React.FC = () => {
       });
 
       // Ricarica i dati dopo il salvataggio
-      const updatedResponse = await fetch('http://localhost:3001/api/venues/closing-periods', {
+      const updatedResponse = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/closing-periods`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },

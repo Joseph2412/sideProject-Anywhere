@@ -42,7 +42,7 @@ export const PaymentsForm = () => {
       return;
     }
 
-    fetch('http://localhost:3001/api/venues/payments', {
+    fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/payments`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -70,7 +70,7 @@ export const PaymentsForm = () => {
     setLoading(true);
 
     try {
-      const res = await fetch(`http://localhost:3001/api/venues/payments`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/payments`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
