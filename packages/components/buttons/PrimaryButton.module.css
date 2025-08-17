@@ -1,15 +1,24 @@
 .primary {
-  background-color: #00063e;
+  background-color: #00063e !important;
   border-color: #d6d7e6 !important;
-  font-weight: 500;
-  color: #d6d7e6 !important;
-  margin-bottom: 0px;
+  font-weight: 500 !important;
+  color: #fff !important;
+  margin-bottom: 0px !important;
   height: 32px !important;
-  border-radius: 6px;
-  padding: 4px 15px;
-  font-size: 14px;
-  margin-bottom: 0px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 6px !important;
+  padding: 4px 15px !important;
+  font-size: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Forza colore anche su hover/focus/active */
+.primary:hover,
+.primary:focus,
+.primary:active {
+  background-color: #00063e !important;
+  color: #fff !important;
+  border-color: #d6d7e6 !important;
+  box-shadow: none !important;
 }

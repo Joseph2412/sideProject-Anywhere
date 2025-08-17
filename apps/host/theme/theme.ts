@@ -40,6 +40,9 @@ const theme: ThemeConfig = {
       optionSelectedBg: '#00063e',
       optionSelectedColor: '#fff',
     },
+    Tabs: {
+      itemSelectedColor: '#fff', // testo bianco su tab selezionato
+    },
   },
 };
 

@@ -16,7 +16,7 @@
   background-color: #ffffff;
   border: 1px solid #ededed;
   border-radius: 8px;
-  padding: 32px 16px 16px; 
+  padding: 32px 16px 16px;
   box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
@@ -32,15 +32,15 @@
 
 /* Titolo */
 .title {
-width: 100%;
-margin-bottom: 12px;
-font-weight:400;
-position: relative;
-font-size: 30px;
-line-height: 32px;
-display: inline-block;
-color: #1f1f1f;
-text-align: center;
+  width: 100%;
+  margin-bottom: 12px;
+  font-weight: 400;
+  position: relative;
+  font-size: 30px;
+  line-height: 32px;
+  display: inline-block;
+  color: #1f1f1f;
+  text-align: center;
 }
 
 /* Divider principale */
@@ -102,11 +102,11 @@ text-align: center;
   border-radius: 6px;
   height: 32px;
   transition: all 0.2s ease;
-  }
+}
 
 .secondaryButton:hover {
-    border: 1px solid !important;
-    background-color: white !important;
+  border: 1px solid !important;
+  background-color: white !important;
 }
 
 .input:hover {
@@ -127,4 +127,14 @@ text-align: center;
   background-color: white !important;
   color: #1f1f1f !important;
   border-color: #1f1f1f !important;
+}
+
+.primaryButton {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  height: 32px !important;
+  margin-bottom: 10px !important;
+  margin-top: 20px !important;
 }

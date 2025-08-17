@@ -5,6 +5,7 @@ import { messageToast } from '@repo/ui/store/LayoutStore';
 import { NotificationChannel, NotificationType } from './NotificationType';
 import { NotificationGroups } from './NotificationGroups';
 import { NotificationItems } from './NotificationItems';
+import { usePreferences } from '@repo/hooks';
 
 type NotificationPreference = {
   [key in NotificationType]: {
@@ -14,16 +15,22 @@ type NotificationPreference = {
 };
 export const PreferencesForm = () => {
   const [form] = Form.useForm();
-
   const setMessage = useSetAtom(messageToast);
 
-  const urlFetch = `${process.env.NEXT_PUBLIC_API_HOST}/user/preferences`; //Mi scocciava riscrivere sempre sta fetch de m****
-  const token = localStorage.getItem('token'); //Ripeschiamo il Token
+  const token = localStorage.getItem('token') || '';
+  const { data, isLoading, error } = usePreferences(token);
 
   const [formValues, setFormValues] = useState<NotificationPreference>(
     {} as NotificationPreference
   );
-  const [isLoading, setIsLoading] = useState(true);
+
+  // Aggiorna lo stato quando arrivano i dati
+  useEffect(() => {
+    if (data && data.preferences) {
+      form.setFieldsValue(data.preferences);
+      setFormValues(data.preferences);
+    }
+  }, [data, form]);
 
   /**
    * Gestisce il toggle di massa per gruppi di preferenze
@@ -66,48 +73,7 @@ export const PreferencesForm = () => {
     });
   };
 
-  /**
-   * useEffect per caricamento iniziale delle preferenze utente
-   * Pattern: GET → normalizzazione dati → reduce per struttura predefinita
-   * Normalizzazione: converte dati API in formato standardizzato con fallback
-   * Reduce: crea oggetto completo anche per preferenze non ancora salvate
-   */
-  useEffect(() => {
-    fetch(urlFetch, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Non Autorizzato');
-        return res.json();
-      })
-      .then((data: { preferences: NotificationPreference } | null) => {
-        const normalized = NotificationItems.reduce((acc, item) => {
-          const saved = data?.preferences?.[item.key];
-          acc[item.key] = {
-            push: saved?.push ?? false,
-            email: saved?.email ?? false,
-          };
-          return acc;
-        }, {} as NotificationPreference);
-
-        setFormValues(normalized);
-      })
-      .catch(() => {
-        const fallback = NotificationItems.reduce((acc, item) => {
-          acc[item.key] = { push: false, email: false };
-          return acc;
-        }, {} as NotificationPreference);
-
-        setFormValues(fallback);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [token]);
+  const urlFetch = `${process.env.NEXT_PUBLIC_API_HOST}/user/preferences`; //Mi scocciava riscrivere sempre sta fetch de m****
 
   const handleCheckboxChange = async (
     type: NotificationType,
@@ -150,6 +116,15 @@ export const PreferencesForm = () => {
     key === 'booking_cancelled_due_to_low_participation' && channel === 'push';
 
   if (isLoading) return null;
+  if (error) {
+    setMessage({
+      type: 'error',
+      message: 'Errore nel caricamento preferenze',
+      description: 'Impossibile caricare le preferenze',
+      placement: 'bottomRight',
+    });
+    return null;
+  }
 
   return (
     <Form form={form}>

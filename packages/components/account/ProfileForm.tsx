@@ -2,9 +2,10 @@ import { Form, Button, Upload, Avatar, Space, message, Row, Col, Card } from 'an
 import { UploadOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
 import { NibolInput } from '../inputs/Input';
 import { useState, useEffect } from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { authUserAtom, hostProfileAtom, messageToast } from '@repo/ui/store/LayoutStore';
-import { useHostProfile } from '@repo/hooks';
+import { useSetAtom } from 'jotai';
+import { messageToast } from '@repo/ui/store/LayoutStore';
+import { useUserProfile } from '@repo/hooks';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import styles from './profile.module.css';
 import { UploadChangeParam, UploadFile } from 'antd/es/upload';
 
@@ -13,12 +14,40 @@ export const ProfileForm = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null); //Provvisorio: Imposta Atomo Jotai.
   const [loading, setLoading] = useState(false); //Stato di Loading in base a step
 
-  const profile = useAtomValue(hostProfileAtom); //Richiamo i dati di HostProfile
-  const user = useAtomValue(authUserAtom); //Da qui richiamo solo USER EMAIL
-  const setUser = useSetAtom(authUserAtom);
-  const setProfile = useSetAtom(hostProfileAtom);
-  const reaload = useHostProfile(setUser, setProfile);
+  const { data, isLoading } = useUserProfile();
+
   const setMessage = useSetAtom(messageToast);
+  console.log('Dati profilo:', data);
+
+  const queryClient = useQueryClient();
+
+  const updateProfile = useMutation({
+    mutationFn: async (values: { firstName: string; lastName: string }) => {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/user/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(values),
+      });
+      if (!res.ok) throw new Error();
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      setMessage({
+        type: 'success',
+        message: 'Profilo Aggiornato con successo!',
+        description: 'Profilo Aggiornato',
+        duration: 3,
+        placement: 'bottomRight',
+      });
+    },
+    onError: () => {
+      message.error("Errore durante l'aggiornamento");
+    },
+  });
 
   /**
    * Gestisce il submit del form profilo utente
@@ -29,28 +58,7 @@ export const ProfileForm = () => {
   const onFinish = async (values: { firstName: string; lastName: string }) => {
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/user/profile`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (!res.ok) throw new Error();
-
-      await reaload();
-
-      setMessage({
-        type: 'success',
-        message: 'Profilo Aggiornato con successo!',
-        description: 'Profilo Aggiornato',
-        duration: 3,
-        placement: 'bottomRight',
-      });
-    } catch {
-      message.error("Errore durante l'aggiornamento");
+      await updateProfile.mutateAsync(values);
     } finally {
       setLoading(false);
     }
@@ -82,18 +90,20 @@ export const ProfileForm = () => {
    * Gestione null-safety: controlli espliciti per evitare errori TypeScript
    */
   useEffect(() => {
-    if (profile && user) {
-      //Se abbiamo Profilo
-      //Ridondante? si ma serve per far star zitto Typescript
+    if (data) {
       form.setFieldsValue({
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        email: user.email, //Sennò segnalava il "Possibile NULL"
-      }); //Setto i valori del Form con firstName, lastName ed Email (ma disabled)
+        firstName: data.profile.firstName,
+        lastName: data.profile.lastName,
+        email: data.user.email,
+      });
     }
-  }, [profile, form, user]);
+  }, [data, form]);
 
   const handleRemoveAvatar = () => setAvatarUrl(null); //quando un domani averemo S3, richiamiamo path del file e lo leviamo.
+
+  if (isLoading) {
+    return <div>Caricamento profilo...</div>;
+  }
 
   return (
     <Form
@@ -130,11 +140,10 @@ export const ProfileForm = () => {
 
         <Row gutter={[0, 0]}>
           <Col span={12}>
-            <Form.Item rules={[{ required: true, message: 'Inserisci il nome' }]}>
+            <Form.Item name="firstName" rules={[{ required: true, message: 'Inserisci il nome' }]}>
               <NibolInput
                 validateTrigger="onSubmit"
                 label="Nome"
-                name="firstName"
                 hideAsterisk={true}
                 required={true}
                 style={{ height: 32, width: '100%' }}
@@ -142,11 +151,13 @@ export const ProfileForm = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item rules={[{ required: true, message: 'Inserisci il cognome' }]}>
+            <Form.Item
+              name="lastName"
+              rules={[{ required: true, message: 'Inserisci il cognome' }]}
+            >
               <NibolInput
                 validateTrigger="onSubmit"
                 label="Cognome"
-                name="lastName"
                 hideAsterisk={true}
                 required={true}
                 style={{ height: 32, width: '100%' }}
@@ -155,27 +166,26 @@ export const ProfileForm = () => {
           </Col>
         </Row>
 
-        <Form.Item>
+        <Form.Item name="email">
           <NibolInput
             label="Email"
-            name="email"
             disabled
             style={{ height: 32, width: '49%' }}
             hideAsterisk={true}
           />
-          <div style={{ color: '#8c8c8c', fontSize: 12, marginTop: 4 }}>
-            Per modificare la mail, scrivi a support@nibol.com.
-          </div>
         </Form.Item>
+        <div style={{ color: '#8c8c8c', fontSize: 12, marginTop: 4 }}>
+          Per modificare la mail, scrivi a support@nibol.com.
+        </div>
         <Form.Item>
           <Space>
             <Button
               htmlType="button"
               onClick={() => {
-                if (profile) {
+                if (data) {
                   form.setFieldsValue({
-                    firstName: profile.firstName,
-                    lastName: profile.lastName,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
                   });
                 }
               }}

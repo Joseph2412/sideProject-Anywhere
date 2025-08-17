@@ -13,7 +13,7 @@ export default function LoginPage() {
         <LoginForm
           onLoginSuccess={() => {
             setTimeout(() => {
-              router.push('/homepage');
+              router.push('/calendar');
             }, 300);
           }}
           onGoToSignup={() => router.replace('/signup')}

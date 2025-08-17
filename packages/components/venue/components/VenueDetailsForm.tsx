@@ -6,11 +6,13 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { NibolInput } from '../../inputs/Input';
 import styles from './VenueDetailsForm.module.css';
 import { useState } from 'react';
+import { useVenues } from '@repo/hooks';
 
 //Import di Jotai e degli Atom Necessari
 import { useAtomValue, useAtom, useSetAtom } from 'jotai';
 import { messageToast } from '@repo/ui/store/LayoutStore';
 import { venueAtom } from '@repo/ui/store/VenueDetails';
+import { PrimaryButton } from './../../buttons/PrimaryButton';
 
 export const VenueDetailsForm = () => {
   const [form] = Form.useForm();
@@ -23,8 +25,8 @@ export const VenueDetailsForm = () => {
   const availableServices = ['WiFi', 'Stampante', 'Caffè', 'Reception', 'Parcheggio'];
 
   const [loading, setLoading] = useState(false); //Stato LOADING
-  const [venueDetails, setVenueDetails] = useAtom(venueAtom);
-  const venue = useAtomValue(venueAtom);
+  const [venueDetails, setVenueDetails] = useState<any>({});
+  const { data, isLoading } = useVenues();
 
   const setMessage = useSetAtom(messageToast);
 
@@ -35,21 +37,11 @@ export const VenueDetailsForm = () => {
    */
   //Richiamo Dati Sul Form
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.venue) {
-          form.setFieldsValue({ ...data.venue, avatarUrl: data.venue.avatarURL || '' });
-          setVenueDetails(data.venue);
-        } else {
-          console.error('Venue non trovato');
-        }
-      });
-  }, [form, setVenueDetails]);
+    if (data && data.venue) {
+      form.setFieldsValue({ ...data.venue, avatarUrl: data.venue.avatarURL || '' });
+      setVenueDetails(data.venue);
+    }
+  }, [data, form]);
 
   const onFinish = async (values: typeof venueDetails) => {
     setLoading(true);
@@ -74,7 +66,7 @@ export const VenueDetailsForm = () => {
       } else {
         setMessage({
           type: 'error',
-          message: 'Errore 1',
+          message: 'Errore durante il salvataggio',
           duration: 3,
           placement: 'bottomRight',
         });
@@ -82,7 +74,7 @@ export const VenueDetailsForm = () => {
     } catch {
       setMessage({
         type: 'error',
-        message: 'Errore 2',
+        message: 'Errore durante il salvataggio',
         duration: 3,
         placement: 'bottomRight',
       });
@@ -90,6 +82,10 @@ export const VenueDetailsForm = () => {
       setLoading(false);
     }
   };
+
+  if (isLoading) {
+    return <div>Caricamento dati venue...</div>;
+  }
 
   return (
     <Form
@@ -177,12 +173,12 @@ export const VenueDetailsForm = () => {
             <Button
               htmlType="button"
               onClick={() => {
-                if (venue) {
+                if (venueDetails) {
                   form.setFieldsValue({
-                    name: venue.name,
-                    address: venue.address,
-                    description: venue.description,
-                    services: venue.services,
+                    name: venueDetails.name,
+                    address: venueDetails.address,
+                    description: venueDetails.description,
+                    services: venueDetails.services,
                   });
                 }
               }}
@@ -190,9 +186,9 @@ export const VenueDetailsForm = () => {
             >
               Annulla
             </Button>
-            <Button type="primary" htmlType="submit" disabled={loading}>
+            <PrimaryButton type="primary" htmlType="submit" disabled={loading}>
               Salva
-            </Button>
+            </PrimaryButton>
           </Space>
         </Form.Item>
       </Card>

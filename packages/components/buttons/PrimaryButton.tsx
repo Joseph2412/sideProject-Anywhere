@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { Button, ButtonProps } from 'antd';
 import styles from './PrimaryButton.module.css';
 
@@ -7,24 +7,23 @@ type Props = ButtonProps & {
   text?: string;
 };
 
-// forwardRef con tipo HTMLButtonElement in uscita, HTMLElement in entrata
-const PrimaryButtonInner = (
-  { text, children, ...rest }: Props,
-  ref: React.Ref<HTMLButtonElement>
-) => {
-  return (
-    <Button
-      {...rest}
-      ref={ref as unknown as React.Ref<HTMLElement>}
-      size="large"
-      block
-      className={styles.primary}
-    >
-      {text || children}
-    </Button>
-  );
-};
+export const PrimaryButton = React.forwardRef<HTMLElement, Props>(
+  ({ text, loading, disabled, style, className, onClick, children, ...rest }, _ref) => {
+    return (
+      <Button
+        {...rest}
+        size="large"
+        type="primary"
+        loading={loading}
+        disabled={disabled}
+        style={style}
+        className={`${styles.primary} ${className || ''}`}
+        onClick={onClick}
+      >
+        {text || children}
+      </Button>
+    );
+  }
+);
 
-// forwardRef tipato correttamente per TypeScript + Ant Design
-export const PrimaryButton = forwardRef<HTMLButtonElement, Props>(PrimaryButtonInner);
 PrimaryButton.displayName = 'PrimaryButton';

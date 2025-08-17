@@ -1,39 +1,24 @@
-import type { AuthUser, HostProfile } from './types';
+import { useQuery } from '@tanstack/react-query';
 
-// These atoms will be passed as parameters to avoid circular dependency
-export const useHostProfile = (
-  setUser: (user: AuthUser) => void,
-  setProfile: (profile: HostProfile) => void
-) => {
-  return async () => {
-    try {
+export function useUserProfile() {
+  return useQuery({
+    queryKey: ['profile'], // <--- Cambia qui
+    queryFn: async () => {
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('Token di autenticazione non trovato');
       }
-
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/user/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-
       if (!res.ok) {
         throw new Error(`Errore ${res.status}: ${res.statusText}`);
       }
-
-      const data = await res.json();
-
-      if (data.user) {
-        setUser(data.user);
-      }
-      if (data.profile) {
-        setProfile(data.profile);
-      }
-    } catch (error) {
-      console.error('Errore nel caricamento del profilo:', error);
-      throw new Error('Impossibile ricaricare il profilo utente');
-    }
-  };
-};
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}

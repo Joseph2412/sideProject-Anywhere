@@ -4,15 +4,18 @@ import { OpeningDayData, weekDays } from './openingHours.types';
 import { DayOpeningHours } from './DayOpeningHours';
 import { useAtom } from 'jotai';
 import { messageToast } from '@repo/ui/store/ToastStore';
+import { useVenueOpeningDays, useUpdateVenueOpeningDays } from '@repo/hooks';
+import { PrimaryButton } from './../../../buttons/PrimaryButton';
 
 export const VenueHoursForm: React.FC = () => {
   const [openingDaysState, setOpeningDaysState] = useState<Record<string, OpeningDayData>>({});
   const [initialOpeningDaysState, setInitialOpeningDaysState] = useState<
     Record<string, OpeningDayData>
   >({});
-  const [loading, setLoading] = useState<boolean>(true);
-  const [saving, setSaving] = useState<boolean>(false);
   const [, setToastMessage] = useAtom(messageToast);
+  const { data, isLoading } = useVenueOpeningDays();
+  const updateOpeningDays = useUpdateVenueOpeningDays();
+  const [saving, setSaving] = useState<boolean>(false);
 
   /**
    * useEffect per caricamento orari di apertura venue
@@ -21,87 +24,37 @@ export const VenueHoursForm: React.FC = () => {
    * Deep copy: JSON.parse(JSON.stringify()) per stato iniziale immutabile
    */
   useEffect(() => {
-    const fetchOpeningDays = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/opening-days`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
-
-        if (!res.ok) {
-          throw new Error('Errore nel recupero degli orari di apertura');
-        }
-
-        const data = await res.json();
-
-        /**
-         * Normalizza i dati backend con template weekDays
-         * Pattern: reduce per creare oggetto completo con fallback values
-         * Logica: trova dati esistenti o usa defaults (isClosed: true, periods: [])
-         */
-        // Mappa direttamente i dati con boolean e array stringhe
-        const formattedData = weekDays.reduce(
-          (acc, day) => {
-            const foundDay = data.openingDays?.find((hour: any) => hour.day === day.value);
-            acc[day.value] = {
-              day: day.value,
-              isClosed: foundDay?.isClosed ?? true, // Boolean diretto
-              periods: foundDay?.periods || [], // Array stringhe diretto
-            };
-            return acc;
-          },
-          {} as Record<string, OpeningDayData>
-        );
-
-        setOpeningDaysState(formattedData);
-        setInitialOpeningDaysState(JSON.parse(JSON.stringify(formattedData)));
-      } catch (error) {
-        console.error('Errore nel fetch degli orari:', error);
-        setToastMessage({
-          type: 'error',
-          message: 'Errore nel recupero degli orari di apertura',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOpeningDays();
-  }, [setToastMessage]);
+    if (data && data.openingDays) {
+      const formattedData = weekDays.reduce(
+        (acc, day) => {
+          const foundDay = data.openingDays?.find((hour: any) => hour.day === day.value);
+          acc[day.value] = {
+            day: day.value,
+            isClosed: foundDay?.isClosed ?? true,
+            periods: foundDay?.periods || [],
+          };
+          return acc;
+        },
+        {} as Record<string, OpeningDayData>
+      );
+      setOpeningDaysState(formattedData);
+      setInitialOpeningDaysState(JSON.parse(JSON.stringify(formattedData)));
+    }
+  }, [data]);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Trasforma in array per il backend - INVIA sempre tutti i periodi
       const formattedOpeningDays = Object.values(openingDaysState).map(dayData => ({
         day: dayData.day,
-        isClosed: dayData.isClosed, // Boolean diretto
-        periods: dayData.periods.filter(p => p.includes('-')), // TUTTI i periodi validi
+        isClosed: dayData.isClosed,
+        periods: dayData.periods.filter(p => p.includes('-')),
       }));
-
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/opening-days`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ openingDays: formattedOpeningDays }),
-      });
-
-      const responseData = await res.json();
-
-      if (!res.ok) {
-        throw new Error(responseData.message || 'Errore durante il salvataggio');
-      }
-
-      // Usa messageToast come nel resto del codebase
+      await updateOpeningDays.mutateAsync(formattedOpeningDays);
       setToastMessage({
         type: 'success',
         message: 'Orari di apertura salvati con successo!',
       });
-
       setInitialOpeningDaysState(JSON.parse(JSON.stringify(openingDaysState)));
     } catch (error) {
       console.error('Errore nel salvataggio:', error);
@@ -128,8 +81,12 @@ export const VenueHoursForm: React.FC = () => {
     setOpeningDaysState(JSON.parse(JSON.stringify(initialOpeningDaysState)));
   };
 
-  if (loading) {
-    return <Spin tip="Caricamento orari di apertura..." />;
+  if (isLoading) {
+    return (
+      <Spin tip="Caricamento orari di apertura...">
+        <div style={{ minHeight: 80 }} />
+      </Spin>
+    );
   }
 
   return (
@@ -153,9 +110,9 @@ export const VenueHoursForm: React.FC = () => {
         <Button onClick={handleReset} disabled={saving}>
           Annulla
         </Button>
-        <Button type="primary" onClick={handleSave} loading={saving}>
+        <PrimaryButton type="primary" onClick={handleSave} loading={saving}>
           Salva
-        </Button>
+        </PrimaryButton>
       </Space>
     </Form>
   );

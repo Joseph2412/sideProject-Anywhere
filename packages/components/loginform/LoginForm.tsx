@@ -411,7 +411,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
                 loading={loading} // Spinner durante API call
                 disabled={loading} // Previene doppi click
                 onClick={handleLogin} // Handler principale
-                style={{ height: 32, marginBottom: 10, marginTop: 20 }}
+                className={styles.primaryButton}
                 text="Continua"
               />
 

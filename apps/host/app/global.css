@@ -33,3 +33,103 @@
 .ant-menu-submenu-selected > .ant-menu-submenu-title {
   color: black !important;
 }
+
+.ant-tabs,
+.ant-tabs-tab,
+.ant-tag,
+.ant-select,
+.ant-select-item-option-content,
+.ant-select-selection-item,
+.ant-select-selection-overflow-item {
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans', sans-serif !important;
+}
+
+.ant-tabs-tab-active,
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #000639 !important;
+  border-radius: 8px 8px 0 0;
+}
+
+.ant-tabs-hover,
+.ant-tabs-tab.ant-tabs-tab-hover .ant-tabs-tab-btn {
+  color: #000639 !important;
+  border-radius: 8px 8px 0 0;
+}
+
+/* Tabs Sopra Componetni Locale e Pacchetti on HOVER */
+.ant-tabs-tab:hover .ant-tabs-tab-btn {
+  color: #1827aa !important;
+  background: transparent !important;
+}
+.ant-tabs-ink-bar {
+  background: #00063e !important; /* Colore blu scuro */
+  height: 3px !important; /* Spessore */
+  border-radius: 3px !important; /* Arrotondamento opzionale */
+}
+
+/* Tab con dropdown (SubMenu): mantieni background trasparente */
+.ant-tabs-dropdown {
+  background: transparent !important;
+}
+
+/* Tabs ANT-MENU della SIDEBAR */
+
+.ant-menu,
+.ant-menu-item,
+.ant-menu-submenu-title {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+/* Menu item selezionato: blu scuro, testo bianco */
+.ant-menu-item-selected {
+  background: #00063e !important;
+  color: #fff !important;
+  border-radius: 10px !important;
+}
+
+/* Menu item hover: blu scuro, testo bianco */
+.ant-menu-item:hover {
+  background: #00063e !important;
+  color: #fff !important;
+  border-radius: 10px !important;
+}
+
+/* Icone coerenti */
+.ant-menu-item .anticon {
+  color: #00063e !important;
+}
+.ant-menu-item-selected .anticon,
+.ant-menu-item:hover .anticon {
+  color: #fff !important;
+}
+
+.ant-picker,
+.ant-picker-input > input,
+.ant-picker-dropdown,
+.ant-picker-dropdown .ant-picker-time-panel,
+.ant-picker-dropdown .ant-picker-content th,
+.ant-picker-dropdown .ant-picker-content td {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 15px; /* opzionale: adatta la dimensione */
+}
+
+/* Rimuovi bordo azzurrino (outline/border blu) su input e bottoni Ant Design */
+.ant-input:focus,
+.ant-input-focused,
+.ant-input:hover,
+.ant-btn:focus,
+.ant-btn:active,
+.ant-btn:focus-visible,
+.ant-btn:hover,
+.ant-picker-focused,
+.ant-picker:focus,
+.ant-picker:hover,
+.ant-picker-input > input:focus,
+.ant-picker-input > input:active,
+.ant-picker-input > input:focus-visible,
+.ant-picker-input > input:hover {
+  box-shadow: none !important;
+  border-color: #d9d9d9 !important; /* colore neutro coerente con il resto */
+  outline: none !important;
+  color: #000639 !important; /* colore coerente con il tema */
+}

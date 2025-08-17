@@ -6,7 +6,7 @@ import { FormItemProps } from 'antd/es/form';
 type NibolInputProps = InputProps &
   FormItemProps & {
     label: string;
-    name: string;
+    name?: string;
     rules?: Rule[];
     password?: boolean;
     validateTrigger?: string;
@@ -20,9 +20,12 @@ export const NibolInput: React.FC<NibolInputProps> = ({
   password = false,
   className,
   validateTrigger,
-  hideAsterisk = false, // corretto qui
+  hideAsterisk = false,
   ...rest
 }) => {
+  // Rimuovi ref da rest se presente
+  const { ref, ...safeRest } = rest as any;
+
   return (
     <Form.Item
       label={label}
@@ -32,9 +35,9 @@ export const NibolInput: React.FC<NibolInputProps> = ({
       required={!hideAsterisk}
     >
       {password ? (
-        <Input.Password {...rest} size="large" className={className} />
+        <Input.Password {...safeRest} size="large" className={className} />
       ) : (
-        <Input {...rest} size="large" className={className} />
+        <Input {...safeRest} size="large" className={className} />
       )}
     </Form.Item>
   );

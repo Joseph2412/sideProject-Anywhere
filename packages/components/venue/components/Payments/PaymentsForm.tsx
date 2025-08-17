@@ -2,6 +2,7 @@ import { Form, Button, Space, Row, Col, Card, Select } from 'antd';
 import { NibolInput } from '../../../inputs/Input';
 import styles from './Payments.module.css';
 import { useEffect, useState } from 'react';
+import { useVenues } from '@repo/hooks';
 
 import { useSetAtom } from 'jotai';
 import { messageToast } from '@repo/ui';
@@ -34,37 +35,14 @@ export const PaymentsForm = () => {
    * Pattern: fetch + setFieldsValue per pre-popolamento form con dati esistenti
    * Dependency: [form] - si riattiva solo se cambia l'istanza del form
    */
+  const { data, isLoading } = useVenues();
+  console.log('Dati venues:', data);
   useEffect(() => {
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-      console.error('Nessun token trovato nel localStorage');
-      return;
+    if (data && data.payments) {
+      form.setFieldsValue(data.payments);
+      setInitialValues(data.payments);
     }
-
-    fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/payments`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then(data => {
-        if (data) {
-          form.setFieldsValue(data);
-          setInitialValues(data); // Salva i valori iniziali per il form
-        } else {
-          console.error('Payments non trovati');
-        }
-      })
-      .catch(error => {
-        console.error('Errore nel recupero dei dati:', error);
-      });
-  }, [form]);
+  }, [data, form]);
 
   const onFinish = async (values: any) => {
     setLoading(true);
@@ -114,6 +92,10 @@ export const PaymentsForm = () => {
       setLoading(false);
     }
   };
+
+  if (isLoading) {
+    return <div>Caricamento dati pagamento...</div>;
+  }
 
   return (
     <Form

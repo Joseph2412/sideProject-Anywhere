@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useVenueClosingPeriods } from '@repo/hooks';
 import {
   Switch,
   Button,
@@ -104,48 +105,25 @@ export const VenueClosingDays: React.FC = () => {
   // Hook per impostare i messaggi toast
   const setMessageToast = useSetAtom(messageToast);
 
+  const { data, isLoading } = useVenueClosingPeriods();
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/closing-periods`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then(data => {
-        /**
-         * Trasforma i dati dal backend nel formato utilizzato dal form
-         * Pattern: map() per convertire array API → formato UI component
-         * Logica: distingue tra giorno singolo e range di date usando dayjs.isSame()
-         * Spread operator condizionale per structure dinamica dell'oggetto
-         */
-        const formatted = data.closingPeriods.map((p: any) => {
-          const startDate = dayjs(p.start);
-          const endDate = dayjs(p.end);
-
-          // Determina se è un giorno singolo o un range
-          const isSameDay = startDate.isSame(endDate, 'day');
-
-          return {
-            id: p.id,
-            isRange: !isSameDay,
-            ...(isSameDay
-              ? { singleDate: startDate }
-              : { dates: [startDate, endDate] as [Dayjs, Dayjs] }),
-          };
-        });
-
-        form.setFieldsValue({ periods: formatted });
-        setOriginalPeriods(formatted);
-      })
-      .catch((err: Error) => {
-        console.error('Errore durante il fetch:', err);
+    if (data && data.closingPeriods) {
+      const formatted = data.closingPeriods.map((p: any) => {
+        const startDate = dayjs(p.start);
+        const endDate = dayjs(p.end);
+        const isSameDay = startDate.isSame(endDate, 'day');
+        return {
+          id: p.id,
+          isRange: !isSameDay,
+          ...(isSameDay
+            ? { singleDate: startDate }
+            : { dates: [startDate, endDate] as [Dayjs, Dayjs] }),
+        };
       });
-  }, [form]);
+      form.setFieldsValue({ periods: formatted });
+      setOriginalPeriods(formatted);
+    }
+  }, [data, form]);
 
   // Componente per ogni periodo
   const PeriodRow: React.FC<{
@@ -303,14 +281,17 @@ export const VenueClosingDays: React.FC = () => {
       }));
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/closing-periods`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ closingPeriods }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/api/venues/closing-periods`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify({ closingPeriods }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Errore durante il salvataggio');
@@ -325,11 +306,14 @@ export const VenueClosingDays: React.FC = () => {
       });
 
       // Ricarica i dati dopo il salvataggio
-      const updatedResponse = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/closing-periods`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+      const updatedResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/api/venues/closing-periods`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
 
       if (updatedResponse.ok) {
         const updatedData = await updatedResponse.json();
@@ -371,6 +355,10 @@ export const VenueClosingDays: React.FC = () => {
     const year = currentYear - 5 + i;
     return { value: year, label: year.toString() };
   });
+
+  if (isLoading) {
+    return <div>Caricamento periodi di chiusura...</div>;
+  }
 
   return (
     <>
@@ -427,9 +415,15 @@ export const VenueClosingDays: React.FC = () => {
           <Button key="cancel" onClick={() => setIsModalVisible(false)}>
             Annulla
           </Button>,
-          <Button key="import" type="primary" loading={loadingHolidays} onClick={importHolidays}>
+          <PrimaryButton
+            key="import"
+            type="primary"
+            loading={loadingHolidays}
+            onClick={importHolidays}
+            style={{ color: 'white' }}
+          >
             Importa
-          </Button>,
+          </PrimaryButton>,
         ]}
       >
         <div style={{ marginBottom: 16 }}>
