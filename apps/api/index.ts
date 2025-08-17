@@ -18,7 +18,10 @@ import {
 
 const server: FastifyInstance = fastify();
 
-server.register(cors, {});
+server.register(cors, {
+  origin: process.env.API_HOST,
+  credentials: true,
+});
 
 server.register(fastifyJwt, {
   secret: process.env.JWT_SECRET!,
