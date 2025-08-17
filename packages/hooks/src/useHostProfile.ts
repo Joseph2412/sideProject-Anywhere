@@ -19,7 +19,7 @@ export const useHostProfile = (
         throw new Error('Token di autenticazione non trovato');
       }
 
-      const res = await fetch('http://localhost:3001/user/profile', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/user/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',

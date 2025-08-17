@@ -74,7 +74,7 @@ type SignupResponse = {
  */
 const userSignup = async (payload: SignupPayload): Promise<SignupResponse> => {
   // Chiamata HTTP POST al endpoint di registrazione
-  const res = await fetch('http://localhost:3001/auth/signup', {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/auth/signup`, {
     method: 'POST', // POST per inviare dati sensibili
     headers: {
       'Content-Type': 'application/json', // Specifica formato dati JSON

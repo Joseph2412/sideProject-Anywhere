@@ -17,7 +17,7 @@ export const PreferencesForm = () => {
 
   const setMessage = useSetAtom(messageToast);
 
-  const urlFetch = 'http://localhost:3001/user/preferences'; //Mi scocciava riscrivere sempre sta fetch de m****
+  const urlFetch = `${process.env.NEXT_PUBLIC_API_HOST}/user/preferences`; //Mi scocciava riscrivere sempre sta fetch de m****
   const token = localStorage.getItem('token'); //Ripeschiamo il Token
 
   const [formValues, setFormValues] = useState<NotificationPreference>(

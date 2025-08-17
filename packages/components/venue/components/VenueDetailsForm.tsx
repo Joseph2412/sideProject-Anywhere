@@ -35,7 +35,7 @@ export const VenueDetailsForm = () => {
    */
   //Richiamo Dati Sul Form
   useEffect(() => {
-    fetch('http://localhost:3001/api/venues', {
+    fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
@@ -54,7 +54,7 @@ export const VenueDetailsForm = () => {
   const onFinish = async (values: typeof venueDetails) => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:3001/api/venues`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

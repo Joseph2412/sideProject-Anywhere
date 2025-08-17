@@ -29,7 +29,7 @@ export const ProfileForm = () => {
   const onFinish = async (values: { firstName: string; lastName: string }) => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/user/profile', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/user/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

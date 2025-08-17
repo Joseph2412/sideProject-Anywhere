@@ -24,7 +24,7 @@ export const VenueHoursForm: React.FC = () => {
     const fetchOpeningDays = async () => {
       setLoading(true);
       try {
-        const res = await fetch('http://localhost:3001/api/venues/opening-days', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/opening-days`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -81,7 +81,7 @@ export const VenueHoursForm: React.FC = () => {
         periods: dayData.periods.filter(p => p.includes('-')), // TUTTI i periodi validi
       }));
 
-      const res = await fetch('http://localhost:3001/api/venues/opening-days', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/opening-days`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

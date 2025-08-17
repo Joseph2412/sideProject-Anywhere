@@ -19,7 +19,7 @@ import {
 const server: FastifyInstance = fastify();
 
 server.register(cors, {
-  origin: 'http://localhost:3000',
+  origin: process.env.API_HOST,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
 });
