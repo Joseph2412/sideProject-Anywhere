@@ -2,6 +2,7 @@ import 'antd/dist/reset.css';
 import './global.css';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import LayoutClientWrapper from './LayoutClientWrapper';
+import '@ant-design/v5-patch-for-react-19';
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],

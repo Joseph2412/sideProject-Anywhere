@@ -106,7 +106,7 @@ export const PaymentsForm = () => {
       onFinish={onFinish}
     >
       <Card
-        bodyStyle={{ paddingTop: 10, paddingBottom: 10, paddingLeft: 15, paddingRight: 15 }}
+        styles={{ body: { paddingTop: 10, paddingBottom: 10, paddingLeft: 15, paddingRight: 15 } }}
         style={{ marginBottom: 20 }}
       >
         <Row gutter={[0, 0]}>
@@ -225,7 +225,7 @@ export const PaymentsForm = () => {
         </Form.Item>
       </Card>
 
-      <Card bodyStyle={{ paddingTop: 10, paddingBottom: 10, paddingLeft: 15 }}>
+      <Card styles={{ body: { paddingTop: 10, paddingBottom: 10, paddingLeft: 15 } }}>
         <div style={{ color: '#8c8c8c', fontSize: 12, marginBottom: 8 }}>
           Informazioni Per emissione Fattura
         </div>

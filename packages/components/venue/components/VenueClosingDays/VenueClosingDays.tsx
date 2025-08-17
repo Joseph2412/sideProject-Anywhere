@@ -411,20 +411,22 @@ export const VenueClosingDays: React.FC = () => {
         title="Importa festività nazionali"
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
-        footer={[
-          <Button key="cancel" onClick={() => setIsModalVisible(false)}>
-            Annulla
-          </Button>,
-          <PrimaryButton
-            key="import"
-            type="primary"
-            loading={loadingHolidays}
-            onClick={importHolidays}
-            style={{ color: 'white' }}
-          >
-            Importa
-          </PrimaryButton>,
-        ]}
+        footer={
+          <Space>
+            <Button key="cancel" onClick={() => setIsModalVisible(false)}>
+              Annulla
+            </Button>
+            <PrimaryButton
+              key="import"
+              type="primary"
+              loading={loadingHolidays}
+              onClick={importHolidays}
+              style={{ color: 'white' }}
+            >
+              Importa
+            </PrimaryButton>
+          </Space>
+        }
       >
         <div style={{ marginBottom: 16 }}>
           <label style={{ display: 'block', marginBottom: 8 }}>Paese</label>

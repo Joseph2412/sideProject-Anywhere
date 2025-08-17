@@ -19,7 +19,7 @@
     "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.83.0",
     "@types/next": "^9.0.0",
-    "antd": "^5.13.0",
+    "antd": "5.27.0",
     "dayjs": "^1.11.10",
     "jotai": "^2.8.4",
     "next": "^15.4.2",

@@ -30,7 +30,7 @@ const menuItems = [
     icon: <ShopOutlined />,
     label: 'Locale',
     children: [
-      { key: 'venue', label: <Link href="/venue">Generali</Link> },
+      { key: 'venue-general', label: <Link href="/venue">Generali</Link> },
       { key: 'payments', label: <Link href="/payments">Pagamenti</Link> },
     ],
   },

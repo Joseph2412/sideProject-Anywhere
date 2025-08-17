@@ -128,7 +128,7 @@ export const PreferencesForm = () => {
 
   return (
     <Form form={form}>
-      <Card style={{ borderRadius: 8 }} bodyStyle={{ padding: 20 }}>
+      <Card style={{ borderRadius: 8 }} styles={{ body: { padding: 20 } }}>
         {NotificationGroups.map((group, index) => (
           <div key={group.title}>
             {/* Titolo gruppo */}
