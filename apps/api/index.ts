@@ -19,7 +19,7 @@ import {
 const server: FastifyInstance = fastify();
 
 server.register(cors, {
-  origin: process.env.API_HOST,
+  origin: process.env.APP_HOST,
   credentials: true,
 });
 
