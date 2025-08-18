@@ -1,4 +1,4 @@
-import type { AuthUser, HostProfile } from './types';
+import type { AuthUser, HostProfile } from "./types";
 
 /**
  * Hook personalizzato per ricaricare i dati del profilo utente e host
@@ -10,21 +10,24 @@ import type { AuthUser, HostProfile } from './types';
 // These atoms will be passed as parameters to avoid circular dependency
 export const useHostProfile = (
   setUser: (user: AuthUser) => void,
-  setProfile: (profile: HostProfile) => void
+  setProfile: (profile: HostProfile) => void,
 ) => {
   return async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error('Token di autenticazione non trovato');
+        throw new Error("Token di autenticazione non trovato");
       }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/user/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/user/profile`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (!res.ok) {
         throw new Error(`Errore ${res.status}: ${res.statusText}`);
@@ -39,8 +42,8 @@ export const useHostProfile = (
         setProfile(data.profile);
       }
     } catch (error) {
-      console.error('Errore nel caricamento del profilo:', error);
-      throw new Error('Impossibile ricaricare il profilo utente');
+      console.error("Errore nel caricamento del profilo:", error);
+      throw new Error("Impossibile ricaricare il profilo utente");
     }
   };
 };

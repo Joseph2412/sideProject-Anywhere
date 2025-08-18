@@ -1,13 +1,18 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../../libs/prisma';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { prisma } from "../../libs/prisma";
 
-export const getVenueDetailsHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+export const getVenueDetailsHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   const prof = await prisma.hostProfile.findUnique({
     where: { userId: request.user.id },
     select: { id: true },
   });
   if (!prof) {
-    return reply.code(404).send({ message: 'HostProfile not found for current user' });
+    return reply
+      .code(404)
+      .send({ message: "HostProfile not found for current user" });
   }
 
   const venue = await prisma.coworkingVenue.findUnique({
@@ -21,7 +26,7 @@ export const getVenueDetailsHandler = async (request: FastifyRequest, reply: Fas
       photos: true,
       avatarURL: true,
       openingDays: {
-        orderBy: [{ day: 'asc' }],
+        orderBy: [{ day: "asc" }],
         select: {
           id: true,
           day: true,
@@ -37,18 +42,22 @@ export const getVenueDetailsHandler = async (request: FastifyRequest, reply: Fas
   return reply.code(200).send({ venue });
 };
 
-export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-  const { name, address, description, services, avatarURL, photos } = request.body as {
-    name: string;
-    address: string;
-    description?: string | null;
-    services?: string[];
-    avatarURL?: string | null;
-    photos?: string[];
-  };
+export const updateVenueDetailsHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const { name, address, description, services, avatarURL, photos } =
+    request.body as {
+      name: string;
+      address: string;
+      description?: string | null;
+      services?: string[];
+      avatarURL?: string | null;
+      photos?: string[];
+    };
 
   if (!name || !address) {
-    return reply.code(400).send({ message: 'name and address are required' });
+    return reply.code(400).send({ message: "name and address are required" });
   }
 
   // Lookup profilo host dal token
@@ -57,7 +66,9 @@ export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: 
     select: { id: true },
   });
   if (!prof) {
-    return reply.code(404).send({ message: 'HostProfile not found for current user' });
+    return reply
+      .code(404)
+      .send({ message: "HostProfile not found for current user" });
   }
 
   const venue = await prisma.coworkingVenue.upsert({

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useVenueClosingPeriods } from '@repo/hooks';
+import React, { useEffect, useRef, useState } from "react";
+import { useVenueClosingPeriods } from "@repo/hooks";
 import {
   Switch,
   Button,
@@ -12,12 +12,12 @@ import {
   Modal,
   Select,
   Space,
-} from 'antd';
-import { PrimaryButton } from '../../../buttons/PrimaryButton';
-import type { Dayjs } from 'dayjs';
-import dayjs from 'dayjs';
-import { useSetAtom } from 'jotai';
-import { messageToast } from '@repo/ui/store/ToastStore';
+} from "antd";
+import { PrimaryButton } from "../../../buttons/PrimaryButton";
+import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
+import { useSetAtom } from "jotai";
+import { messageToast } from "@repo/ui/store/ToastStore";
 
 type ClosingPeriod = {
   id?: number;
@@ -50,7 +50,7 @@ type Holiday = {
 const useDatePickerToggle = (
   form: any,
   fieldName: (string | number)[],
-  initialIsRange: boolean
+  initialIsRange: boolean,
 ) => {
   const [isRange, setIsRange] = useState(initialIsRange);
 
@@ -64,12 +64,12 @@ const useDatePickerToggle = (
     // Reset dei campi quando cambia il tipo di picker
     if (checked) {
       // Switch ON: passa a RangePicker (+ Giorni)
-      form.setFieldValue([...fieldName, 'singleDate'], undefined);
-      form.setFieldValue([...fieldName, 'isRange'], true);
+      form.setFieldValue([...fieldName, "singleDate"], undefined);
+      form.setFieldValue([...fieldName, "isRange"], true);
     } else {
       // Switch OFF: passa a DatePicker singolo
-      form.setFieldValue([...fieldName, 'dates'], undefined);
-      form.setFieldValue([...fieldName, 'isRange'], false);
+      form.setFieldValue([...fieldName, "dates"], undefined);
+      form.setFieldValue([...fieldName, "isRange"], false);
     }
   };
 
@@ -78,16 +78,16 @@ const useDatePickerToggle = (
 
 // Lista dei paesi supportati
 const COUNTRIES = [
-  { value: 'IT', label: 'Italia' },
-  { value: 'FR', label: 'Francia' },
-  { value: 'DE', label: 'Germania' },
-  { value: 'ES', label: 'Spagna' },
-  { value: 'GB', label: 'Regno Unito' },
-  { value: 'AT', label: 'Austria' },
-  { value: 'BE', label: 'Belgio' },
-  { value: 'CH', label: 'Svizzera' },
-  { value: 'NL', label: 'Paesi Bassi' },
-  { value: 'PT', label: 'Portogallo' },
+  { value: "IT", label: "Italia" },
+  { value: "FR", label: "Francia" },
+  { value: "DE", label: "Germania" },
+  { value: "ES", label: "Spagna" },
+  { value: "GB", label: "Regno Unito" },
+  { value: "AT", label: "Austria" },
+  { value: "BE", label: "Belgio" },
+  { value: "CH", label: "Svizzera" },
+  { value: "NL", label: "Paesi Bassi" },
+  { value: "PT", label: "Portogallo" },
 ];
 
 export const VenueClosingDays: React.FC = () => {
@@ -98,8 +98,10 @@ export const VenueClosingDays: React.FC = () => {
 
   // Stati per il modal di importazione festività
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState<string>('IT');
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [selectedCountry, setSelectedCountry] = useState<string>("IT");
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear(),
+  );
   const [loadingHolidays, setLoadingHolidays] = useState(false);
 
   // Hook per impostare i messaggi toast
@@ -111,7 +113,7 @@ export const VenueClosingDays: React.FC = () => {
       const formatted = data.closingPeriods.map((p: any) => {
         const startDate = dayjs(p.start);
         const endDate = dayjs(p.end);
-        const isSameDay = startDate.isSame(endDate, 'day');
+        const isSameDay = startDate.isSame(endDate, "day");
         return {
           id: p.id,
           isRange: !isSameDay,
@@ -132,31 +134,35 @@ export const VenueClosingDays: React.FC = () => {
     remove: (name: number) => void;
   }> = ({ name, restField, remove }) => {
     // Ottieni il valore isRange dal form per questo campo specifico
-    const fieldValue = form.getFieldValue(['periods', name]);
+    const fieldValue = form.getFieldValue(["periods", name]);
     const initialIsRange = fieldValue?.isRange ?? false;
 
     const { isRange, handleSwitchChange } = useDatePickerToggle(
       form,
-      ['periods', name],
-      initialIsRange
+      ["periods", name],
+      initialIsRange,
     );
 
     return (
       <Form.Item
         key={name}
         style={{ marginBottom: 15 }}
-        label={isRange ? 'Periodo Dal - Al' : 'Periodo Giorno'}
+        label={isRange ? "Periodo Dal - Al" : "Periodo Giorno"}
       >
         <Row gutter={16} align="top">
           <Col flex="0 0 auto">
-            <Switch onChange={handleSwitchChange} checked={isRange} style={{ marginTop: 10 }} />
+            <Switch
+              onChange={handleSwitchChange}
+              checked={isRange}
+              style={{ marginTop: 10 }}
+            />
           </Col>
           <Col flex="0 0 auto">
             <Space.Compact size="middle">
               {isRange ? (
                 <Form.Item
                   {...restField}
-                  name={[name, 'dates']}
+                  name={[name, "dates"]}
                   style={{
                     marginBottom: 0,
                     marginRight: 10,
@@ -164,16 +170,21 @@ export const VenueClosingDays: React.FC = () => {
                   rules={[
                     {
                       required: true,
-                      message: 'Seleziona un intervallo di date',
+                      message: "Seleziona un intervallo di date",
                     },
                   ]}
                 >
-                  <RangePicker style={{ borderTopRightRadius: 5, borderBottomRightRadius: 5 }} />
+                  <RangePicker
+                    style={{
+                      borderTopRightRadius: 5,
+                      borderBottomRightRadius: 5,
+                    }}
+                  />
                 </Form.Item>
               ) : (
                 <Form.Item
                   {...restField}
-                  name={[name, 'singleDate']}
+                  name={[name, "singleDate"]}
                   style={{
                     marginBottom: 0,
                     marginRight: 10,
@@ -183,11 +194,16 @@ export const VenueClosingDays: React.FC = () => {
                   rules={[
                     {
                       required: true,
-                      message: 'Seleziona una data',
+                      message: "Seleziona una data",
                     },
                   ]}
                 >
-                  <DatePicker style={{ borderTopRightRadius: 5, borderBottomRightRadius: 5 }} />
+                  <DatePicker
+                    style={{
+                      borderTopRightRadius: 5,
+                      borderBottomRightRadius: 5,
+                    }}
+                  />
                 </Form.Item>
               )}
               <Button
@@ -212,11 +228,11 @@ export const VenueClosingDays: React.FC = () => {
     setLoadingHolidays(true);
     try {
       const response = await fetch(
-        `https://date.nager.at/api/v3/PublicHolidays/${selectedYear}/${selectedCountry}`
+        `https://date.nager.at/api/v3/PublicHolidays/${selectedYear}/${selectedCountry}`,
       );
 
       if (!response.ok) {
-        throw new Error('Errore nel recupero delle festività');
+        throw new Error("Errore nel recupero delle festività");
       }
 
       const holidays: Holiday[] = await response.json();
@@ -238,7 +254,7 @@ export const VenueClosingDays: React.FC = () => {
       });
 
       // Ottieni i periodi esistenti dal form
-      const currentPeriods = form.getFieldValue('periods') || [];
+      const currentPeriods = form.getFieldValue("periods") || [];
 
       // Aggiungi le festività ai periodi esistenti
       const updatedPeriods = [...currentPeriods, ...holidayPeriods];
@@ -247,22 +263,22 @@ export const VenueClosingDays: React.FC = () => {
       form.setFieldsValue({ periods: updatedPeriods });
 
       setMessageToast({
-        type: 'success',
-        message: 'Festività importate',
+        type: "success",
+        message: "Festività importate",
         description: `${holidays.length} festività nazionali aggiunte per ${selectedCountry} ${selectedYear}`,
         duration: 3,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
 
       setIsModalVisible(false);
     } catch (error) {
       console.error("Errore durante l'importazione:", error);
       setMessageToast({
-        type: 'error',
-        message: 'Errore',
+        type: "error",
+        message: "Errore",
         description: "Errore durante l'importazione delle festività nazionali.",
         duration: 3,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     } finally {
       setLoadingHolidays(false);
@@ -276,33 +292,37 @@ export const VenueClosingDays: React.FC = () => {
       .filter((period: ClosingPeriod) => period.dates || period.singleDate)
       .map((period: ClosingPeriod) => ({
         id: period.id,
-        start: period.singleDate ? period.singleDate.toISOString() : period.dates![0].toISOString(),
-        end: period.singleDate ? period.singleDate.toISOString() : period.dates![1].toISOString(),
+        start: period.singleDate
+          ? period.singleDate.toISOString()
+          : period.dates![0].toISOString(),
+        end: period.singleDate
+          ? period.singleDate.toISOString()
+          : period.dates![1].toISOString(),
       }));
 
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_HOST}/api/venues/closing-periods`,
         {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify({ closingPeriods }),
-        }
+        },
       );
 
       if (!response.ok) {
-        throw new Error('Errore durante il salvataggio');
+        throw new Error("Errore durante il salvataggio");
       }
 
       setMessageToast({
-        type: 'success',
-        message: 'Successo',
-        description: 'Periodi di chiusura salvati con successo.',
+        type: "success",
+        message: "Successo",
+        description: "Periodi di chiusura salvati con successo.",
         duration: 3,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
 
       // Ricarica i dati dopo il salvataggio
@@ -310,9 +330,9 @@ export const VenueClosingDays: React.FC = () => {
         `${process.env.NEXT_PUBLIC_API_HOST}/api/venues/closing-periods`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
 
       if (updatedResponse.ok) {
@@ -320,7 +340,7 @@ export const VenueClosingDays: React.FC = () => {
         const formatted = updatedData.closingPeriods.map((p: any) => {
           const startDate = dayjs(p.start);
           const endDate = dayjs(p.end);
-          const isSameDay = startDate.isSame(endDate, 'day');
+          const isSameDay = startDate.isSame(endDate, "day");
 
           return {
             id: p.id,
@@ -336,11 +356,11 @@ export const VenueClosingDays: React.FC = () => {
       }
     } catch (err) {
       setMessageToast({
-        type: 'error',
-        message: 'Errore',
-        description: 'Errore durante il salvataggio dei periodi di chiusura.',
+        type: "error",
+        message: "Errore",
+        description: "Errore durante il salvataggio dei periodi di chiusura.",
         duration: 3,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     }
   };
@@ -365,7 +385,10 @@ export const VenueClosingDays: React.FC = () => {
       <Form form={form} layout="vertical" onFinish={handleSave}>
         <Card>
           <Row>
-            <PrimaryButton style={{ width: 'auto' }} onClick={() => setIsModalVisible(true)}>
+            <PrimaryButton
+              style={{ width: "auto" }}
+              onClick={() => setIsModalVisible(true)}
+            >
               Importa Festività Nazionali
             </PrimaryButton>
           </Row>
@@ -377,7 +400,12 @@ export const VenueClosingDays: React.FC = () => {
                 return (
                   <div>
                     {fields.map(({ key, name, ...restField }) => (
-                      <PeriodRow key={key} name={name} restField={restField} remove={remove} />
+                      <PeriodRow
+                        key={key}
+                        name={name}
+                        restField={restField}
+                        remove={remove}
+                      />
                     ))}
                   </div>
                 );
@@ -388,16 +416,20 @@ export const VenueClosingDays: React.FC = () => {
               style={{
                 marginTop: 15,
                 gap: 15,
-                display: 'flex',
-                justifyContent: 'space-between',
+                display: "flex",
+                justifyContent: "space-between",
               }}
             >
-              <div style={{ display: 'flex', gap: 15 }}>
+              <div style={{ display: "flex", gap: 15 }}>
                 <Button onClick={handleCancel}>Annulla</Button>
                 <PrimaryButton htmlType="submit">Salva</PrimaryButton>
               </div>
               <Col>
-                <Button onClick={() => addRef.current?.({ id: Date.now(), isRange: false })}>
+                <Button
+                  onClick={() =>
+                    addRef.current?.({ id: Date.now(), isRange: false })
+                  }
+                >
                   Aggiungi
                 </Button>
               </Col>
@@ -421,7 +453,7 @@ export const VenueClosingDays: React.FC = () => {
               type="primary"
               loading={loadingHolidays}
               onClick={importHolidays}
-              style={{ color: 'white' }}
+              style={{ color: "white" }}
             >
               Importa
             </PrimaryButton>
@@ -429,18 +461,18 @@ export const VenueClosingDays: React.FC = () => {
         }
       >
         <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 8 }}>Paese</label>
+          <label style={{ display: "block", marginBottom: 8 }}>Paese</label>
           <Select
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             value={selectedCountry}
             onChange={setSelectedCountry}
             options={COUNTRIES}
           />
         </div>
         <div>
-          <label style={{ display: 'block', marginBottom: 8 }}>Anno</label>
+          <label style={{ display: "block", marginBottom: 8 }}>Anno</label>
           <Select
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             value={selectedYear}
             onChange={setSelectedYear}
             options={yearOptions}

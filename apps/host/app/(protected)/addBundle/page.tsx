@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { AddBundleForm } from '@repo/components';
+import { AddBundleForm } from "@repo/components";
 
 export default function AddBundlePage() {
   return <AddBundleForm />;

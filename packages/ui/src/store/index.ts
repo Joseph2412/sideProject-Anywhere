@@ -25,16 +25,16 @@
  */
 
 // Store per gestione autenticazione e profili utente
-export * from './AuthStore';
+export * from "./AuthStore";
 
 // Store per gestione notifiche toast/messaggi
-export * from './ToastStore';
+export * from "./ToastStore";
 
 // Store per gestione navigazione e tab layout
-export * from './NavigationStore';
+export * from "./NavigationStore";
 
 // Store per gestione dati venue completi
-export * from './VenueDetails';
+export * from "./VenueDetails";
 
 // Store legacy per compatibilità (da verificare se utilizzato)
-export * from './LayoutStore';
+export * from "./LayoutStore";

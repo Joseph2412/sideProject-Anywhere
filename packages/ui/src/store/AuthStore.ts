@@ -15,7 +15,7 @@
  * - Due atom separati per gestire i due tipi di informazioni
  */
 
-import { atom } from 'jotai';
+import { atom } from "jotai";
 
 /**
  * TYPE DEFINITION: AuthUser
@@ -37,7 +37,7 @@ export type AuthUser = {
   id: number; // Primary key dal database
   name: string; // Nome per display UI
   email: string; // Email univoca per login
-  role: 'USER' | 'HOST'; // Union type: solo questi due ruoli esistono
+  role: "USER" | "HOST"; // Union type: solo questi due ruoli esistono
 };
 
 /**

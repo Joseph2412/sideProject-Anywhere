@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
-import { Checkbox, TimePicker, Button, Space, Typography, Row, Col } from 'antd';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import type { CheckboxChangeEvent } from 'antd/es/checkbox';
-import dayjs from 'dayjs';
-import { parsePeriodString, formatPeriodString } from './openingHours.types';
-import { PrimaryButton } from './../../../buttons/PrimaryButton';
+import React, { useState } from "react";
+import {
+  Checkbox,
+  TimePicker,
+  Button,
+  Space,
+  Typography,
+  Row,
+  Col,
+} from "antd";
+import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import type { CheckboxChangeEvent } from "antd/es/checkbox";
+import dayjs from "dayjs";
+import { parsePeriodString, formatPeriodString } from "./openingHours.types";
+import { PrimaryButton } from "./../../../buttons/PrimaryButton";
 
 interface DayOpeningHoursProps {
   day: string;
@@ -13,7 +21,10 @@ interface DayOpeningHoursProps {
     isClosed: boolean;
     periods: string[];
   };
-  onUpdateDay: (dayKey: string, data: { isClosed: boolean; periods: string[] }) => void;
+  onUpdateDay: (
+    dayKey: string,
+    data: { isClosed: boolean; periods: string[] },
+  ) => void;
 }
 
 export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
@@ -40,7 +51,7 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
     } else {
       // Da chiuso ad aperto: crea subito un periodo pendente (non salvato)
       setTimeout(() => {
-        setPendingPeriod('08:00-18:00');
+        setPendingPeriod("08:00-18:00");
       }, 0);
       onUpdateDay(dayKey, {
         isClosed: false,
@@ -51,7 +62,7 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
 
   // Inizia un nuovo periodo (non ancora confermato)
   const handleAddPeriod = () => {
-    setPendingPeriod('12:00-18:00');
+    setPendingPeriod("12:00-18:00");
   };
 
   // Conferma il periodo pendente
@@ -63,7 +74,7 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
         periods: newPeriods,
       });
       // Dopo la conferma, riapri subito un nuovo periodo pending
-      setPendingPeriod('08:00-18:00');
+      setPendingPeriod("08:00-18:00");
     }
   };
 
@@ -75,7 +86,10 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
     });
   };
 
-  const handlePeriodChange = (index: number, timeStrings: [string, string] | null) => {
+  const handlePeriodChange = (
+    index: number,
+    timeStrings: [string, string] | null,
+  ) => {
     if (!timeStrings || !timeStrings[0] || !timeStrings[1]) return;
 
     const newPeriods = [...periods];
@@ -107,16 +121,16 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
             {periods.map((period, index) => {
               const parsed = parsePeriodString(period);
               const timeRange: [dayjs.Dayjs | null, dayjs.Dayjs | null] = parsed
-                ? [dayjs(parsed.start, 'HH:mm'), dayjs(parsed.end, 'HH:mm')]
+                ? [dayjs(parsed.start, "HH:mm"), dayjs(parsed.end, "HH:mm")]
                 : [null, null];
 
               return (
                 <div key={index}>
                   <Typography.Text
                     style={{
-                      fontSize: '12px',
-                      display: 'block',
-                      marginBottom: '4px',
+                      fontSize: "12px",
+                      display: "block",
+                      marginBottom: "4px",
                     }}
                   >
                     Dalle - Alle
@@ -127,14 +141,19 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
                         format="HH:mm"
                         value={timeRange}
                         onChange={(_, timeStrings) =>
-                          handlePeriodChange(index, timeStrings as [string, string])
+                          handlePeriodChange(
+                            index,
+                            timeStrings as [string, string],
+                          )
                         }
                       />
                     </Col>
                     <Col>
                       {/* Mostra "Rimuovi" solo dal secondo periodo in poi */}
                       {index > 0 && (
-                        <Button onClick={() => handleRemovePeriod(index)}>Rimuovi</Button>
+                        <Button onClick={() => handleRemovePeriod(index)}>
+                          Rimuovi
+                        </Button>
                       )}
                     </Col>
                   </Row>
@@ -149,9 +168,9 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
                   <div>
                     <Typography.Text
                       style={{
-                        fontSize: '12px',
-                        display: 'block',
-                        marginBottom: '4px',
+                        fontSize: "12px",
+                        display: "block",
+                        marginBottom: "4px",
                       }}
                     >
                       Dalle - Alle
@@ -163,16 +182,27 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
                           value={(() => {
                             const parsed = parsePeriodString(pendingPeriod);
                             return parsed
-                              ? [dayjs(parsed.start, 'HH:mm'), dayjs(parsed.end, 'HH:mm')]
-                              : [dayjs('08:00', 'HH:mm'), dayjs('18:00', 'HH:mm')];
+                              ? [
+                                  dayjs(parsed.start, "HH:mm"),
+                                  dayjs(parsed.end, "HH:mm"),
+                                ]
+                              : [
+                                  dayjs("08:00", "HH:mm"),
+                                  dayjs("18:00", "HH:mm"),
+                                ];
                           })()}
                           onChange={(_, timeStrings) =>
-                            handlePendingPeriodChange(timeStrings as [string, string])
+                            handlePendingPeriodChange(
+                              timeStrings as [string, string],
+                            )
                           }
                         />
                       </Col>
                       <Col>
-                        <PrimaryButton type="primary" onClick={handleConfirmPeriod}>
+                        <PrimaryButton
+                          type="primary"
+                          onClick={handleConfirmPeriod}
+                        >
                           Aggiungi periodo
                         </PrimaryButton>
                       </Col>
@@ -183,9 +213,9 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
                   <div>
                     <Typography.Text
                       style={{
-                        fontSize: '12px',
-                        display: 'block',
-                        marginBottom: '4px',
+                        fontSize: "12px",
+                        display: "block",
+                        marginBottom: "4px",
                       }}
                     >
                       Dalle - Alle
@@ -194,9 +224,17 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
                       <Col>
                         <TimePicker.RangePicker
                           format="HH:mm"
-                          value={[dayjs('08:00', 'HH:mm'), dayjs('18:00', 'HH:mm')]}
+                          value={[
+                            dayjs("08:00", "HH:mm"),
+                            dayjs("18:00", "HH:mm"),
+                          ]}
                           onChange={(_, timeStrings) =>
-                            setPendingPeriod(formatPeriodString(timeStrings[0], timeStrings[1]))
+                            setPendingPeriod(
+                              formatPeriodString(
+                                timeStrings[0],
+                                timeStrings[1],
+                              ),
+                            )
                           }
                         />
                       </Col>
@@ -205,7 +243,7 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
                           type="primary"
                           onClick={() => {
                             // Conferma direttamente se l'utente ha già selezionato un orario
-                            setPendingPeriod('08:00-18:00');
+                            setPendingPeriod("08:00-18:00");
                             handleConfirmPeriod();
                           }}
                         >

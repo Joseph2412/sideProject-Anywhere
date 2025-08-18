@@ -17,16 +17,16 @@
  * 4. Mostra help contextual per sezioni complesse
  */
 
-'use client'; // Client Component per interattività
+"use client"; // Client Component per interattività
 
 // Import librerie UI
-import { Tooltip, Typography } from 'antd';
-import { InfoCircleOutlined } from '@ant-design/icons';
-import { useAtomValue } from 'jotai';
-import styles from './Header.module.css';
+import { Tooltip, Typography } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import { useAtomValue } from "jotai";
+import styles from "./Header.module.css";
 
 // Import store per accesso stato globale
-import { selectedTabAtom } from '@repo/ui/store/LayoutStore';
+import { selectedTabAtom } from "@repo/ui/store/LayoutStore";
 
 /**
  * TYPE DEFINITION: HeaderProps
@@ -71,12 +71,12 @@ type HeaderProps = {
  * - Se manca una chiave, fallback a 'Benvenuto'
  */
 const keyToTitleMap: Record<string, string> = {
-  calendar: 'Calendario', // Sezione gestione calendario
-  gestione: 'Generali', // Dettagli generali venue
-  pagamenti: 'Pagamenti', // Configurazione pagamenti
-  aggiungi: 'Aggiungi pacchetto', // Form creazione pacchetti
-  profilo: 'Profilo', // Gestione profilo utente
-  preferenze: 'Notifiche', // Impostazioni notifiche
+  calendar: "Calendario", // Sezione gestione calendario
+  gestione: "Generali", // Dettagli generali venue
+  pagamenti: "Pagamenti", // Configurazione pagamenti
+  aggiungi: "Aggiungi pacchetto", // Form creazione pacchetti
+  profilo: "Profilo", // Gestione profilo utente
+  preferenze: "Notifiche", // Impostazioni notifiche
 };
 
 /**
@@ -127,7 +127,7 @@ export default function Header({ className }: HeaderProps) {
    * - selectedTab='calendar' → pageTitle='Calendario'
    * - selectedTab='xyz' → pageTitle='Benvenuto' (fallback)
    */
-  const pageTitle = keyToTitleMap[selectedTab] ?? 'Benvenuto';
+  const pageTitle = keyToTitleMap[selectedTab] ?? "Benvenuto";
 
   /**
    * COMPONENT RENDER
@@ -140,7 +140,7 @@ export default function Header({ className }: HeaderProps) {
         MAIN TITLE 
         Typography.Title di Ant Design per consistent styling
       */}
-      <Typography.Title level={4} style={{ margin: 0, color: '#000' }}>
+      <Typography.Title level={4} style={{ margin: 0, color: "#000" }}>
         {pageTitle}
 
         {/* 
@@ -148,12 +148,12 @@ export default function Header({ className }: HeaderProps) {
           Mostra help icon solo per sezione Pagamenti
           Fornisce informazioni contestuali specifiche
         */}
-        {pageTitle === 'Pagamenti' && (
+        {pageTitle === "Pagamenti" && (
           <Tooltip title="Accrediteremo sul tuo conto corrente mensilmente il totale incassato al netto dei costi.">
             <InfoCircleOutlined
               style={{
-                color: '#888', // Grigio discreto
-                cursor: 'pointer', // Indica interattività
+                color: "#888", // Grigio discreto
+                cursor: "pointer", // Indica interattività
                 marginLeft: 7, // Spazio dal titolo
                 fontSize: 14, // Dimensione icona
               }}

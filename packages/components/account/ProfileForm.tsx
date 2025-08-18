@@ -1,13 +1,27 @@
-import { Form, Button, Upload, Avatar, Space, message, Row, Col, Card } from 'antd';
-import { UploadOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
-import { NibolInput } from '../inputs/Input';
-import { useState, useEffect } from 'react';
-import { useSetAtom } from 'jotai';
-import { messageToast } from '@repo/ui/store/LayoutStore';
-import { useUserProfile } from '@repo/hooks';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import styles from './profile.module.css';
-import { UploadChangeParam, UploadFile } from 'antd/es/upload';
+import {
+  Form,
+  Button,
+  Upload,
+  Avatar,
+  Space,
+  message,
+  Row,
+  Col,
+  Card,
+} from "antd";
+import {
+  UploadOutlined,
+  DeleteOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { NibolInput } from "../inputs/Input";
+import { useState, useEffect } from "react";
+import { useSetAtom } from "jotai";
+import { messageToast } from "@repo/ui/store/LayoutStore";
+import { useUserProfile } from "@repo/hooks";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import styles from "./profile.module.css";
+import { UploadChangeParam, UploadFile } from "antd/es/upload";
 
 export const ProfileForm = () => {
   const [form] = Form.useForm();
@@ -17,31 +31,34 @@ export const ProfileForm = () => {
   const { data, isLoading } = useUserProfile();
 
   const setMessage = useSetAtom(messageToast);
-  console.log('Dati profilo:', data);
+  console.log("Dati profilo:", data);
 
   const queryClient = useQueryClient();
 
   const updateProfile = useMutation({
     mutationFn: async (values: { firstName: string; lastName: string }) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/user/profile`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/user/profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(values),
         },
-        body: JSON.stringify(values),
-      });
+      );
       if (!res.ok) throw new Error();
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
       setMessage({
-        type: 'success',
-        message: 'Profilo Aggiornato con successo!',
-        description: 'Profilo Aggiornato',
+        type: "success",
+        message: "Profilo Aggiornato con successo!",
+        description: "Profilo Aggiornato",
         duration: 3,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     },
     onError: () => {
@@ -109,29 +126,41 @@ export const ProfileForm = () => {
     <Form
       form={form}
       layout="vertical"
-      style={{ width: '100%', borderRadius: 8 }}
+      style={{ width: "100%", borderRadius: 8 }}
       onFinish={onFinish}
     >
       <Card>
         <Form.Item label="Foto profilo">
           <Space>
-            <Avatar size={64} icon={!avatarUrl && <UserOutlined />} src={avatarUrl ?? undefined} />
-            <Upload showUploadList={false} beforeUpload={() => false} onChange={handleAvatarChange}>
+            <Avatar
+              size={64}
+              icon={!avatarUrl && <UserOutlined />}
+              src={avatarUrl ?? undefined}
+            />
+            <Upload
+              showUploadList={false}
+              beforeUpload={() => false}
+              onChange={handleAvatarChange}
+            >
               <Button
                 icon={<UploadOutlined />}
                 className={styles.buttonUpload}
                 style={{
                   height: 32,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 Carica
               </Button>
             </Upload>
             {avatarUrl && (
-              <Button icon={<DeleteOutlined />} danger onClick={handleRemoveAvatar}>
+              <Button
+                icon={<DeleteOutlined />}
+                danger
+                onClick={handleRemoveAvatar}
+              >
                 Rimuovi
               </Button>
             )}
@@ -140,27 +169,31 @@ export const ProfileForm = () => {
 
         <Row gutter={[0, 0]}>
           <Col span={12}>
-            <Form.Item name="firstName" rules={[{ required: true, message: 'Inserisci il nome' }]}>
+            <Form.Item
+              name="firstName"
+              rules={[{ required: true, message: "Inserisci il nome" }]}
+            >
               <NibolInput
+                name="firstName"
                 validateTrigger="onSubmit"
                 label="Nome"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: 32, width: '100%' }}
+                style={{ height: 32, width: "100%" }}
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
               name="lastName"
-              rules={[{ required: true, message: 'Inserisci il cognome' }]}
+              rules={[{ required: true, message: "Inserisci il cognome" }]}
             >
               <NibolInput
                 validateTrigger="onSubmit"
                 label="Cognome"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: 32, width: '100%' }}
+                style={{ height: 32, width: "100%" }}
               />
             </Form.Item>
           </Col>
@@ -170,11 +203,11 @@ export const ProfileForm = () => {
           <NibolInput
             label="Email"
             disabled
-            style={{ height: 32, width: '49%' }}
+            style={{ height: 32, width: "49%" }}
             hideAsterisk={true}
           />
         </Form.Item>
-        <div style={{ color: '#8c8c8c', fontSize: 12, marginTop: 4 }}>
+        <div style={{ color: "#8c8c8c", fontSize: 12, marginTop: 4 }}>
           Per modificare la mail, scrivi a support@nibol.com.
         </div>
         <Form.Item>
@@ -193,7 +226,12 @@ export const ProfileForm = () => {
             >
               Annulla
             </Button>
-            <Button type="primary" htmlType="submit" loading={loading} className={styles.save}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              className={styles.save}
+            >
               Salva
             </Button>
           </Space>

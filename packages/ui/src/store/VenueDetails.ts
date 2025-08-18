@@ -16,7 +16,7 @@
  * - VenueDetails: Struttura principale che contiene tutto
  */
 
-import { atomWithStorage } from 'jotai/utils';
+import { atomWithStorage } from "jotai/utils";
 
 /**
  * TYPE DEFINITION: OpeningDay
@@ -188,4 +188,7 @@ export type VenueDetails = {
  * In applicazioni più grandi si potrebbe considerare di dividere
  * in atom separati per performance, ma per questa scala è ottimale.
  */
-export const venueAtom = atomWithStorage<VenueDetails | null>('venueDetails', null);
+export const venueAtom = atomWithStorage<VenueDetails | null>(
+  "venueDetails",
+  null,
+);

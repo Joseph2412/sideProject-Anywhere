@@ -15,8 +15,8 @@
  * - pageTitleAtom: Atom per sincronizzare titolo header
  */
 
-import { atom } from 'jotai';
-import { atomWithStorage } from 'jotai/utils';
+import { atom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
 
 /**
  * TYPE DEFINITION: TabKey
@@ -37,13 +37,13 @@ import { atomWithStorage } from 'jotai/utils';
  * e nel switch del layout per il rendering del contenuto corretto.
  */
 export type TabKey =
-  | 'calendar' // Sezione calendario
-  | 'gestione' // Dettagli venue
-  | 'pagamenti' // Setup pagamenti
-  | 'aggiungi' // Aggiungi pacchetti
-  | 'profilo' // Profilo utente
-  | 'preferenze' // Notifiche e preferenze
-  | 'pacchetti'; // Lista pacchetti
+  | "calendar" // Sezione calendario
+  | "gestione" // Dettagli venue
+  | "pagamenti" // Setup pagamenti
+  | "aggiungi" // Aggiungi pacchetti
+  | "profilo" // Profilo utente
+  | "preferenze" // Notifiche e preferenze
+  | "pacchetti"; // Lista pacchetti
 
 /**
  * ATOM GLOBALE: pageTitleAtom
@@ -60,7 +60,7 @@ export type TabKey =
  * - Valore di default: 'Selected Tab'
  * - Valori tipici: 'Calendario', 'Pagamenti', 'Profilo', ecc.
  */
-export const pageTitleAtom = atom<string>('Selected Tab');
+export const pageTitleAtom = atom<string>("Selected Tab");
 
 /**
  * ATOM PERSISTENTE: selectedTabAtom
@@ -87,4 +87,7 @@ export const pageTitleAtom = atom<string>('Selected Tab');
  * STORAGE KEY: 'selectedTab'
  * - Chiave usata nel localStorage per salvare/ripristinare valore
  */
-export const selectedTabAtom = atomWithStorage<TabKey>('selectedTab', 'calendar');
+export const selectedTabAtom = atomWithStorage<TabKey>(
+  "selectedTab",
+  "calendar",
+);

@@ -1,5 +1,5 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../../libs/prisma';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { prisma } from "../../libs/prisma";
 
 type CheckEmailRequest = {
   email: string;
@@ -7,7 +7,7 @@ type CheckEmailRequest = {
 
 export const checkEmailHandler = async (
   request: FastifyRequest<{ Body: CheckEmailRequest }>,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) => {
   const { email } = request.body;
 
@@ -18,7 +18,7 @@ export const checkEmailHandler = async (
 
     return reply.send({ exists: !!user });
   } catch (error) {
-    console.error('Errore in checkEmail:', error);
-    return reply.code(500).send({ error: 'Errore interno del server' });
+    console.error("Errore in checkEmail:", error);
+    return reply.code(500).send({ error: "Errore interno del server" });
   }
 };

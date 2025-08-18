@@ -1,9 +1,9 @@
-import { FastifyInstance } from 'fastify';
-import { loginRoute } from './login';
-import { signupRoute } from './signup';
-import { resetPasswordRoute } from './resetPassword';
-import { restorePasswordRoute } from './restorePassword';
-import { checkEmailRoute } from './checkEmail';
+import { FastifyInstance } from "fastify";
+import { loginRoute } from "./login";
+import { signupRoute } from "./signup";
+import { resetPasswordRoute } from "./resetPassword";
+import { restorePasswordRoute } from "./restorePassword";
+import { checkEmailRoute } from "./checkEmail";
 
 export async function authRoutes(server: FastifyInstance) {
   server.register(loginRoute);

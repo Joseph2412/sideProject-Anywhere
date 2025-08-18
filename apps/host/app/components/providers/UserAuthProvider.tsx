@@ -1,10 +1,10 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { useSetAtom, useAtomValue } from 'jotai';
-import { useRouter } from 'next/navigation';
-import { authUserAtom, hostProfileAtom } from '@repo/ui/store/LayoutStore';
-import { useHostProfile } from '@repo/hooks';
-import { useLogout } from '../../hooks/useLogout';
+"use client";
+import { useEffect, useState } from "react";
+import { useSetAtom, useAtomValue } from "jotai";
+import { useRouter } from "next/navigation";
+import { authUserAtom, hostProfileAtom } from "@repo/ui/store/LayoutStore";
+import { useHostProfile } from "@repo/hooks";
+import { useLogout } from "../../hooks/useLogout";
 
 type Props = {
   children: React.ReactNode;
@@ -29,7 +29,7 @@ export const UserProvider = ({ children }: Props) => {
    * Dependencies: router, setUser, logout, authUser, hostProfile, setHostProfile, reloadProfile
    */
   useEffect(() => {
-    const token = localStorage.getItem('token'); //FIX ToDo: Token non in localStorage ma in Cookie
+    const token = localStorage.getItem("token"); //FIX ToDo: Token non in localStorage ma in Cookie
 
     if (!token) {
       setLoading(false);
@@ -49,7 +49,15 @@ export const UserProvider = ({ children }: Props) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [router, setUser, logout, authUser, hostProfile, setHostProfile, reloadProfile]);
+  }, [
+    router,
+    setUser,
+    logout,
+    authUser,
+    hostProfile,
+    setHostProfile,
+    reloadProfile,
+  ]);
 
   if (loading) return <div>Caricamento profilo...</div>;
 

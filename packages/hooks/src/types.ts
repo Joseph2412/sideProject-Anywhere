@@ -11,7 +11,7 @@ export type AuthUser = {
   id: number;
   name: string;
   email: string;
-  role: 'USER' | 'HOST';
+  role: "USER" | "HOST";
 };
 
 export type HostProfile = {
