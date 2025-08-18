@@ -1,0 +1,44 @@
+name: XYZ
+
+on:
+  push:
+    branches:
+      - release/xyz
+
+jobs:
+  deploy-xyz:
+    name: Deploy on .XYZ
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        folder: [ '/anywhere' ]
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: release/xyz
+
+      - name: Restart App
+        uses: appleboy/ssh-action@master
+        with:
+          host: 'host.nibol.xyz'
+          username: ubuntu
+          key: ${{ secrets.DEV_KEY }}
+          script: |
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
+            cd ~/anywhere
+            git checkout .
+            git checkout release/xyz
+            git pull
+            pnpm database:generate
+            pnpm database:migrate
+            pm2 delete all
+            cd ~/anywhere/apps/api
+            pm2 start ecosystem.config.js
+            cd ~/anywhere/apps/host
+            pm2 start ecosystem.config.cjs
+            pm2 save
+
+        env:
+          CI: 'true'
