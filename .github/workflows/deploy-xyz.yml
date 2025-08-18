@@ -18,7 +18,7 @@ jobs:
         with:
           ref: release/xyz
 
-      - name: Restart App
+      - name: Checkout
         uses: appleboy/ssh-action@master
         with:
           host: 'host.nibol.xyz'
@@ -31,9 +31,32 @@ jobs:
             git checkout .
             git checkout release/xyz
             git pull
-            pnpm build
+
+      - name: Install and build
+        uses: appleboy/ssh-action@master
+        with:
+          host: 'host.nibol.xyz'
+          username: ubuntu
+          key: ${{ secrets.KEY }}
+          script: |
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
+            cd ~/anywhere
+            pnpm i
             pnpm database:generate
             pnpm database:migrate
+            pnpm build
+
+      - name: Restart PM2 processes
+        uses: appleboy/ssh-action@master
+        with:
+          host: 'host.nibol.xyz'
+          username: ubuntu
+          key: ${{ secrets.KEY }}
+          script: |
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
+            cd ~/anywhere
             pm2 delete all
             cd ~/anywhere/apps/api
             pm2 start ecosystem.config.js
