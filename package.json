@@ -12,7 +12,8 @@
     "database:migrate": "cd packages/database && npm run migrate && cd -",
     "backend": "cd apps/api && pnpm run dev",
     "frontend": "cd apps/host && pnpm run dev",
-    "studio": "cd packages/database && pnpm prisma studio"
+    "studio": "cd packages/database && pnpm prisma studio",
+    "deploy:xyz": "git checkout release/xyz && git pull && git merge - --no-edit && git push && git checkout -"
   },
   "devDependencies": {
     "@types/react": "19.1.10",
