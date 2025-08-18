@@ -230,7 +230,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
     <div className={styles.container}>
       <div className={styles.card}>
         {/* BRANDING - Logo aziendale per identità visuale */}
-        <img src="/Logo.svg" alt="Nibol" className={styles.logo} />
+        <img src="/logo.svg" alt="Nibol" className={styles.logo} />
         <Divider />
 
         {/* TITOLO - Messaggio chiaro dell'azione (registrazione per gestori) */}

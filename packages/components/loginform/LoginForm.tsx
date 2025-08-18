@@ -370,7 +370,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
         {/* CARD - Superficie elevata con bordi arrotondati per il form */}
         <div className={styles.card}>
           {/* LOGO AZIENDALE - Branding e identità visuale */}
-          <img src="/Logo.svg" alt="Nibol" className={styles.logo} />
+          <img src="/logo.svg" alt="Nibol" className={styles.logo} />
 
           {/* DIVIDER - Separatore visuale tra logo e contenuto */}
           <Divider />
