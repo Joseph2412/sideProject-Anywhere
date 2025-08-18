@@ -1,94 +1,22 @@
-/**
- * TOAST MESSAGE PROVIDER
- *
- * Component che gestisce la visualizzazione delle notifiche toast in tutta l'applicazione.
- * Ascolta l'atom messageToast e mostra automaticamente le notifiche usando Ant Design.
- *
- * CONCETTI CHIAVE:
- * - PROVIDER PATTERN: Component wrapper che fornisce funzionalità a tutti i children
- * - GLOBAL NOTIFICATIONS: Sistema centralizzato per mostrare messaggi utente
- * - HYDRATION: Processo di "reidratazione" del client dopo server-side rendering
- * - ANTD NOTIFICATION: API di Ant Design per mostrare toast eleganti
- *
- * RESPONSABILITÀ:
- * 1. Ascolta cambiamenti nell'atom messageToast
- * 2. Converte ToastPayload in notifiche Ant Design
- * 3. Gestisce duplicazione messaggi con showOnce
- * 4. Assicura compatibilità SSR/CSR con hydration
- */
+// ToastMessageProvider: gestisce notifiche toast globali con Ant Design
 
-"use client"; // Indica che questo è un Client Component (Next.js 13+)
+'use client'; // Indica che questo è un Client Component (Next.js 13+)
 
-import * as React from "react";
-import { useEffect, useState, useRef } from "react";
-import { messageToast, ToastPayload } from "@repo/ui/store/ToastStore";
-import { useAtom } from "jotai";
-import { notification } from "antd";
+import * as React from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { messageToast, ToastPayload } from '@repo/ui/store/ToastStore';
+import { useAtom } from 'jotai';
+import { notification } from 'antd';
 
-/**
- * COMPONENT: MessageProvider
- *
- * Provider che wrappa l'intera applicazione per gestire notifiche toast globali.
- *
- * @param children - Tutti i componenti child che avranno accesso alle notifiche
- * @returns JSX element che renderizza children + notification system
- *
- * PATTERN PROVIDER:
- * - Si posiziona in alto nell'albero dei componenti
- * - Fornisce servizi a tutti i componenti discendenti
- * - Non modifica visualmente il layout, solo aggiunge funzionalità
- */
-export function MessageProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}): React.ReactElement {
-  /**
-   * JOTAI ATOM CONNECTION
-   *
-   * Collegamento bidirezionale con l'atom messageToast:
-   * - toast: valore corrente dell'atom (ToastPayload | false)
-   * - setToast: funzione per aggiornare l'atom
-   *
-   * QUANDO CAMBIA:
-   * - Qualsiasi componente chiama setToast() con nuovi dati
-   * - Questo useEffect si attiva automaticamente
-   */
+// MessageProvider: provider per notifiche toast globali
+export function MessageProvider({ children }: { children: React.ReactNode }): React.ReactElement {
+  // Jotai atom connection per toast
   const [toast, setToast] = useAtom<ToastPayload | false>(messageToast);
 
-  /**
-   * HYDRATION STATE
-   *
-   * Traccia se il component è stato "idratato" lato client.
-   * Necessario per compatibilità SSR (Server-Side Rendering).
-   *
-   * PROBLEMA SSR:
-   * - Server genera HTML senza JavaScript
-   * - Client deve "reidratare" aggiungendo interattività
-   * - Toast/notifiche richiedono JavaScript, non funzionano su server
-   *
-   * SOLUZIONE:
-   * - Inizia false (server + primi render client)
-   * - Diventa true dopo primo useEffect client
-   * - Solo allora mostra notifiche
-   */
+  // Stato hydration per SSR/CSR
   const [isHydrated, setIsHydrated] = useState(false);
 
-  /**
-   * DUPLICATE MESSAGE TRACKING
-   *
-   * useRef per tracciare l'ultimo messaggio mostrato.
-   * Evita di mostrare lo stesso messaggio multiple volte quando showOnce=true.
-   *
-   * PERCHÉ useRef:
-   * - Persiste tra re-render senza causarli
-   * - Non fa parte dello stato del component
-   * - Perfetto per valori "di servizio" come cache
-   *
-   * UTILIZZO:
-   * - Salva il testo dell'ultimo messaggio mostrato
-   * - Se showOnce=true e message è uguale, non mostra di nuovo
-   */
+  // Tracciamento duplicati toast: evita duplicati se showOnce=true, usa useRef per persistenza tra re-render
   const lastShownMessageRef = useRef<string | null>(null);
 
   /**
@@ -156,11 +84,11 @@ export function MessageProvider({
 
     // MOSTRA NOTIFICA: Usa API Ant Design con configurazione da ToastPayload
     api.open({
-      type: toast.type || "info", // Tipo: success, error, warning, info
+      type: toast.type || 'info', // Tipo: success, error, warning, info
       message: toast.message, // Titolo principale
-      description: toast.description || "", // Testo aggiuntivo
+      description: toast.description || '', // Testo aggiuntivo
       duration: toast.duration ?? 3, // Durata in secondi (default 3)
-      placement: toast.placement || "bottomRight", // Posizione schermo
+      placement: toast.placement || 'bottomRight', // Posizione schermo
       onClose: () => {
         setToast(false); // Reset atom quando notifica si chiude
       },

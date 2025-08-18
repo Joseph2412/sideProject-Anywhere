@@ -1,5 +1,5 @@
-import { FastifyRequest, FastifyReply } from "fastify";
-import { prisma } from "../../libs/prisma";
+import { FastifyRequest, FastifyReply } from 'fastify';
+import { prisma } from '../../libs/prisma';
 
 interface PaymentDetailPayload {
   companyName: string;
@@ -12,18 +12,18 @@ interface PaymentDetailPayload {
 
 export const getVenuePaymentsDetailsHandler = async (
   request: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) => {
   try {
     const userId = request.user.id;
 
     const venue = await prisma.coworkingVenue.findFirst({
-      where: { hostProfile: { userId } },
+      where: { userProfileId: userId },
       include: { paymentInfo: true },
     });
 
     if (!venue) {
-      return reply.code(404).send({ error: "Venue not found" });
+      return reply.code(404).send({ error: 'Venue not found' });
     }
 
     // Se non ci sono dati di pagamento, restituisci un oggetto vuoto
@@ -37,24 +37,24 @@ export const getVenuePaymentsDetailsHandler = async (
     return reply.code(200).send(response);
   } catch (error) {
     console.error("Errore dell'handler:", error);
-    return reply.code(500).send({ error: "Internal Server Error" });
+    return reply.code(500).send({ error: 'Internal Server Error' });
   }
 };
 
 export const updateVenuePaymentsDetailsHandler = async (
   request: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) => {
   try {
     const userId = request.user.id;
 
     const venue = await prisma.coworkingVenue.findFirst({
-      where: { hostProfile: { userId } },
+      where: { userProfileId: userId },
       include: { paymentInfo: true },
     });
 
     if (!venue) {
-      return reply.code(404).send({ error: "Venue not found" });
+      return reply.code(404).send({ error: 'Venue not found' });
     }
 
     const { companyName, address, iban, bicSwift, countryCode, currencyCode } =
@@ -84,6 +84,6 @@ export const updateVenuePaymentsDetailsHandler = async (
     return reply.code(200).send({ paymentInfo });
   } catch (error) {
     console.error("Errore dell'handler:", error);
-    return reply.code(500).send({ error: "Internal Server Error" });
+    return reply.code(500).send({ error: 'Internal Server Error' });
   }
 };

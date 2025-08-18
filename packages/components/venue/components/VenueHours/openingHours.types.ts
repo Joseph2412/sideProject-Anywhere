@@ -5,13 +5,13 @@ export interface OpeningDayData {
 }
 
 export const weekDays = [
-  { value: "MONDAY", label: "Lunedì" },
-  { value: "TUESDAY", label: "Martedì" },
-  { value: "WEDNESDAY", label: "Mercoledì" },
-  { value: "THURSDAY", label: "Giovedì" },
-  { value: "FRIDAY", label: "Venerdì" },
-  { value: "SATURDAY", label: "Sabato" },
-  { value: "SUNDAY", label: "Domenica" },
+  { value: 'MONDAY', label: 'Lunedì' },
+  { value: 'TUESDAY', label: 'Martedì' },
+  { value: 'WEDNESDAY', label: 'Mercoledì' },
+  { value: 'THURSDAY', label: 'Giovedì' },
+  { value: 'FRIDAY', label: 'Venerdì' },
+  { value: 'SATURDAY', label: 'Sabato' },
+  { value: 'SUNDAY', label: 'Domenica' },
 ];
 
 // Utility per validazione
@@ -21,10 +21,8 @@ export const isValidTimePeriod = (period: string): boolean => {
 };
 
 // Utility per parsing
-export const parsePeriodString = (
-  period: string,
-): { start: string; end: string } | null => {
-  const [start, end] = period.split("-");
+export const parsePeriodString = (period: string): { start: string; end: string } | null => {
+  const [start, end] = period.split('-');
   if (start && end) {
     return { start, end };
   }

@@ -1,5 +1,5 @@
 // Providers
-export * from "./providers";
+export * from './providers';
 
 // Components
-export * from "../";
+export * from '../';

@@ -1,1 +1,1 @@
-export { MessageProvider } from "./ToastMessageProvider";
+export { MessageProvider } from './ToastMessageProvider';

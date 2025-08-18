@@ -1,23 +1,21 @@
-/**
- * Tipi condivisi per hooks e componenti dell'autenticazione
- * Pattern: Single Source of Truth per type definitions
- * AuthUser: Rappresenta l'utente autenticato con ruoli definiti
- * HostProfile: Dati estesi del profilo host con preferenze opzionali
- * Utilizzo: Evita duplicazione di tipi tra packages diversi
- */
+// Tipi condivisi per hooks e componenti (single source of truth)
 
-// Shared types for hooks to maintain consistency
-export type AuthUser = {
+export type CoworkingVenue = {
   id: number;
   name: string;
-  email: string;
-  role: "USER" | "HOST";
+  address: string;
+  description?: string;
+  services?: string[];
+  logoUrl?: string;
 };
 
-export type HostProfile = {
+export type UserProfile = {
+  id: number;
   firstName: string;
   lastName: string;
   email: string;
+  role: 'USER' | 'HOST';
   avatarUrl: string;
-  preferences?: Record<string, unknown>;
+  preferences?: Record<string, unknown> | null;
+  coworkingVenue?: CoworkingVenue | null;
 };

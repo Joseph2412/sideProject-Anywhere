@@ -17,32 +17,25 @@ model User {
   id       Int     @id @default(autoincrement())
   email    String  @unique
   password String  
-  name     String?
-  role     Role
-  profile   HostProfile?
-  resetToken String? // Token per il reset della password
-  resetTokenExpires DateTime? // Data di scadenza del token
-
-  @@index([role])
-}
-
-model HostProfile {
-  id          Int    @id @default(autoincrement())
   firstName   String
   lastName    String
   avatarUrl   String? //String di URLs su S3 
   preferences Json? //Riferimento a sezione NOTIFICHE del Componente Profio
 
-  coworkingVenue   CoworkingVenue? 
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int  @unique
+  coworkingVenue   CoworkingVenue? //Coworking Collegato ad utente 
 
+
+  role     Role
+
+  resetToken String? // Token per il reset della password
+  resetTokenExpires DateTime? // Data di scadenza del token
   createdAt DateTime @default(now()) //Idea: Sezione Profilo "Sei Nostro Cliente da..."/"Data Iscrizione...." . Comuqnue utile per Analisi db
   updatedAt DateTime @updatedAt //Idea: "Data Ultima Modifica" Su Sezione Profilo. Utile per Behavior Insight Su db
-
+  
   @@index([createdAt])
 }
+
 
 //Enum per USER
 enum Role {
@@ -61,14 +54,14 @@ model CoworkingVenue {
   photos       String[] //URLs di S3
   packages     Package[] //1 Locale ha tanti pacchetti
   
-  hostProfile  HostProfile @relation(fields: [hostProfileId], references: [id])
-  hostProfileId Int @unique
 
   closingPeriods ClosingPeriod[]
-  avatarURL  String?
+  logoURL  String?
   openingDays OpenDays[]
   paymentInfo PaymentInfo?
 
+  userProfile  User @relation(fields: [userProfileId], references: [id])
+  userProfileId Int @unique
   @@index([name])
 }
 

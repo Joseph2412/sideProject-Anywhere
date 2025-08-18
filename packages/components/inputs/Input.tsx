@@ -1,7 +1,7 @@
-import { Input, Form } from "antd";
-import { Rule } from "antd/es/form";
-import { InputProps } from "antd/lib/input";
-import { FormItemProps } from "antd/es/form";
+import { Input, Form } from 'antd';
+import { Rule } from 'antd/es/form';
+import { InputProps } from 'antd/lib/input';
+import { FormItemProps } from 'antd/es/form';
 
 type NibolInputProps = InputProps &
   FormItemProps & {

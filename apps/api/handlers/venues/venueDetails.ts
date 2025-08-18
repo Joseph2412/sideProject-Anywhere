@@ -1,22 +1,9 @@
-import { FastifyRequest, FastifyReply } from "fastify";
-import { prisma } from "../../libs/prisma";
+import { FastifyRequest, FastifyReply } from 'fastify';
+import { prisma } from '../../libs/prisma';
 
-export const getVenueDetailsHandler = async (
-  request: FastifyRequest,
-  reply: FastifyReply,
-) => {
-  const prof = await prisma.hostProfile.findUnique({
-    where: { userId: request.user.id },
-    select: { id: true },
-  });
-  if (!prof) {
-    return reply
-      .code(404)
-      .send({ message: "HostProfile not found for current user" });
-  }
-
-  const venue = await prisma.coworkingVenue.findUnique({
-    where: { hostProfileId: prof.id },
+export const getVenueDetailsHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+  const venue = await prisma.coworkingVenue.findFirst({
+    where: { userProfileId: request.user.id },
     select: {
       id: true,
       name: true,
@@ -24,14 +11,14 @@ export const getVenueDetailsHandler = async (
       description: true,
       services: true,
       photos: true,
-      avatarURL: true,
+      logoURL: true,
       openingDays: {
-        orderBy: [{ day: "asc" }],
+        orderBy: [{ day: 'asc' }],
         select: {
           id: true,
           day: true,
           isClosed: true,
-          periods: true, //
+          periods: true,
         },
       },
     },
@@ -42,45 +29,30 @@ export const getVenueDetailsHandler = async (
   return reply.code(200).send({ venue });
 };
 
-export const updateVenueDetailsHandler = async (
-  request: FastifyRequest,
-  reply: FastifyReply,
-) => {
-  const { name, address, description, services, avatarURL, photos } =
-    request.body as {
-      name: string;
-      address: string;
-      description?: string | null;
-      services?: string[];
-      avatarURL?: string | null;
-      photos?: string[];
-    };
+export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+  const { name, address, description, services, logoURL, photos } = request.body as {
+    name: string;
+    address: string;
+    description?: string | null;
+    services?: string[];
+    logoURL?: string | null;
+    photos?: string[];
+  };
 
   if (!name || !address) {
-    return reply.code(400).send({ message: "name and address are required" });
-  }
-
-  // Lookup profilo host dal token
-  const prof = await prisma.hostProfile.findUnique({
-    where: { userId: request.user.id },
-    select: { id: true },
-  });
-  if (!prof) {
-    return reply
-      .code(404)
-      .send({ message: "HostProfile not found for current user" });
+    return reply.code(400).send({ message: 'name and address are required' });
   }
 
   const venue = await prisma.coworkingVenue.upsert({
-    where: { hostProfileId: prof.id },
+    where: { userProfileId: request.user.id },
     create: {
-      hostProfileId: prof.id,
+      userProfileId: request.user.id,
       name,
       address,
       description: description ?? null,
       services: services ?? [],
       photos: photos ?? [],
-      avatarURL: avatarURL ?? null,
+      logoURL: logoURL ?? null,
     },
     update: {
       name,
@@ -88,7 +60,7 @@ export const updateVenueDetailsHandler = async (
       description: description ?? null,
       services: services ?? [],
       photos: photos ?? [],
-      avatarURL: avatarURL ?? null,
+      logoURL: logoURL ?? null,
     },
     select: {
       id: true,
@@ -97,7 +69,7 @@ export const updateVenueDetailsHandler = async (
       description: true,
       services: true,
       photos: true,
-      avatarURL: true,
+      logoURL: true,
     },
   });
 

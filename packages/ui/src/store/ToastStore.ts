@@ -11,7 +11,7 @@
  * - TYPESCRIPT TYPES: Definizioni di tipo per garantire type safety
  */
 
-import { atom } from "jotai";
+import { atom } from 'jotai';
 
 /**
  * TYPE DEFINITION: ToastPayload
@@ -29,11 +29,11 @@ import { atom } from "jotai";
  * NOTA: Il "?" dopo il nome significa che la proprietà è OPZIONALE
  */
 export type ToastPayload = {
-  type?: "success" | "error" | "info" | "warning"; // Union type: solo questi valori permessi
+  type?: 'success' | 'error' | 'info' | 'warning'; // Union type: solo questi valori permessi
   message: string; // Obbligatorio: deve sempre esserci
   description?: string; // Opzionale: testo aggiuntivo
   duration?: number; // Opzionale: secondi di durata
-  placement?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight"; // Posizione
+  placement?: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'; // Posizione
   showOnce?: boolean; // Opzionale: evita duplicati
 };
 

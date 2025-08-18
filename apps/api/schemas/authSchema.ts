@@ -1,15 +1,15 @@
 export const signupSchema = {
   body: {
-    type: "object",
-    required: ["email", "password", "firstName", "lastName", "role"],
+    type: 'object',
+    required: ['email', 'password', 'firstName', 'lastName', 'role'],
     properties: {
-      email: { type: "string", format: "email" },
-      password: { type: "string", minLength: 8 }, //minomo 8 Caratteri.
-      firstName: { type: "string", minLength: 1 },
-      lastName: { type: "string", minLength: 1 },
+      email: { type: 'string', format: 'email' },
+      password: { type: 'string', minLength: 8 }, //minomo 8 Caratteri.
+      firstName: { type: 'string', minLength: 1 },
+      lastName: { type: 'string', minLength: 1 },
       role: {
-        type: "string",
-        enum: ["USER", "HOST"],
+        type: 'string',
+        enum: ['USER', 'HOST'],
       },
     },
     additionalProperties: false,
@@ -20,16 +20,16 @@ export const signupSchema = {
 
 export const loginSchema = {
   body: {
-    type: "object",
-    required: ["email", "password"],
+    type: 'object',
+    required: ['email', 'password'],
     properties: {
       email: {
-        type: "string",
-        format: "email",
+        type: 'string',
+        format: 'email',
       },
 
       password: {
-        type: "string",
+        type: 'string',
         minLength: 1,
       },
     },
@@ -39,12 +39,12 @@ export const loginSchema = {
 
 export const resetPasswordScheme = {
   body: {
-    type: "object",
-    required: ["email"],
+    type: 'object',
+    required: ['email'],
     properties: {
       email: {
-        type: "string",
-        format: "email",
+        type: 'string',
+        format: 'email',
       },
     },
     additionalProperties: false,
@@ -53,11 +53,11 @@ export const resetPasswordScheme = {
 
 export const restorePasswordScheme = {
   body: {
-    type: "object",
-    required: ["token", "newPassword"],
+    type: 'object',
+    required: ['token', 'newPassword'],
     properties: {
-      token: { type: "string" },
-      newPassword: { type: "string", minLength: 10 },
+      token: { type: 'string' },
+      newPassword: { type: 'string', minLength: 10 },
     },
     additionalProperties: false,
   },
@@ -65,12 +65,12 @@ export const restorePasswordScheme = {
 
 export const checkEmailSchema = {
   body: {
-    type: "object",
-    required: ["email"],
+    type: 'object',
+    required: ['email'],
     properties: {
       email: {
-        type: "string",
-        format: "email",
+        type: 'string',
+        format: 'email',
       },
     },
     additionalProperties: false,
@@ -80,41 +80,44 @@ export const checkEmailSchema = {
 export const profileSchema = {
   response: {
     200: {
-      type: "object",
+      type: 'object',
       properties: {
         user: {
-          type: "object",
+          type: 'object',
           properties: {
-            id: { type: "number" },
-            name: { type: "string" },
-            email: { type: "string" },
-            role: { type: "string", enum: ["USER", "HOST"] },
+            id: { type: 'number' },
+            email: { type: 'string' },
+            firstName: { type: 'string' },
+            lastName: { type: 'string' },
+            avatarUrl: { type: 'string' },
+            preferences: { type: 'object' },
+            role: { type: 'string', enum: ['USER', 'HOST'] },
+            coworkingVenue: {
+              type: ['object', 'null'],
+              properties: {
+                id: { type: 'number' },
+                name: { type: 'string' },
+              },
+              required: ['id', 'name'],
+            },
           },
-          required: ["id", "name", "email", "role"],
-        },
-        profile: {
-          type: "object",
-          properties: {
-            firstName: { type: "string" },
-            lastName: { type: "string" },
-            avatarUrl: { type: "string" },
-            preferences: { type: "object" },
-          },
-          required: ["firstName", "lastName", "avatarUrl", "preferences"],
+          required: ['id', 'firstName', 'lastName', 'email', 'role', 'avatarUrl', 'preferences'],
         },
       },
-      required: ["user", "profile"],
+      required: ['user'],
     },
   },
 };
 
 export const updateProfileSchema = {
   body: {
-    type: "object",
-    required: ["firstName", "lastName"],
+    type: 'object',
+    required: ['firstName', 'lastName'],
     properties: {
-      firstName: { type: "string", minLength: 1, maxLength: 20 }, //Stesso Motivo di lastName
-      lastName: { type: "string", minLength: 1, maxLength: 20 }, //Per Sicurezza: Chi ha un Cognome più lungo di 20 caratteri?
+      firstName: { type: 'string', minLength: 1, maxLength: 20 },
+      lastName: { type: 'string', minLength: 1, maxLength: 20 },
+      avatarUrl: { type: 'string' },
+      preferences: { type: 'object' },
     },
     additionalProperties: false,
   },

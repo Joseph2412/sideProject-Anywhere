@@ -1,18 +1,15 @@
-import { FastifyInstance } from "fastify";
-import {
-  profileHandler,
-  updateProfileHandler,
-} from "../../handlers/user/profile";
-import { profileSchema, updateProfileSchema } from "../../schemas/authSchema";
+import { FastifyInstance } from 'fastify';
+import { profileHandler, updateProfileHandler } from '../../handlers/user/profile';
+import { profileSchema, updateProfileSchema } from '../../schemas/authSchema';
 
 export async function profileRoute(fastify: FastifyInstance) {
   fastify.get(
-    "/profile",
+    '/profile',
     { preHandler: fastify.authenticate, schema: profileSchema },
-    profileHandler,
+    profileHandler
   );
 
-  fastify.put("/profile", {
+  fastify.put('/profile', {
     preValidation: [fastify.authenticate],
     schema: updateProfileSchema,
     handler: updateProfileHandler,

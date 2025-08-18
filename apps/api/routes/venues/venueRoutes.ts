@@ -1,11 +1,11 @@
-import { FastifyInstance } from "fastify";
+import { FastifyInstance } from 'fastify';
 
 import {
   venueDetailsRoute,
   venueOpeningDaysRoute,
   venueClosingPeriods,
   venuePayments,
-} from "./venues";
+} from './venues';
 
 export async function venuesRoutes(fastify: FastifyInstance) {
   venueDetailsRoute(fastify);

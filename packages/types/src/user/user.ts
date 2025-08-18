@@ -1,19 +1,15 @@
-import { User } from "@repo/database";
+import { CoworkingVenue, User } from '@repo/database';
 
 // esempio di tipo derivato da User di Prisma
-export type UserLogin = Pick<User, "email" | "password">;
+export type UserLogin = Pick<User, 'email' | 'password'>;
 
-export type AuthUser = {
+export type UserProfile = {
   id: number;
-  name: string;
-  email: string;
-  role: "USER" | "HOST";
-};
-
-export type HostProfile = {
   firstName: string;
   lastName: string;
   email: string;
+  role: 'USER' | 'HOST';
   avatarUrl: string;
-  preferences?: Record<string, unknown>;
+  preferences?: JSON | null;
+  coworkingVenue?: CoworkingVenue | null;
 };

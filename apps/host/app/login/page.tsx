@@ -1,8 +1,8 @@
-"use client";
-import React from "react";
-import { LoginForm } from "@repo/components";
-import { useRouter } from "next/navigation";
-import { MessageProvider } from "@repo/components";
+'use client';
+import React from 'react';
+import { LoginForm } from '@repo/components';
+import { useRouter } from 'next/navigation';
+import { MessageProvider } from '@repo/components';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,10 +13,10 @@ export default function LoginPage() {
         <LoginForm
           onLoginSuccess={() => {
             setTimeout(() => {
-              router.push("/calendar");
+              router.push('/calendar');
             }, 300);
           }}
-          onGoToSignup={() => router.replace("/signup")}
+          onGoToSignup={() => router.replace('/signup')}
         />
       </MessageProvider>
     </>

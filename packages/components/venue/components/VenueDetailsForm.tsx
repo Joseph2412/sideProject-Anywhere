@@ -1,64 +1,36 @@
-import React, { useEffect } from "react"; //Importiamo TUTTO da React
+import React, { useEffect } from 'react'; // React
 
-import {
-  Form,
-  Button,
-  Upload,
-  Avatar,
-  Space,
-  Row,
-  Col,
-  Card,
-  Select,
-  Tag,
-  Input,
-} from "antd";
+import { Form, Button, Upload, Avatar, Space, Row, Col, Card, Select, Tag, Input } from 'antd';
 
-import { DeleteOutlined } from "@ant-design/icons";
-import { NibolInput } from "../../inputs/Input";
-import styles from "./VenueDetailsForm.module.css";
-import { useState } from "react";
-import { useVenues } from "@repo/hooks";
+import { DeleteOutlined } from '@ant-design/icons';
+import { NibolInput } from '../../inputs/Input';
+import styles from './VenueDetailsForm.module.css';
+import { useState } from 'react';
+import { useVenues } from '@repo/hooks';
 
-//Import di Jotai e degli Atom Necessari
-import { useAtomValue, useAtom, useSetAtom } from "jotai";
-import { messageToast } from "@repo/ui/store/LayoutStore";
-import { venueAtom } from "@repo/ui/store/VenueDetails";
-import { PrimaryButton } from "./../../buttons/PrimaryButton";
+// Jotai e store
+import { useAtomValue, useAtom, useSetAtom } from 'jotai';
+import { messageToast } from '@repo/ui/store/LayoutStore';
+import { PrimaryButton } from './../../buttons/PrimaryButton';
 
 export const VenueDetailsForm = () => {
   const [form] = Form.useForm();
 
-  /**
-   * Array dei servizi disponibili per tutte le venue
-   * Pattern: hardcoded values per consistenza e semplicità
-   * Uso: popola Select component per selezione servizi venue
-   */
-  const availableServices = [
-    "WiFi",
-    "Stampante",
-    "Caffè",
-    "Reception",
-    "Parcheggio",
-  ];
+  // Array servizi disponibili per venue
+  const availableServices = ['WiFi', 'Stampante', 'Caffè', 'Reception', 'Parcheggio'];
 
-  const [loading, setLoading] = useState(false); //Stato LOADING
+  const [loading, setLoading] = useState(false); // Stato loading
   const [venueDetails, setVenueDetails] = useState<any>({});
   const { data, isLoading } = useVenues();
 
   const setMessage = useSetAtom(messageToast);
 
-  /**
-   * useEffect per caricamento dati venue esistenti
-   * Pattern: fetch → setFieldsValue + atom sync per dual state management
-   * Mappatura: avatarURL → avatarUrl per compatibilità form
-   */
-  //Richiamo Dati Sul Form
+  // useEffect per caricamento dati venue esistenti
   useEffect(() => {
     if (data && data.venue) {
       form.setFieldsValue({
         ...data.venue,
-        avatarUrl: data.venue.avatarURL || "",
+        avatarUrl: data.venue.avatarURL || '',
       });
       setVenueDetails(data.venue);
     }
@@ -67,40 +39,37 @@ export const VenueDetailsForm = () => {
   const onFinish = async (values: typeof venueDetails) => {
     setLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_HOST}/api/venues`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify(values),
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-      );
+        body: JSON.stringify(values),
+      });
       if (res.ok) {
         const data = await res.json();
         setVenueDetails(data.venue);
         setMessage({
-          type: "success",
-          message: "Dettagli del locale aggiornati con successo",
+          type: 'success',
+          message: 'Dettagli aggiornati',
           duration: 3,
-          placement: "bottomRight",
+          placement: 'bottomRight',
         });
       } else {
         setMessage({
-          type: "error",
-          message: "Errore durante il salvataggio",
+          type: 'error',
+          message: 'Errore salvataggio',
           duration: 3,
-          placement: "bottomRight",
+          placement: 'bottomRight',
         });
       }
     } catch {
       setMessage({
-        type: "error",
-        message: "Errore durante il salvataggio",
+        type: 'error',
+        message: 'Errore salvataggio',
         duration: 3,
-        placement: "bottomRight",
+        placement: 'bottomRight',
       });
     } finally {
       setLoading(false);
@@ -114,17 +83,13 @@ export const VenueDetailsForm = () => {
   return (
     <Form
       layout="vertical"
-      style={{ width: "100%", borderRadius: 8 }}
+      style={{ width: '100%', borderRadius: 8 }}
       form={form}
       initialValues={venueDetails || {}}
       onFinish={onFinish}
     >
       <Card>
-        <Form.Item
-          name="avatarUrl"
-          label="Foto profilo"
-          className={styles.profileUpload}
-        >
+        <Form.Item name="avatarUrl" label="Foto profilo" className={styles.profileUpload}>
           <div className={styles.profileContainer}>
             <Avatar size={64} />
             <div className={styles.buttonColumn}>
@@ -140,9 +105,7 @@ export const VenueDetailsForm = () => {
           <Col span={12}>
             <Form.Item
               name="name"
-              rules={[
-                { required: true, message: "Inserisci il Nome de Locale" },
-              ]}
+              rules={[{ required: true, message: 'Inserisci il Nome de Locale' }]}
             >
               <NibolInput
                 validateTrigger="onSubmit"
@@ -150,16 +113,14 @@ export const VenueDetailsForm = () => {
                 name="name"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: 32, width: "100%" }}
+                style={{ height: 32, width: '100%' }}
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
               name="address"
-              rules={[
-                { required: true, message: "Inserisci L'indirizzo del Locale" },
-              ]}
+              rules={[{ required: true, message: "Inserisci L'indirizzo del Locale" }]}
             >
               <NibolInput
                 validateTrigger="onSubmit"
@@ -167,39 +128,36 @@ export const VenueDetailsForm = () => {
                 name="address"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: 32, width: "100%" }}
+                style={{ height: 32, width: '100%' }}
               />
             </Form.Item>
           </Col>
         </Row>
 
         <Form.Item name="description" label="Descrizione">
-          <Input.TextArea
-            style={{ height: 32, width: "100%", minHeight: 100 }}
-          />
+          <Input.TextArea style={{ height: 32, width: '100%', minHeight: 100 }} />
         </Form.Item>
         <Form.Item name="services" label="Servizi">
           <Select
             mode="tags"
-            style={{ height: 32, width: "100%" }}
+            style={{ height: 32, width: '100%' }}
             placeholder="Inserisci o Selezione dei Servizi"
-            options={availableServices.map((service) => ({
+            options={availableServices.map(service => ({
               label: service,
               value: service,
             }))}
           />
         </Form.Item>
-        <div
-          style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 12 }}
-        >
-          {availableServices.map((service) => (
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 12 }}>
+          {availableServices.map(service => (
             <Tag
               key={service}
               className={styles.clickableTag}
               onClick={() => {
-                const current = form.getFieldValue("services") || [];
+                console.log('Valore attuale di services:', form.getFieldValue('services'));
+                const current = form.getFieldValue('services') || [];
                 if (!current.includes(service)) {
-                  form.setFieldValue("services", [...current, service]);
+                  form.setFieldValue('services', [...current, service]);
                 }
               }}
             >

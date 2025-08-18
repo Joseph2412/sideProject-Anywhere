@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { PaymentsForm } from "@repo/components";
+import { PaymentsForm } from '@repo/components';
 
 export default function PaymentsPage() {
   return <PaymentsForm />;

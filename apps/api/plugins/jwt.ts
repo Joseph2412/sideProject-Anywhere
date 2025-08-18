@@ -1,6 +1,6 @@
-import fp from "fastify-plugin";
-import jwt from "@fastify/jwt";
-import { FastifyInstance } from "fastify";
+import fp from 'fastify-plugin';
+import jwt from '@fastify/jwt';
+import { FastifyInstance } from 'fastify';
 
 /**
  * Plugin Fastify per gestione JWT authentication
@@ -16,11 +16,11 @@ export default fp(async function (app: FastifyInstance) {
    * Pattern: decorator pattern per aggiungere funzionalità all'istanza Fastify
    * Uso: preHandler: app.auth nelle route protette
    */
-  app.decorate("auth", async (request: any, reply: any) => {
+  app.decorate('auth', async (request: any, reply: any) => {
     try {
       await request.jwtVerify();
     } catch {
-      return reply.code(401).send({ message: "Unauthorized" });
+      return reply.code(401).send({ message: 'Unauthorized' });
     }
   });
 });
@@ -28,11 +28,11 @@ export default fp(async function (app: FastifyInstance) {
 /**
  * Type augmentation per aggiungere tipizzazione ai decorator
  */
-declare module "fastify" {
+declare module 'fastify' {
   interface FastifyInstance {
     auth: any;
   }
   interface FastifyRequest {
-    user: { id: number; email: string; role: "HOST" | "USER" }; // payload firmato al login
+    user: { id: number; email: string; role: 'HOST' | 'USER' }; // payload firmato al login
   }
 }
