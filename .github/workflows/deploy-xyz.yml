@@ -23,7 +23,7 @@ jobs:
         with:
           host: 'host.nibol.xyz'
           username: ubuntu
-          key: ${{ secrets.DEV_KEY }}
+          key: ${{ secrets.KEY }}
           script: |
             export NVM_DIR=~/.nvm
             source ~/.nvm/nvm.sh
