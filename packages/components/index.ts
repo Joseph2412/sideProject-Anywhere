@@ -37,5 +37,5 @@ export * from './tabs';
 export * from './calendar';
 
 // Bundle Components
-export * from './bundle/AddBundleForm';
+export * from './bundle/BundleForm';
 export * from './bundle/PackagesList';

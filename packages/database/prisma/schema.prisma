@@ -81,11 +81,12 @@ model Package {
   id               Int             @id @default(autoincrement())
   title            String          @db.VarChar(200)
   description      String?         @db.VarChar(200)
-  squareMetres     Int
-  capacity         Int
+  squareMetres     Int?
+  capacity         Int?
+  seats            Int?
   services         String[]
-  type             typeCoworking //Può essere 1 di questi 3 typeCoworking
-  plans            Plan[] //Un pacchetto può avere + Piani = Orario, Giornaliero, Settimanale, Mensile ed Annuale
+  type             typeCoworking //Può essere 1 di questi 2 typeCoworking
+  plans            PackagePlan[] //Un pacchetto può avere + Piani = Orario, Giornaliero, Settimanale, Mensile ed Annuale
   photos           String[] //Array di URLs S3
   venue           Venue? @relation(fields: [venueId], references: [id])
   venueId       Int?
@@ -95,7 +96,7 @@ model Package {
   @@index([capacity])
 }
 
-model Plan {
+model PackagePlan {
   id        Int       @id @default(autoincrement())
   name      String
   rate      PlansRate

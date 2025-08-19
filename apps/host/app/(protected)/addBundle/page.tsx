@@ -1,7 +1,7 @@
 'use client';
 
-import { AddBundleForm } from '@repo/components';
+import { BundleForm } from '@repo/components';
 
-export default function AddBundlePage() {
-  return <AddBundleForm />;
+export default function BundleFormPage() {
+  return <BundleForm />;
 }
