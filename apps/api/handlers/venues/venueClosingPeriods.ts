@@ -8,8 +8,8 @@ export const getVenueClosingPeriodsHandler = async (
   try {
     const userId = request.user.id;
 
-    const venue = await prisma.coworkingVenue.findFirst({
-      where: { userProfileId: userId },
+    const venue = await prisma.venue.findFirst({
+      where: { user: { id: userId } },
       include: { closingPeriods: true },
     });
 
@@ -46,8 +46,8 @@ export const updateVenueClosingPeriodsHandler = async (
   try {
     const userId = request.user.id;
 
-    const venue = await prisma.coworkingVenue.findFirst({
-      where: { userProfileId: userId },
+    const venue = await prisma.venue.findFirst({
+      where: { user: { id: userId } },
       include: { closingPeriods: true },
     });
 

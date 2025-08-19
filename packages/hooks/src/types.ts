@@ -1,6 +1,6 @@
 // Tipi condivisi per hooks e componenti (single source of truth)
 
-export type CoworkingVenue = {
+export type Venue = {
   id: number;
   name: string;
   address: string;
@@ -17,5 +17,5 @@ export type UserProfile = {
   role: 'USER' | 'HOST';
   avatarUrl: string;
   preferences?: Record<string, unknown> | null;
-  coworkingVenue?: CoworkingVenue | null;
+  venue?: Venue | null;
 };

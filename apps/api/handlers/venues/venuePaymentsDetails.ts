@@ -17,8 +17,8 @@ export const getVenuePaymentsDetailsHandler = async (
   try {
     const userId = request.user.id;
 
-    const venue = await prisma.coworkingVenue.findFirst({
-      where: { userProfileId: userId },
+    const venue = await prisma.venue.findFirst({
+      where: { user: { id: userId } },
       include: { paymentInfo: true },
     });
 
@@ -48,8 +48,8 @@ export const updateVenuePaymentsDetailsHandler = async (
   try {
     const userId = request.user.id;
 
-    const venue = await prisma.coworkingVenue.findFirst({
-      where: { userProfileId: userId },
+    const venue = await prisma.venue.findFirst({
+      where: { user: { id: userId } },
       include: { paymentInfo: true },
     });
 

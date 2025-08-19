@@ -92,7 +92,7 @@ export const profileSchema = {
             avatarUrl: { type: 'string' },
             preferences: { type: 'object' },
             role: { type: 'string', enum: ['USER', 'HOST'] },
-            coworkingVenue: {
+            venue: {
               type: ['object', 'null'],
               properties: {
                 id: { type: 'number' },

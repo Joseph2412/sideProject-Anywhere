@@ -6,8 +6,8 @@ export const getVenueOpeningDaysHandler = async (request: FastifyRequest, reply:
   try {
     const userId = request.user.id;
 
-    const venue = await prisma.coworkingVenue.findFirst({
-      where: { userProfileId: userId },
+    const venue = await prisma.venue.findFirst({
+      where: { user: { id: userId } },
       include: { openingDays: true },
     });
 
@@ -39,8 +39,8 @@ export const updateVenueOpeningDaysHandler = async (
   try {
     const userId = request.user.id;
 
-    const venue = await prisma.coworkingVenue.findFirst({
-      where: { userProfileId: userId },
+    const venue = await prisma.venue.findFirst({
+      where: { user: { id: userId } },
     });
 
     if (!venue) {

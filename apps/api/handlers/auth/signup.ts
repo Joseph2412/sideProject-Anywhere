@@ -29,6 +29,16 @@ export const signupHandler = async (request: FastifyRequest, reply: FastifyReply
         firstName,
         lastName,
         role,
+        venue: {
+          create: {
+            name: ' ',
+            address: ' ',
+            description: ' ',
+            services: [],
+            photos: [],
+            logoURL: ' ',
+          },
+        },
       },
     });
     return reply.code(201).send({ userId: newUser.id });

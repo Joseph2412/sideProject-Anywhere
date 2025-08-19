@@ -2,31 +2,36 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { prisma } from '../../libs/prisma';
 
 export const getVenueDetailsHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-  const venue = await prisma.coworkingVenue.findFirst({
-    where: { userProfileId: request.user.id },
+  // Recupera l'utente e la venue in un'unica query
+  const user = await prisma.user.findUnique({
+    where: { id: request.user.id },
     select: {
-      id: true,
-      name: true,
-      address: true,
-      description: true,
-      services: true,
-      photos: true,
-      logoURL: true,
-      openingDays: {
-        orderBy: [{ day: 'asc' }],
+      venue: {
         select: {
           id: true,
-          day: true,
-          isClosed: true,
-          periods: true,
+          name: true,
+          address: true,
+          description: true,
+          services: true,
+          photos: true,
+          logoURL: true,
+          openingDays: {
+            orderBy: [{ day: 'asc' }],
+            select: {
+              id: true,
+              day: true,
+              isClosed: true,
+              periods: true,
+            },
+          },
         },
       },
     },
   });
 
-  if (!venue) return reply.code(404).send({ venue: null });
+  if (!user?.venue) return reply.code(404).send({ venue: null });
 
-  return reply.code(200).send({ venue });
+  return reply.code(200).send({ venue: user.venue });
 };
 
 export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: FastifyReply) => {
@@ -43,10 +48,16 @@ export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: 
     return reply.code(400).send({ message: 'name and address are required' });
   }
 
-  const venue = await prisma.coworkingVenue.upsert({
-    where: { userProfileId: request.user.id },
+  // Recupera venueId dell'utente in una sola query
+  const user = await prisma.user.findUnique({
+    where: { id: request.user.id },
+    select: { venueId: true },
+  });
+
+  const venue = await prisma.venue.upsert({
+    where: { id: user?.venueId ?? 0 },
     create: {
-      userProfileId: request.user.id,
+      user: { connect: { id: request.user.id } },
       name,
       address,
       description: description ?? null,

@@ -41,6 +41,7 @@ export const PaymentsForm = () => {
         },
         body: JSON.stringify({
           companyName: values.companyName,
+          address: values.address,
           iban: values.iban,
           bicSwift: values.bicSwift,
           countryCode: values.countryCode,

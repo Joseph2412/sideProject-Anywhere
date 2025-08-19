@@ -23,13 +23,14 @@ model User {
   preferences Json? //Riferimento a sezione NOTIFICHE del Componente Profio
 
 
-  coworkingVenue   CoworkingVenue? //Coworking Collegato ad utente 
-
+  venue   Venue? @relation(fields: [venueId], references: [id])//Coworking Collegato ad utente 
+  venueId Int? @unique
 
   role     Role
-
+  
   resetToken String? // Token per il reset della password
   resetTokenExpires DateTime? // Data di scadenza del token
+  
   createdAt DateTime @default(now()) //Idea: Sezione Profilo "Sei Nostro Cliente da..."/"Data Iscrizione...." . Comuqnue utile per Analisi db
   updatedAt DateTime @updatedAt //Idea: "Data Ultima Modifica" Su Sezione Profilo. Utile per Behavior Insight Su db
   
@@ -45,7 +46,7 @@ enum Role {
 
 //Modelli Componenti Locale, Pacchetti e Piani
 
-model CoworkingVenue {
+model Venue {
   id           Int           @id @default(autoincrement())
   name         String
   address      String        @db.VarChar(200)
@@ -53,15 +54,14 @@ model CoworkingVenue {
   description  String?        @db.VarChar(200)
   photos       String[] //URLs di S3
   packages     Package[] //1 Locale ha tanti pacchetti
-  
-
   closingPeriods ClosingPeriod[]
   logoURL  String?
   openingDays OpenDays[]
   paymentInfo PaymentInfo?
 
-  userProfile  User @relation(fields: [userProfileId], references: [id])
-  userProfileId Int @unique
+  user User? //Senza questa Prisma mi da errore. Se provo ad eliminarlo mi ritorna
+  //Error validating field `venue` in model `User`: The relation field `venue` on model `User` is missing an opposite relation field on the model `Venue`. Either run `prisma format` or add it manually.Prisma
+
   @@index([name])
 }
 
@@ -70,7 +70,7 @@ model OpenDays {
   day      WeekDay       
   isClosed Boolean         @default(false)
   periods  String[]        // Array di stringhe: ["09:00-12:00", "14:00-18:00"] 
-  venue    CoworkingVenue  @relation(fields: [venueId], references: [id])
+  venue    Venue  @relation(fields: [venueId], references: [id])
   venueId  Int
   
   @@index([venueId])
@@ -87,10 +87,10 @@ model Package {
   type             typeCoworking //Può essere 1 di questi 3 typeCoworking
   plans            Plan[] //Un pacchetto può avere + Piani = Orario, Giornaliero, Settimanale, Mensile ed Annuale
   photos           String[] //Array di URLs S3
-  CoworkingVenue   CoworkingVenue? @relation(fields: [coworkingVenueId], references: [id])
-  coworkingVenueId Int?
+  venue           Venue? @relation(fields: [venueId], references: [id])
+  venueId       Int?
 
-  @@index([coworkingVenueId])
+  @@index([venueId])
   @@index([type])
   @@index([capacity])
 }
@@ -138,7 +138,7 @@ model ClosingPeriod {
   id Int @id @default(autoincrement())
   start DateTime?
   end DateTime?
-  venue CoworkingVenue @relation(fields: [venueId], references: [id])
+  venue Venue @relation(fields: [venueId], references: [id])
   venueId Int
 
   @@index([venueId])
@@ -151,11 +151,11 @@ model PaymentInfo {
   id Int @id @default(autoincrement())
   companyName String
   address String
-  iban String @unique @db.VarChar(34)
+  iban String? @db.VarChar(34)
   bicSwift String @db.VarChar(11)
   countryCode String @db.VarChar(3) //ISO 3166-1 alpha-2 code
   currencyCode String @db.VarChar(3) //ISO 4217 code
-  venue CoworkingVenue @relation(fields: [venueId], references: [id])
+  venue Venue @relation(fields: [venueId], references: [id])
   venueId Int @unique
 
 }

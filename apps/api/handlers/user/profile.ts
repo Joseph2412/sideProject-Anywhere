@@ -15,7 +15,7 @@ export const profileHandler = async (request: FastifyRequest, reply: FastifyRepl
       id: auth.id,
     },
     include: {
-      coworkingVenue: true,
+      venue: true,
     },
   });
 
@@ -32,7 +32,7 @@ export const profileHandler = async (request: FastifyRequest, reply: FastifyRepl
       avatarUrl: user.avatarUrl,
       preferences: user.preferences,
       role: user.role,
-      coworkingVenue: user.coworkingVenue ?? null,
+      venue: user.venue ?? null,
     },
   });
 };
