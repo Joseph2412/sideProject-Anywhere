@@ -13,6 +13,7 @@ import {
   venueOpeningDaysRoute,
   venuePayments,
 } from './routes/venues/venues';
+import { packagesRoutes } from './routes/packages/packagesRoutes';
 
 //Ricorda di importare prisma in ogni handler senza istanziarlo sempre
 
@@ -56,6 +57,7 @@ server.register(venueDetailsRoute, { prefix: '/api' });
 server.register(venueOpeningDaysRoute, { prefix: '/api' });
 server.register(venueClosingPeriods, { prefix: '/api' });
 server.register(venuePayments, { prefix: '/api' });
+server.register(packagesRoutes, { prefix: '/api' });
 
 server.listen({ port: 3001 }, (err, address) => {
   if (err) {

@@ -1,0 +1,72 @@
+export const createPackageSchema = {
+  body: {
+    type: 'object',
+    required: ['title', 'description', 'type'],
+    properties: {
+      title: { type: 'string' },
+      description: { type: 'string' },
+      capacity: { type: 'number' },
+      seats: { type: 'number' },
+      services: { type: 'array', items: { type: 'string' } },
+      squareMetres: { type: 'number' },
+      type: { type: 'string', enum: ['SALA', 'DESK'] },
+    },
+    allOf: [
+      {
+        if: { properties: { type: { const: 'DESK' } } },
+        then: { required: ['seats'] },
+      },
+      {
+        if: { properties: { type: { const: 'SALA' } } },
+        then: { required: ['squareMetres', 'capacity'] },
+      },
+    ],
+  },
+};
+export const getPackagesDetailsSchema = {
+  params: {
+    type: 'object',
+    required: ['id'],
+    properties: {
+      title: { type: 'string' },
+      description: { type: 'string' },
+      squareMetres: { type: 'number' },
+      capacity: { type: 'number' },
+      services: {
+        type: 'array',
+        items: {
+          type: 'string',
+        },
+      },
+      type: {
+        type: 'string',
+        enum: ['SALA', 'DESK'],
+      },
+      seats: { type: 'number' },
+    },
+  },
+};
+
+export const updatePackageDetailsSchema = {
+  body: {
+    type: 'object',
+    required: ['title', 'type'],
+    properties: {
+      title: { type: 'string' },
+      description: { type: 'string' },
+      squareMetres: { type: 'number' },
+      capacity: { type: 'number' },
+      services: {
+        type: 'array',
+        items: {
+          type: 'string',
+        },
+      },
+      type: {
+        type: 'string',
+        enum: ['SALA', 'DESK'],
+      },
+      seats: { type: 'number' },
+    },
+  },
+};

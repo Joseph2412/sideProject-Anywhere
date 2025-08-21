@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react'; // React
+import React, { useEffect } from 'react';
+
+//Componete FORM DETTAGLI PACCHETTO
 
 import { Form, Button, Upload, Avatar, Space, Row, Col, Card, Select, Tag, Input } from 'antd';
 
@@ -8,85 +10,95 @@ import { useState } from 'react';
 import { useVenues } from '@repo/hooks';
 
 // Jotai e store
-import { useAtomValue, useAtom, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom, useAtom } from 'jotai';
 import { messageToast } from '@repo/ui/store/LayoutStore';
 import { PrimaryButton } from '../../buttons/PrimaryButton';
+import { fetchPackagesAtom, packageFormAtom } from '@repo/ui/store/PackageFormStore';
 
-export const BundleDetails = () => {
+export const PackageDetails = () => {
+  const [details, setDetails] = useAtom(packageFormAtom);
   const [form] = Form.useForm();
-
-  // Array servizi disponibili per venue
-
-  const [loading, setLoading] = useState(false); // Stato loading
-  const [venueDetails, setVenueDetails] = useState<any>({});
-  const { data, isLoading } = useVenues();
-  const [selectedType, setSelectedType] = useState<'sala' | 'desk' | undefined>(undefined);
-
+  const [loading, setLoading] = useState(false);
   const setMessage = useSetAtom(messageToast);
+  const fetchPackages = useSetAtom(fetchPackagesAtom);
 
-  // useEffect per caricamento dati venue esistenti
-  // useEffect(() => {
-  //   if (data && data.venue) {
-  //     form.setFieldsValue({
-  //       ...data.venue,
-  //       avatarUrl: data.venue.avatarURL || '',
-  //     });
-  //     setVenueDetails(data.venue);
-  //   }
-  // }, [data, form]);
+  // Carica i dati precedenti dal database all'avvio
+  useEffect(() => {
+    const fetchDetails = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setDetails(data);
+          form.setFieldsValue(data);
+        }
+      } catch (error) {
+        setMessage({ type: 'error', message: 'Errore nel caricamento dettagli pacchetto' });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setDetails, setMessage]);
 
-  // const onFinish = async (values: typeof venueDetails) => {
-  //   setLoading(true);
-  //   try {
-  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues`, {
-  //       method: 'PUT',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         Authorization: `Bearer ${localStorage.getItem('token')}`,
-  //       },
-  //       body: JSON.stringify(values),
-  //     });
-  //     if (res.ok) {
-  //       const data = await res.json();
-  //       setVenueDetails(data.venue);
-  //       setMessage({
-  //         type: 'success',
-  //         message: 'Dettagli aggiornati',
-  //         duration: 3,
-  //         placement: 'bottomRight',
-  //       });
-  //     } else {
-  //       setMessage({
-  //         type: 'error',
-  //         message: 'Errore salvataggio',
-  //         duration: 3,
-  //         placement: 'bottomRight',
-  //       });
-  //     }
-  //   } catch {
-  //     setMessage({
-  //       type: 'error',
-  //       message: 'Errore salvataggio',
-  //       duration: 3,
-  //       placement: 'bottomRight',
-  //     });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  // Calcola direttamente il tipo selezionato dall'atomo
+  const selectedType = details?.type ? (details.type.toLowerCase() as 'sala' | 'desk') : undefined;
 
-  // if (isLoading) {
-  //   return <div>Caricamento dati venue...</div>;
-  // }
+  // Gestione submit del form per aggiornare i dati
+  const handleFinish = async (values: any) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(values),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setDetails(data);
+        setMessage({ type: 'success', message: 'Pacchetto aggiunto!' });
+        await fetchPackages();
+      } else {
+        setMessage({ type: 'error', message: 'Errore durante aggiunta pacchetto' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', message: 'Errore durante aggiunta pacchetto' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Sincronizza i valori del form con details ogni volta che details cambia
+  useEffect(() => {
+    if (details) {
+      form.setFieldsValue(details);
+    }
+  }, [details, form]);
 
   return (
     <Form
       layout="vertical"
       style={{ width: '100%', borderRadius: 8 }}
       form={form}
-      initialValues={venueDetails || {}}
       requiredMark={false}
-      // onFinish={onFinish}
+      onValuesChange={(_, allValues) => {
+        if (!details) return;
+        setDetails({
+          ...details,
+          ...allValues,
+          type: allValues.type ? (allValues.type as 'Sala' | 'Desk') : details.type,
+        });
+      }}
+      onFinish={handleFinish}
     >
       <Card>
         <Row gutter={[0, 0]}>
@@ -98,7 +110,7 @@ export const BundleDetails = () => {
               <NibolInput
                 validateTrigger="onSubmit"
                 label="Nome del Piano"
-                name="name"
+                name="title"
                 hideAsterisk={true}
                 required={true}
                 style={{ height: 32, width: '100%' }}
@@ -108,20 +120,17 @@ export const BundleDetails = () => {
           <Col span={12}>
             <Form.Item
               name="type"
-              rules={[{ required: true, message: 'Inserisci il Tipo di Piano' }]}
-              label="Tipo di Piano"
+              rules={[{ required: true, message: 'Specifica la Tipologia' }]}
+              label="Tipologia"
               style={{ marginTop: 10 }}
             >
               <Select
-                defaultValue="Sala" //Qui devi passare il tipo dinamico alla scelta del cliente
                 style={{ width: '100%', height: 32 }}
                 options={[
-                  { value: 'sala', label: 'Sala' },
-                  { value: 'desk', label: 'Desk' },
+                  { value: 'SALA', label: 'Sala' },
+                  { value: 'DESK', label: 'Desk' },
                 ]}
                 onChange={value => {
-                  setSelectedType(value as 'sala' | 'desk');
-
                   //resetCampi Condizionali se DESK|SALA
                   if (value === 'desk') {
                     form.setFieldsValue({ seats: undefined });
@@ -133,10 +142,8 @@ export const BundleDetails = () => {
             </Form.Item>
           </Col>
         </Row>
-
         {/* //Campi Descrizione e Servizi
          */}
-
         <Form.Item name="description" label="Descrizione">
           <Input.TextArea style={{ height: 32, width: '100%', minHeight: 100 }} />
         </Form.Item>
@@ -144,9 +151,6 @@ export const BundleDetails = () => {
           <Select mode="tags" style={{ height: 28, width: '100%' }} />
         </Form.Item>
 
-        {/* //Campi Condizionali */}
-
-        {/* SE SALA */}
         {selectedType === 'sala' && (
           <Row gutter={[16, 0]}>
             <Col span={12}>
@@ -161,7 +165,7 @@ export const BundleDetails = () => {
             <Col span={12}>
               <Form.Item
                 name="squareMetres"
-                label="Metri Quadrati"
+                label="Metri Quadrati (m²)"
                 rules={[{ required: true, message: 'Inserisci i metri quadrati' }]}
               >
                 <Input type="number" min={1} style={{ width: 100 }} />
@@ -170,7 +174,6 @@ export const BundleDetails = () => {
           </Row>
         )}
 
-        {/* Se DESK */}
         {selectedType === 'desk' && (
           <Form.Item
             name="seats"
@@ -180,25 +183,19 @@ export const BundleDetails = () => {
             <Input type="number" min={1} style={{ width: 100 }} />
           </Form.Item>
         )}
-
         <Form.Item style={{ marginTop: 20 }}>
           <Space>
             <Button
               htmlType="button"
               onClick={() => {
-                if (venueDetails) {
-                  form.setFieldsValue({
-                    name: venueDetails.name,
-                    address: venueDetails.address,
-                    description: venueDetails.description,
-                    services: venueDetails.services,
-                  });
-                }
+                form.resetFields();
+                form.setFieldsValue(details);
               }}
+              disabled={loading}
             >
               Annulla
             </Button>
-            <PrimaryButton type="primary" htmlType="submit" disabled={loading}>
+            <PrimaryButton type="primary" htmlType="submit" disabled={loading} loading={loading}>
               Salva
             </PrimaryButton>
           </Space>

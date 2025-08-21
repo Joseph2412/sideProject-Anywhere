@@ -21,7 +21,6 @@ const keyToTitleMap: Record<string, string> = {
   profile: 'Profilo',
   preferences: 'Notifiche',
   payments: 'Pagamenti',
-  // TODO: nome dinamico sala/pacchetto
 };
 
 // Header component
@@ -34,10 +33,9 @@ export default function Header({ className }: HeaderProps) {
   // Render JSX header
   return (
     <header className={className ?? styles.header}>
-      {/* Titolo principale */}
       <Typography.Title level={4} style={{ margin: 0, color: '#000' }}>
         {pageTitle}
-        {/* Tooltip solo per Pagamenti */}
+
         {pageTitle === 'Pagamenti' && (
           <Tooltip title="Accrediteremo sul tuo conto corrente mensilmente il totale incassato al netto dei costi.">
             <InfoCircleOutlined
