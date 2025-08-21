@@ -1,9 +1,9 @@
 export const createPackageSchema = {
   body: {
     type: 'object',
-    required: ['title', 'description', 'type'],
+    required: ['name', 'description', 'type'],
     properties: {
-      title: { type: 'string' },
+      name: { type: 'string' },
       description: { type: 'string' },
       capacity: { type: 'number' },
       seats: { type: 'number' },
@@ -28,7 +28,7 @@ export const getPackagesDetailsSchema = {
     type: 'object',
     required: ['id'],
     properties: {
-      title: { type: 'string' },
+      name: { type: 'string' },
       description: { type: 'string' },
       squareMetres: { type: 'number' },
       capacity: { type: 'number' },
@@ -50,9 +50,9 @@ export const getPackagesDetailsSchema = {
 export const updatePackageDetailsSchema = {
   body: {
     type: 'object',
-    required: ['title', 'type'],
+    required: ['name', 'type'],
     properties: {
-      title: { type: 'string' },
+      name: { type: 'string' },
       description: { type: 'string' },
       squareMetres: { type: 'number' },
       capacity: { type: 'number' },

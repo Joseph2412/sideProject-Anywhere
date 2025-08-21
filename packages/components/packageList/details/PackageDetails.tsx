@@ -13,39 +13,53 @@ import { useVenues } from '@repo/hooks';
 import { useAtomValue, useSetAtom, useAtom } from 'jotai';
 import { messageToast } from '@repo/ui/store/LayoutStore';
 import { PrimaryButton } from '../../buttons/PrimaryButton';
-import { fetchPackagesAtom, packageFormAtom } from '@repo/ui/store/PackageFormStore';
+import { fetchPackagesAtom } from '@repo/ui/store/PackageFormStore';
+import { useSearchParams, useParams } from 'next/navigation';
 
 export const PackageDetails = () => {
-  const [details, setDetails] = useAtom(packageFormAtom);
+  const searchParams = useSearchParams();
+  const params = useParams();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const setMessage = useSetAtom(messageToast);
   const fetchPackages = useSetAtom(fetchPackagesAtom);
 
-  // Carica i dati precedenti dal database all'avvio
+  // Stato locale per i valori del form, sempre sincronizzato con la query string o fetch
+  const [details, setDetails] = useState<any>({});
+
+  // Se c'è id nei params, fetch dei dati pacchetto, altrimenti usa la query string
   useEffect(() => {
-    const fetchDetails = async () => {
+    const id = params?.id;
+    if (id) {
       setLoading(true);
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
-        if (res.ok) {
-          const data = await res.json();
+      fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
+        .then(res => res.json())
+        .then(data => {
           setDetails(data);
-          form.setFieldsValue(data);
-        }
-      } catch (error) {
-        setMessage({ type: 'error', message: 'Errore nel caricamento dettagli pacchetto' });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDetails();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setDetails, setMessage]);
+          form.setFieldsValue({
+            name: data.name,
+            type: data.type === 'Sala' ? 'SALA' : data.type === 'Desk' ? 'DESK' : data.type,
+            description: data.description,
+            services: data.services,
+            capacity: data.capacity,
+            squareMetres: data.squareMetres,
+            seats: data.seats,
+            // aggiungi qui plans e immagini se servono
+          });
+        })
+        .finally(() => setLoading(false));
+    } else {
+      const name = searchParams.get('name') || '';
+      const type = searchParams.get('type') || '';
+      const mappedType = type === 'Sala' ? 'SALA' : type === 'Desk' ? 'DESK' : undefined;
+      setDetails({ name, type });
+      form.setFieldsValue({ name, type: mappedType });
+    }
+  }, [params, searchParams, form]);
 
   // Calcola direttamente il tipo selezionato dall'atomo
   const selectedType = details?.type ? (details.type.toLowerCase() as 'sala' | 'desk') : undefined;
@@ -53,9 +67,22 @@ export const PackageDetails = () => {
   // Gestione submit del form per aggiornare i dati
   const handleFinish = async (values: any) => {
     setLoading(true);
+    const id = params?.id;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages`, {
-        method: 'POST',
+      let url = '';
+      let method: 'POST' | 'PUT' = 'POST';
+      let successMsg = '';
+      if (id) {
+        url = `${process.env.NEXT_PUBLIC_API_HOST}/api/packages/${id}`;
+        method = 'PUT';
+        successMsg = 'Pacchetto aggiornato!';
+      } else {
+        url = `${process.env.NEXT_PUBLIC_API_HOST}/api/packages/add`;
+        method = 'POST';
+        successMsg = 'Pacchetto aggiunto!';
+      }
+      const res = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -65,13 +92,13 @@ export const PackageDetails = () => {
       if (res.ok) {
         const data = await res.json();
         setDetails(data);
-        setMessage({ type: 'success', message: 'Pacchetto aggiunto!' });
+        setMessage({ type: 'success', message: successMsg });
         await fetchPackages();
       } else {
-        setMessage({ type: 'error', message: 'Errore durante aggiunta pacchetto' });
+        setMessage({ type: 'error', message: 'Errore durante la richiesta' });
       }
     } catch (error) {
-      setMessage({ type: 'error', message: 'Errore durante aggiunta pacchetto' });
+      setMessage({ type: 'error', message: 'Errore durante la richiesta' });
     } finally {
       setLoading(false);
     }
@@ -79,8 +106,12 @@ export const PackageDetails = () => {
 
   // Sincronizza i valori del form con details ogni volta che details cambia
   useEffect(() => {
+    // Ogni volta che details cambia (es. da onValuesChange), aggiorna il form
     if (details) {
-      form.setFieldsValue(details);
+      form.setFieldsValue({
+        name: details.name,
+        type: details.type === 'Sala' ? 'SALA' : details.type === 'Desk' ? 'DESK' : details.type,
+      });
     }
   }, [details, form]);
 
@@ -90,6 +121,7 @@ export const PackageDetails = () => {
       style={{ width: '100%', borderRadius: 8 }}
       form={form}
       requiredMark={false}
+      validateTrigger="onSubmit"
       onValuesChange={(_, allValues) => {
         if (!details) return;
         setDetails({
@@ -110,7 +142,7 @@ export const PackageDetails = () => {
               <NibolInput
                 validateTrigger="onSubmit"
                 label="Nome del Piano"
-                name="title"
+                name="name"
                 hideAsterisk={true}
                 required={true}
                 style={{ height: 32, width: '100%' }}
@@ -144,7 +176,11 @@ export const PackageDetails = () => {
         </Row>
         {/* //Campi Descrizione e Servizi
          */}
-        <Form.Item name="description" label="Descrizione">
+        <Form.Item
+          name="description"
+          label="Descrizione"
+          rules={[{ required: true, message: 'Inserisci una descrizione' }]}
+        >
           <Input.TextArea style={{ height: 32, width: '100%', minHeight: 100 }} />
         </Form.Item>
         <Form.Item name="services" label="Servizi">

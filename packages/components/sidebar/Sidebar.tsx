@@ -2,7 +2,7 @@
 
 //COMPONENTE SIDEBAR
 
-import { Menu, Layout, Avatar, Modal, Select, Space, Button, Typography, Input } from 'antd';
+import { Menu, Layout, Avatar, Modal, Select, Space, Button, Typography, Input, Form } from 'antd';
 import { CalendarOutlined, ShopOutlined, UserOutlined, PlusOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -11,18 +11,18 @@ import { Package } from '@repo/ui';
 import { PrimaryButton } from '@repo/components';
 
 import { useSetAtom, useAtomValue } from 'jotai';
-import { packageFormAtom, packagesAtom, fetchPackagesAtom } from '@repo/ui/store/PackageFormStore';
+import { packagesAtom, fetchPackagesAtom } from '@repo/ui/store/PackageFormStore';
+import React from 'react';
 
 const { Sider } = Layout;
 
 interface SidebarProps {
   onLogout?: () => void;
-  // props non più necessari: fetchPackages, packages
 }
 
 interface newPackage {
   id: number;
-  title: string;
+  name: string;
   type: 'SALA' | 'DESK';
   squareMetres?: number;
   capacity?: number;
@@ -75,10 +75,12 @@ const menuItems = [
 ];
 
 export default function Sidebar({ onLogout }: SidebarProps) {
-  console.log('SIDEBAR COMPONENT RENDERED'); // DEBUG LOG
+  console.log('SIDEBAR RENDER'); // DEBUG LOG
+
   const packages = useAtomValue(packagesAtom);
   // Debug: mostra la struttura dei pacchetti
   console.log('Sidebar packages:', packages);
+  const [form] = Form.useForm();
   const router = useRouter();
   // Gestione click solo per il logout
   const handleMenuClick = ({ key }: { key: string }) => {
@@ -96,17 +98,18 @@ export default function Sidebar({ onLogout }: SidebarProps) {
   const isEmpty = packages.length === 0; //Controlliamo se ci sono Pacchetti da Mostrare nella sidebar
 
   const [modalOpen, setModalOpen] = useState(false); //Gestiamo comparsa/scomparsa della Modale
-  const [localName, setLocalName] = useState('');
-  const [localType, setLocalType] = useState<'Sala' | 'Desk'>('Sala');
-  const setPackageForm = useSetAtom(packageFormAtom);
 
   // Funzione per aggiungere un nuovo pacchetto
   // Naviga alla pagina di aggiunta pacchetto passando nome e tipologia come query string
   const handleAddPackage = () => {
-    setPackageForm({ name: localName, type: localType as 'Sala' | 'Desk' });
-    setModalOpen(false);
-    setLocalName('');
-    router.push('/addPackage');
+    form.validateFields().then(values => {
+      setModalOpen(false);
+      const typeString = values.type === 'SALA' ? 'Sala' : values.type === 'DESK' ? 'Desk' : '';
+      const params = new URLSearchParams({ name: values.name, type: typeString });
+      console.log('handleAddPackage:', { ...values, typeString, query: params.toString() });
+      form.resetFields();
+      router.push(`/packages/add?${params.toString()}`);
+    });
   };
 
   useEffect(() => {
@@ -142,42 +145,72 @@ export default function Sidebar({ onLogout }: SidebarProps) {
           </Menu.Item>
         ) : (
           <>
-            {packages.map(pkg => (
-              <Menu.Item key={pkg.id} style={{ marginLeft: 25 }}>
-                <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                  <span
+            <Menu.SubMenu
+              key="packages"
+              icon={
+                // Usa una icona a piacere, qui un esempio con ShopOutlined
+                <ShopOutlined />
+              }
+              title="Pacchetti"
+              style={{
+                marginLeft: 0,
+                paddingLeft: 0,
+                fontWeight: 500,
+              }}
+            >
+              {packages.map(pkg => (
+                <Menu.Item
+                  key={pkg.id}
+                  style={{
+                    paddingLeft: 40,
+                    paddingRight: 16,
+                    height: 48,
+                    display: 'flex',
+                    alignItems: 'center',
+                    borderRadius: 16,
+                    marginBottom: 5,
+                  }}
+                  onClick={() => router.push(`/packages/${pkg.id}`)}
+                >
+                  <div
                     style={{
-                      flex: 1,
-                      minWidth: 0,
-                      fontSize: 12,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {pkg.title}
-                  </span>
-
-                  <span
-                    style={{
-                      marginRight: 15,
-                      whiteSpace: 'nowrap',
-                      display: 'inline-flex',
+                      display: 'flex',
                       alignItems: 'center',
-                      borderRadius: 3,
-                      padding: '4px 8px', // Spazio Dello Span Colorato
-                      fontSize: 11, // Font Scritta. Valuta
-                      lineHeight: 1.2, // Linea in Altezza (provare a "giocarci" con questo valore)
-                      fontWeight: 500,
-                      background: pkg.type === 'SALA' ? '#e6f0ff' : '#fff0f0',
-                      color: pkg.type === 'SALA' ? '#1976d2' : '#e53935',
+                      justifyContent: 'space-between',
+                      width: '100%',
                     }}
                   >
-                    {pkg.type === 'SALA' ? 'Room' : 'Desk'}
-                  </span>
-                </div>
-              </Menu.Item>
-            ))}
+                    <span
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {pkg.name}
+                    </span>
+                    <span
+                      style={{
+                        whiteSpace: 'nowrap',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 6,
+                        height: 20,
+                        minWidth: 50,
+                        padding: '0px 10px',
+                        background: pkg.type === 'SALA' ? '#e6f0ff' : '#fff0f0',
+                        color: pkg.type === 'SALA' ? '#1976d2' : '#e53935',
+                      }}
+                    >
+                      {pkg.type === 'SALA' ? 'Room' : 'Desk'}
+                    </span>
+                  </div>
+                </Menu.Item>
+              ))}
+            </Menu.SubMenu>
             <Menu.Item key="addPackage" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
               Aggiungi Pacchetto
             </Menu.Item>
@@ -216,23 +249,35 @@ export default function Sidebar({ onLogout }: SidebarProps) {
           </Space>
         }
       >
-        <Typography.Text>Nome</Typography.Text>
-        <Input value={localName} onChange={e => setLocalName(e.target.value)} />
-        <div style={{ marginTop: 16 }}>
-          <label style={{ fontWeight: 500, marginBottom: 4, display: 'block' }}>Tipologia</label>
-          <Select
-            value={localType}
-            onChange={value => setLocalType(value)}
-            style={{ width: '100%' }}
+        <Form form={form} layout="vertical" requiredMark={false} validateTrigger="onSubmit">
+          <Form.Item
+            name="name"
+            label={<Typography.Text>Nome</Typography.Text>}
+            rules={[{ required: true, message: 'Inserisci il nome' }]}
+            validateTrigger="onSubmit"
           >
-            <Select.Option value="SALA" label="Sala">
-              Sala
-            </Select.Option>
-            <Select.Option value="DESK" label="Desk">
-              Desk
-            </Select.Option>
-          </Select>
-        </div>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="type"
+            label={
+              <label style={{ fontWeight: 500, marginBottom: 4, display: 'block' }}>
+                Tipologia
+              </label>
+            }
+            rules={[{ required: true, message: 'Seleziona la tipologia' }]}
+            validateTrigger="onSubmit"
+          >
+            <Select style={{ width: '100%' }}>
+              <Select.Option value="SALA" label="Sala">
+                Sala
+              </Select.Option>
+              <Select.Option value="DESK" label="Desk">
+                Desk
+              </Select.Option>
+            </Select>
+          </Form.Item>
+        </Form>
       </Modal>
       <div style={{ position: 'absolute', bottom: 16, paddingLeft: 16 }}>
         <Avatar />

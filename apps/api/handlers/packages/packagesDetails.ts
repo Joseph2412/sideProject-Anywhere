@@ -11,8 +11,8 @@ export const getAllPackagesHandler = async (request: FastifyRequest, reply: Fast
 };
 // Handler per la creazione di un nuovo pacchetto
 export const createPackageHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-  const { title, description, capacity, seats, services, squareMetres, type } = request.body as {
-    title: string;
+  const { name, description, capacity, seats, services, squareMetres, type } = request.body as {
+    name: string;
     description: string;
     capacity: number;
     seats: number;
@@ -23,7 +23,7 @@ export const createPackageHandler = async (request: FastifyRequest, reply: Fasti
 
   const newPackage = await prisma.package.create({
     data: {
-      title,
+      name,
       description,
       capacity,
       seats,
@@ -55,8 +55,8 @@ export const updatePackagesDetailsHandler = async (
   reply: FastifyReply
 ) => {
   const { id } = request.params as { id: string };
-  const { title, description, capacity, seats, services, squareMetres, type } = request.body as {
-    title: string;
+  const { name, description, capacity, seats, services, squareMetres, type } = request.body as {
+    name: string;
     description: string;
     capacity: number;
     seats: number;
@@ -68,7 +68,7 @@ export const updatePackagesDetailsHandler = async (
   try {
     const updatedPackage = await prisma.package.update({
       where: { id: Number(id) },
-      data: { title, description, capacity, seats, services, squareMetres, type },
+      data: { name, description, capacity, seats, services, squareMetres, type },
     });
     return updatedPackage;
   } catch (error) {

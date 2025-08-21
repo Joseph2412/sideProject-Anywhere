@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react';
 import { Form, Divider, InputNumber, Switch, Row, Col, Typography, Card, Button } from 'antd';
 import { useAtom, useSetAtom } from 'jotai';
 import { messageToast } from '@repo/ui/store/ToastStore';
-import { PackagesDetails } from './packagePlans.types';
 import { PrimaryButton } from './../../buttons/PrimaryButton';
 import { usePackages } from '@repo/hooks/src/usePackages';
 
@@ -23,8 +22,17 @@ export const PackagePlans = () => {
   //Ricontrolla: Sei stanco e questi forse dovevano andare su PackagesList
 
   // Stato di attivazione/disattivazione piano
+  // Define plans array (use PlansRate if that's the intended source)
+  const plans = [
+    { value: 'hourly', name: 'Orario', label: 'ora' },
+    { value: 'daily', name: 'Giornaliero', label: 'giorno' },
+    { value: 'weekly', name: 'Settimanale', label: 'settimana' },
+    { value: 'monthly', name: 'Mensile', label: 'mese' },
+    { value: 'yearly', name: 'Annuale', label: 'anno' },
+  ];
+
   const [enabledPlan, setEnabledPlan] = useState<Record<string, boolean>>(() =>
-    PlansRate.reduce(
+    plans.reduce(
       (acc, plan) => {
         acc[plan.value] = false;
         return acc;
@@ -89,7 +97,7 @@ export const PackagePlans = () => {
 
   return (
     <Form layout="vertical">
-      {PlansRate.map(plan => (
+      {plans.map(plan => (
         <Card key={plan.value} style={{ marginBottom: 16 }}>
           <Row align="middle" style={{ marginBottom: 0, marginTop: 0 }}>
             <Col flex="auto">
