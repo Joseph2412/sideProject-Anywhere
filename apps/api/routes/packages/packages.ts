@@ -50,13 +50,13 @@ export async function packagesDetailsRoutes(fastify: FastifyInstance) {
 //Rotte per I Piani/Tipi di Abbonamento dei Pacchetti
 export async function packagesPlansRoutes(fastify: FastifyInstance) {
   fastify.get(
-    '/packages/:id/plans',
+    '/packages/:packageId/plans',
     { preValidation: fastify.authenticate, schema: getPackagePlansSchema },
     getPackagesPlansRateHandler
   );
 
   fastify.put(
-    '/packages/:id/plans',
+    '/packages/:packageId/plans',
     { preValidation: fastify.authenticate, schema: updatePackagePlansSchema },
     updatePackagesPlansRateHandler
   );

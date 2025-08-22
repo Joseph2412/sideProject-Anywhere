@@ -100,7 +100,7 @@ model PackagePlan {
   id        Int       @id @default(autoincrement())
   name      String
   rate      PlansRate
-  price     Int
+  price     Decimal @db.Decimal(10, 2) //Prezzo del piano
   isEnabled Boolean   @default(false)
   package   Package   @relation(fields: [packageId], references: [id])
   packageId Int
