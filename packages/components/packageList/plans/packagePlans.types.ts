@@ -1,4 +1,6 @@
 export interface PlanRateData {
+  id?: number;
+  name: string;
   rate: string; // "HOURLY", "DAILY", "WEEKLY", "MONTHLY", "YEARLY"
   isEnabled: boolean; // Indica se il piano è attivo
   price: number; // Prezzo del piano

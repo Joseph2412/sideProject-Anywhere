@@ -6,16 +6,15 @@ export const getPackagesPlansRateHandler: (
   request: FastifyRequest,
   reply: FastifyReply
 ) => Promise<unknown> = async (request, reply) => {
-  const { id } = request.params as { id: string };
-
-  const packagePlans = await prisma.packagePlan.findUnique({
-    where: { id: Number(id) },
-  });
-
-  if (!packagePlans) {
-    return reply.status(404).send({ message: 'Package not found' });
+  const { packageId } = request.params as { packageId: string };
+  const numericPackageId = Number(packageId);
+  if (isNaN(numericPackageId)) {
+    return reply.status(400).send({ message: 'Invalid packageId' });
   }
-
+  const packagePlans = await prisma.packagePlan.findMany({
+    where: { packageId: numericPackageId },
+    orderBy: { id: 'asc' },
+  });
   return packagePlans;
 };
 

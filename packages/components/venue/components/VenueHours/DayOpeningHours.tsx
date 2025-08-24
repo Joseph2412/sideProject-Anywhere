@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Checkbox, TimePicker, Button, Space, Typography, Row, Col } from 'antd';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import dayjs from 'dayjs';
 import { parsePeriodString, formatPeriodString } from './openingHours.types';
@@ -47,11 +46,6 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
         periods: [], // Reset periodi quando riapri
       });
     }
-  };
-
-  // Inizia un nuovo periodo (non ancora confermato)
-  const handleAddPeriod = () => {
-    setPendingPeriod('12:00-18:00');
   };
 
   // Conferma il periodo pendente

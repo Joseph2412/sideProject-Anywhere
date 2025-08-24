@@ -7,12 +7,12 @@ import { CalendarOutlined, ShopOutlined, UserOutlined, PlusOutlined } from '@ant
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Package } from '@repo/ui';
+
 import { PrimaryButton } from '@repo/components';
+import { messageToast } from '@repo/ui/store/ToastStore';
 
 import { useSetAtom, useAtomValue } from 'jotai';
 import { packagesAtom, fetchPackagesAtom } from '@repo/ui/store/PackageFormStore';
-import React from 'react';
 
 const { Sider } = Layout;
 
@@ -20,64 +20,18 @@ interface SidebarProps {
   onLogout?: () => void;
 }
 
-interface newPackage {
-  id: number;
-  name: string;
-  type: 'SALA' | 'DESK';
-  squareMetres?: number;
-  capacity?: number;
-  services?: string[];
-  plans?: string[];
-  photos?: string[];
-}
-
-// Rimosso: va usato dentro il componente
-
-const menuItems = [
-  {
-    key: 'calendar',
-    icon: <CalendarOutlined />,
-    label: <Link href="/calendar">Calendario</Link>,
-  },
-  {
-    type: 'divider' as const,
-  },
-  {
-    key: 'venue',
-    icon: <ShopOutlined />,
-    label: 'Locale',
-    children: [
-      { key: 'venue-general', label: <Link href="/venue">Generali</Link> },
-      { key: 'payments', label: <Link href="/payments">Pagamenti</Link> },
-    ],
-  },
-  {
-    type: 'divider' as const,
-  },
-  {
-    key: 'addPackage',
-    icon: <PlusOutlined />,
-    label: 'Aggiungi pacchetto',
-  },
-  {
-    type: 'divider' as const,
-  },
-  {
-    key: 'account',
-    icon: <UserOutlined />,
-    label: 'Account',
-    children: [
-      { key: 'profile', label: <Link href="/profile">Profilo</Link> },
-      { key: 'preferences', label: <Link href="/preferences">Notifiche</Link> },
-      { key: 'logout', label: 'Logout' },
-    ],
-  },
-];
-
 export default function Sidebar({ onLogout }: SidebarProps) {
   console.log('SIDEBAR RENDER'); // DEBUG LOG
 
   const packages = useAtomValue(packagesAtom);
+  // Ordina prima per tipologia (DESK prima di SALA), poi per id crescente
+  const sortedPackages = [...packages].sort((a, b) => {
+    if (a.type === b.type) return a.id - b.id;
+    if (a.type === 'DESK') return -1;
+    if (b.type === 'DESK') return 1;
+    return 0;
+  });
+
   // Debug: mostra la struttura dei pacchetti
   console.log('Sidebar packages:', packages);
   const [form] = Form.useForm();
@@ -100,21 +54,43 @@ export default function Sidebar({ onLogout }: SidebarProps) {
   const [modalOpen, setModalOpen] = useState(false); //Gestiamo comparsa/scomparsa della Modale
 
   // Funzione per aggiungere un nuovo pacchetto
-  // Naviga alla pagina di aggiunta pacchetto passando nome e tipologia come query string
-  const handleAddPackage = () => {
-    form.validateFields().then(values => {
+  // Crea il pacchetto, aggiorna la sidebar e fa redirect a /packages/:id
+  const setToastMessage = useSetAtom(messageToast);
+  const handleAddPackage = async () => {
+    try {
+      const values = await form.validateFields();
       setModalOpen(false);
-      const typeString = values.type === 'SALA' ? 'Sala' : values.type === 'DESK' ? 'Desk' : '';
-      const params = new URLSearchParams({ name: values.name, type: typeString });
-      console.log('handleAddPackage:', { ...values, typeString, query: params.toString() });
       form.resetFields();
-      router.push(`/packages/add?${params.toString()}`);
-    });
+      // Chiamata API per creare il pacchetto
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages/add`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ name: values.name, type: values.type }),
+      });
+      if (!res.ok) throw new Error('Errore creazione pacchetto');
+      const data = await res.json();
+      // Aggiorna la sidebar
+      await fetchPackages();
+      // Redirect a /packages/:id
+      if (data.id) {
+        router.push(`/packages/${data.id}`);
+      }
+    } catch (err) {
+      setToastMessage({
+        type: 'error',
+        message: 'Errore durante la creazione del pacchetto',
+        placement: 'bottomRight',
+      });
+      console.error("Errore durante l'aggiunta del pacchetto:", err);
+    }
   };
 
   useEffect(() => {
     fetchPackages();
-  }, []);
+  }, [fetchPackages]);
 
   return (
     <Sider width={220} style={{ background: '#fff', height: '100vh' }}>
@@ -158,7 +134,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
                 fontWeight: 500,
               }}
             >
-              {packages.map(pkg => (
+              {sortedPackages.map(pkg => (
                 <Menu.Item
                   key={pkg.id}
                   style={{

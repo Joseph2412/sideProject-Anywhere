@@ -8,7 +8,7 @@ type Props = ButtonProps & {
 };
 
 export const PrimaryButton = React.forwardRef<HTMLElement, Props>(
-  ({ text, loading, disabled, style, className, onClick, children, ...rest }, _ref) => {
+  ({ text, loading, disabled, style, className, onClick, children, ...rest }) => {
     return (
       <Button
         {...rest}

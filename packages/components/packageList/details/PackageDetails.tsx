@@ -2,32 +2,27 @@ import React, { useEffect } from 'react';
 
 //Componete FORM DETTAGLI PACCHETTO
 
-import { Form, Button, Upload, Avatar, Space, Row, Col, Card, Select, Tag, Input } from 'antd';
+import { Form, Button, Space, Row, Col, Card, Select, Input } from 'antd';
 
-import { DeleteOutlined } from '@ant-design/icons';
 import { NibolInput } from '../../inputs/Input';
 import { useState } from 'react';
-import { useVenues } from '@repo/hooks';
 
 // Jotai e store
-import { useAtomValue, useSetAtom, useAtom } from 'jotai';
-import { messageToast } from '@repo/ui/store/LayoutStore';
+import { useSetAtom } from 'jotai';
+import { messageToast, Package } from '@repo/ui/store/LayoutStore';
 import { PrimaryButton } from '../../buttons/PrimaryButton';
 import { fetchPackagesAtom } from '@repo/ui/store/PackageFormStore';
-import { useSearchParams, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 
 export const PackageDetails = () => {
-  const searchParams = useSearchParams();
   const params = useParams();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const setMessage = useSetAtom(messageToast);
   const fetchPackages = useSetAtom(fetchPackagesAtom);
+  const [details, setDetails] = useState<Package | null>(null);
 
-  // Stato locale per i valori del form, sempre sincronizzato con la query string o fetch
-  const [details, setDetails] = useState<any>({});
-
-  // Se c'è id nei params, fetch dei dati pacchetto, altrimenti usa la query string
+  // Solo fetch tramite id dai params
   useEffect(() => {
     const id = params?.id;
     if (id) {
@@ -48,24 +43,17 @@ export const PackageDetails = () => {
             capacity: data.capacity,
             squareMetres: data.squareMetres,
             seats: data.seats,
-            // aggiungi qui plans e immagini se servono
           });
         })
         .finally(() => setLoading(false));
-    } else {
-      const name = searchParams.get('name') || '';
-      const type = searchParams.get('type') || '';
-      const mappedType = type === 'Sala' ? 'SALA' : type === 'Desk' ? 'DESK' : undefined;
-      setDetails({ name, type });
-      form.setFieldsValue({ name, type: mappedType });
     }
-  }, [params, searchParams, form]);
+  }, [params, form]);
 
   // Calcola direttamente il tipo selezionato dall'atomo
   const selectedType = details?.type ? (details.type.toLowerCase() as 'sala' | 'desk') : undefined;
 
   // Gestione submit del form per aggiornare i dati
-  const handleFinish = async (values: any) => {
+  const handleFinish = async (values: Package) => {
     setLoading(true);
     const id = params?.id;
     try {
@@ -81,6 +69,7 @@ export const PackageDetails = () => {
         method = 'POST';
         successMsg = 'Pacchetto aggiunto!';
       }
+      // Forza POST se non c'è id (aggiunta)
       const res = await fetch(url, {
         method,
         headers: {
@@ -98,6 +87,7 @@ export const PackageDetails = () => {
         setMessage({ type: 'error', message: 'Errore durante la richiesta' });
       }
     } catch (error) {
+      console.error('Errore durante la richiesta:', error);
       setMessage({ type: 'error', message: 'Errore durante la richiesta' });
     } finally {
       setLoading(false);

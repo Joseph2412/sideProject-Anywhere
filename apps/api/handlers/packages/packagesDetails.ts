@@ -1,34 +1,28 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { prisma } from '../../libs/prisma';
+import { PlansRate } from '@repo/database';
 
 export const getAllPackagesHandler = async (request: FastifyRequest, reply: FastifyReply) => {
   try {
-    const packages = await prisma.package.findMany();
+    const packages = await prisma.package.findMany({
+      include: { plans: true },
+    });
     return reply.send(packages);
   } catch (error) {
     return reply.status(500).send({ message: 'Errore nel recupero dei pacchetti' });
   }
 };
+
 // Handler per la creazione di un nuovo pacchetto
 export const createPackageHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-  const { name, description, capacity, seats, services, squareMetres, type } = request.body as {
+  const { name, type } = request.body as {
     name: string;
-    description: string;
-    capacity: number;
-    seats: number;
-    services: string[];
-    squareMetres: number;
     type: 'SALA' | 'DESK';
   };
 
   const newPackage = await prisma.package.create({
     data: {
       name,
-      description,
-      capacity,
-      seats,
-      services,
-      squareMetres,
       type,
     },
   });
@@ -47,7 +41,13 @@ export const getPackagesDetailsHandler = async (request: FastifyRequest, reply: 
     return reply.status(404).send({ message: 'Package not found' });
   }
 
-  return packageDetails;
+  // Recupera anche i piani associati
+  const plans = await prisma.packagePlan.findMany({
+    where: { packageId: Number(id) },
+    orderBy: { id: 'asc' },
+  });
+
+  return { ...packageDetails, plans };
 };
 
 export const updatePackagesDetailsHandler = async (
@@ -55,7 +55,16 @@ export const updatePackagesDetailsHandler = async (
   reply: FastifyReply
 ) => {
   const { id } = request.params as { id: string };
-  const { name, description, capacity, seats, services, squareMetres, type } = request.body as {
+  const {
+    name,
+    description,
+    capacity,
+    seats,
+    services,
+    squareMetres,
+    type,
+    plans = [],
+  } = request.body as {
     name: string;
     description: string;
     capacity: number;
@@ -63,6 +72,7 @@ export const updatePackagesDetailsHandler = async (
     services: string[];
     squareMetres: number;
     type: 'SALA' | 'DESK';
+    plans?: any[];
   };
 
   try {
@@ -70,7 +80,13 @@ export const updatePackagesDetailsHandler = async (
       where: { id: Number(id) },
       data: { name, description, capacity, seats, services, squareMetres, type },
     });
-    return updatedPackage;
+
+    // Ritorna il pacchetto aggiornato con i piani
+    const updatedPlans = await prisma.packagePlan.findMany({
+      where: { packageId: Number(id) },
+      orderBy: { id: 'asc' },
+    });
+    return { ...updatedPackage, plans: updatedPlans };
   } catch (error) {
     return reply.status(404).send({ message: 'Package not found' });
   }

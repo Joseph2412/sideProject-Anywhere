@@ -1,55 +1,72 @@
 //Componente per la gestione dei piani di Abbonamento
 //Ora, Giornaliero, Settimanale, Mensile, Annuale
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { Form, Divider, InputNumber, Switch, Row, Col, Typography, Card, Button } from 'antd';
+import { Form, InputNumber, Switch, Row, Col, Typography, Card, Button } from 'antd';
 import { useSetAtom } from 'jotai';
 import { messageToast } from '@repo/ui/store/ToastStore';
 import { PrimaryButton } from './../../buttons/PrimaryButton';
-import { usePackages } from '@repo/hooks/src/usePackages';
-
+import type { PlanRateData } from './packagePlans.types';
+import { PlansRate } from './packagePlans.types';
 export const PackagePlans = () => {
   const params = useParams();
   const packageId = params?.id;
   const setToastMessage = useSetAtom(messageToast);
   const [saving, setSaving] = useState<boolean>(false);
-  const [packagesDetails, setPackagesDetails] = useState<any>();
+
+  // Mappa ausiliaria per id dei piani
+  const [planIdMap, setPlanIdMap] = useState<Record<string, number | null>>({});
 
   // Define plans array
-  const plans = [
-    { value: 'hourly', name: 'Orario', label: 'ora' },
-    { value: 'daily', name: 'Giornaliero', label: 'giorno' },
-    { value: 'weekly', name: 'Settimanale', label: 'settimana' },
-    { value: 'monthly', name: 'Mensile', label: 'mese' },
-    { value: 'yearly', name: 'Annuale', label: 'anno' },
-  ];
-
-  // Stato di attivazione/disattivazione dei piani
-  const [enabledPlan, setEnabledPlan] = useState<Record<string, boolean>>(() =>
-    plans.reduce(
-      (acc, plan) => {
-        acc[plan.value] = false;
-        return acc;
-      },
-      {} as Record<string, boolean>
-    )
-  );
-
-  const [initialPlanValues, setInitialPlanValues] = useState<
-    Record<string, { isEnabled: boolean; price?: number }>
-  >(() =>
-    plans.reduce(
-      (acc, plan) => {
-        acc[plan.value] = { isEnabled: false, price: undefined };
-        return acc;
-      },
-      {} as Record<string, { isEnabled: boolean; price?: number }>
-    )
-  );
+  // Usa la costante PlansRate dal file dei tipi, ma in lowercase per il frontend
+  const plans = PlansRate.map(p => ({ ...p, value: p.value.toLowerCase() }));
 
   // Serve il form instance per resettare i valori
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages/${packageId}/plans`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        const plansData: PlanRateData[] = Array.isArray(data) ? data : [];
+        const formValues: Record<
+          string,
+          { isEnabled: boolean; price: number | string | undefined }
+        > = {};
+        // Costruisci la mappa ausiliaria degli id
+        const idMap: Record<string, number | null> = {};
+        plansData.forEach(plan => {
+          // Normalizza la chiave in lowercase per compatibilità frontend-backend
+          const rateKey = typeof plan.rate === 'string' ? plan.rate.toLowerCase() : '';
+          formValues[rateKey] = {
+            isEnabled: !!plan.isEnabled,
+            price: plan.price ?? undefined,
+          };
+          idMap[rateKey] = plan.id ?? null;
+        });
+        setPlanIdMap(idMap);
+        form.setFieldsValue(formValues);
+        setEnabledPlan(prev => ({
+          ...prev,
+          ...Object.fromEntries(
+            plansData.map(plan => [plan.rate?.toLowerCase?.() ?? '', !!plan.isEnabled])
+          ),
+        }));
+      })
+      .catch(() => {
+        setEnabledPlan(prev => ({ ...prev }));
+      });
+  }, [packageId, form]);
+
+  // Stato di attivazione/disattivazione dei piani (default: tutti disabilitati)
+  const [enabledPlan, setEnabledPlan] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(plans.map(plan => [plan.value, false]))
+  );
 
   // Gestione attivazione/disattivazione piano
   const handleTogglePlan = (planValue: string, checked: boolean) => {
@@ -67,23 +84,36 @@ export const PackagePlans = () => {
   };
 
   // Funzione per inviare Update/Aggiunta a Database
-  const onFinish = async (values: any) => {
+  const onFinish = async (
+    values: Record<string, { isEnabled: boolean; price: number | string | undefined }>
+  ) => {
     setSaving(true);
 
-    const plansArray = Object.entries(values)
-      .filter(([_, v]) => (v as { isEnabled: boolean }).isEnabled)
-      .map(([type, v]) => {
-        const planMeta = plans.find(plan => plan.value === type);
-        // Recupera l'id se lo hai nei dettagli caricati, altrimenti null
-        const planId = packagesDetails?.find((p: any) => p.rate === type)?.id ?? null;
-        return {
-          id: planId,
-          name: planMeta?.name,
-          rate: type,
-          isEnabled: (v as { isEnabled: boolean }).isEnabled,
-          price: (v as { price: number }).price,
-        };
-      });
+    // Normalizza: imposta isEnabled a false se undefined
+    plans.forEach(plan => {
+      if (typeof values[plan.value]?.isEnabled === 'undefined') {
+        values[plan.value] = { isEnabled: false, price: undefined };
+      }
+    });
+
+    // Prepara l'array dei piani da inviare
+    const plansArray: PlanRateData[] = plans.map(plan => {
+      const v = values[plan.value] || { isEnabled: false, price: undefined };
+      const planId = planIdMap[plan.value.toLowerCase()] ?? null;
+      let priceValue = v.price;
+      if (typeof priceValue === 'string') {
+        priceValue = priceValue.replace(',', '.');
+        priceValue = priceValue === '' ? 0 : Number(priceValue);
+      }
+      return {
+        id: planId ?? undefined,
+        name: plan.name,
+        rate: plan.value.toUpperCase(), // backend expects uppercase
+        isEnabled: !!v.isEnabled,
+        price:
+          !!v.isEnabled && typeof priceValue === 'number' && !isNaN(priceValue) ? priceValue : 0,
+      };
+    });
 
     try {
       const res = await fetch(
@@ -98,8 +128,6 @@ export const PackagePlans = () => {
         }
       );
       if (res.ok) {
-        const data = await res.json();
-        setPackagesDetails(data);
         setToastMessage({
           type: 'success',
           message: 'Piani aggiornati con successo',
@@ -120,7 +148,6 @@ export const PackagePlans = () => {
       setSaving(false);
     }
   };
-
   return (
     <Form layout="vertical" form={form} onFinish={onFinish}>
       {plans.map(plan => (
@@ -157,6 +184,7 @@ export const PackagePlans = () => {
                     step={0.01}
                     stringMode
                     style={{ width: 120 }}
+                    required
                   />
                 </Form.Item>
                 <Typography.Text type="secondary" style={{ fontSize: 12 }}>
@@ -173,7 +201,7 @@ export const PackagePlans = () => {
               >
                 <Button onClick={() => resetFormValue(plan.value)}>Annulla</Button>
                 <PrimaryButton htmlType="submit" loading={saving}>
-                  Prova
+                  Salva
                 </PrimaryButton>
               </div>
             </Row>
@@ -184,5 +212,3 @@ export const PackagePlans = () => {
     </Form>
   );
 };
-
-// ...

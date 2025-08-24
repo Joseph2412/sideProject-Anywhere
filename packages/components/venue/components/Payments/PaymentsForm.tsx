@@ -7,6 +7,15 @@ import { useVenues } from '@repo/hooks';
 import { useSetAtom } from 'jotai';
 import { messageToast } from '@repo/ui';
 
+interface PaymentsFormValues {
+  companyName: string;
+  address: string;
+  iban: string;
+  bicSwift: string;
+  countryCode: string;
+  currencyCode: string;
+}
+
 export const PaymentsForm = () => {
   // Codici paese supportati per i pagamenti (ISO 3166-1)
   const countryCode = ['IT', 'FR', 'DE', 'ES', 'GBR', 'CHE', 'NLD', 'AT'];
@@ -16,7 +25,7 @@ export const PaymentsForm = () => {
 
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [initialValues, setInitialValues] = useState({}); // Nuovo state per salvare i valori iniziali
+  const [initialValues, setInitialValues] = useState<Partial<PaymentsFormValues>>({}); // Nuovo state per salvare i valori iniziali
   const setMessage = useSetAtom(messageToast);
 
   // useEffect per caricare e popolare i dati di pagamento dal backend
@@ -29,7 +38,7 @@ export const PaymentsForm = () => {
     }
   }, [data, form]);
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: PaymentsFormValues) => {
     setLoading(true);
 
     try {
@@ -216,7 +225,7 @@ export const PaymentsForm = () => {
             >
               Annulla
             </Button>
-            <Button type="primary" htmlType="submit" className={styles.save}>
+            <Button type="primary" htmlType="submit" className={styles.save} loading={loading}>
               Salva
             </Button>
           </Space>

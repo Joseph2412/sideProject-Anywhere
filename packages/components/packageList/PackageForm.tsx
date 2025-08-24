@@ -2,9 +2,6 @@ import Tab from '../tabs/tab';
 import { PackageDetails } from './details/PackageDetails';
 import { PackagePlans } from './plans/PackagePlans';
 import { ImageUpload } from '../imageUpload/imageUpload';
-import React from 'react';
-import { useAtom, useSetAtom } from 'jotai';
-import { packageFormAtom } from '@repo/ui/store/PackageFormStore';
 
 //Componente CONTENITORE PACCHETTI
 //Comprende le tab con le diciture Dettagli,Piani,Immagini
@@ -15,9 +12,6 @@ import { packageFormAtom } from '@repo/ui/store/PackageFormStore';
 //ImageUpload = il componente per il caricamento delle immagini
 
 export const PackageForm = () => {
-  const [details, setDetails] = useAtom(packageFormAtom);
-  const setPackageForm = useSetAtom(packageFormAtom);
-
   const tabs = [
     {
       key: 'details',

@@ -1,7 +1,7 @@
 export const createPackageSchema = {
   body: {
     type: 'object',
-    required: ['name', 'description', 'type'],
+    required: ['name', 'type'],
     properties: {
       name: { type: 'string' },
       description: { type: 'string' },
@@ -11,16 +11,6 @@ export const createPackageSchema = {
       squareMetres: { type: 'number' },
       type: { type: 'string', enum: ['SALA', 'DESK'] },
     },
-    allOf: [
-      {
-        if: { properties: { type: { const: 'DESK' } } },
-        then: { required: ['seats'] },
-      },
-      {
-        if: { properties: { type: { const: 'SALA' } } },
-        then: { required: ['squareMetres', 'capacity'] },
-      },
-    ],
   },
 };
 export const getPackagesDetailsSchema = {
