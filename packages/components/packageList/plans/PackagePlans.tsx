@@ -9,6 +9,9 @@ import { messageToast } from '@repo/ui/store/ToastStore';
 import { PrimaryButton } from './../../buttons/PrimaryButton';
 import type { PlanRateData } from './packagePlans.types';
 import { PlansRate } from './packagePlans.types';
+
+import { useMutation, useQueryClient } from '@tanstack/react-query'; //Serve per lo switch
+
 export const PackagePlans = () => {
   const params = useParams();
   const packageId = params?.id;
@@ -24,6 +27,8 @@ export const PackagePlans = () => {
 
   // Serve il form instance per resettare i valori
   const [form] = Form.useForm();
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages/${packageId}/plans`, {
@@ -63,18 +68,66 @@ export const PackagePlans = () => {
       });
   }, [packageId, form]);
 
+  const updatePlans = useMutation({
+    mutationFn: async (plansToUpdate: PlanRateData[]) => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/api/packages/${packageId}/plans`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(plansToUpdate),
+        }
+      );
+      if (!res.ok) throw new Error('Errore aggiornamento piano');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['packages'] });
+      setToastMessage({
+        type: 'success',
+        message: 'Piano aggiornato con successo',
+        placement: 'bottomRight',
+      });
+    },
+    onError: () => {
+      setToastMessage({
+        type: 'error',
+        message: "Errore durante l'aggiornamento del piano",
+        placement: 'bottomRight',
+      });
+    },
+  });
+
   // Stato di attivazione/disattivazione dei piani (default: tutti disabilitati)
   const [enabledPlan, setEnabledPlan] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(plans.map(plan => [plan.value, false]))
   );
 
-  // Gestione attivazione/disattivazione piano
+  // Gestione attivazione/disattivazione piano + Salvataggio RUNTIME
   const handleTogglePlan = (planValue: string, checked: boolean) => {
     setEnabledPlan(prev => ({
       ...prev,
       [planValue]: checked,
     }));
     form.setFieldsValue({ [planValue]: { ...form.getFieldValue(planValue), isEnabled: checked } });
+
+    if (planIdMap[planValue]) {
+      // Prepara il piano da aggiornare
+      const planData = form.getFieldValue(planValue) || {};
+      const plan = plans.find(p => p.value === planValue);
+      updatePlans.mutate([
+        {
+          id: planIdMap[planValue]!,
+          name: plan?.name ?? '',
+          rate: planValue.toUpperCase(),
+          isEnabled: checked,
+          price: planData.price ?? 0,
+        },
+      ]);
+    }
   };
 
   // Funzione per resettare il valore del prezzo e disabilitare il piano
@@ -99,14 +152,15 @@ export const PackagePlans = () => {
     // Prepara l'array dei piani da inviare
     const plansArray: PlanRateData[] = plans.map(plan => {
       const v = values[plan.value] || { isEnabled: false, price: undefined };
-      const planId = planIdMap[plan.value.toLowerCase()] ?? null;
+      // Se non esiste id, passo undefined (mai null)
+      const planId = planIdMap[plan.value.toLowerCase()];
       let priceValue = v.price;
       if (typeof priceValue === 'string') {
         priceValue = priceValue.replace(',', '.');
         priceValue = priceValue === '' ? 0 : Number(priceValue);
       }
       return {
-        id: planId ?? undefined,
+        id: typeof planId === 'number' ? planId : undefined,
         name: plan.name,
         rate: plan.value.toUpperCase(), // backend expects uppercase
         isEnabled: !!v.isEnabled,
@@ -148,6 +202,7 @@ export const PackagePlans = () => {
       setSaving(false);
     }
   };
+
   return (
     <Form layout="vertical" form={form} onFinish={onFinish}>
       {plans.map(plan => (

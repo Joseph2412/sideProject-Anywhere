@@ -5,6 +5,7 @@ import {
   updatePackagesDetailsHandler,
   createPackageHandler,
   getAllPackagesHandler,
+  deletePackagesHandler,
 } from '../../handlers/packages/packagesDetails';
 
 import {
@@ -45,6 +46,7 @@ export async function packagesDetailsRoutes(fastify: FastifyInstance) {
     { preValidation: fastify.authenticate, schema: updatePackageDetailsSchema },
     updatePackagesDetailsHandler
   );
+  fastify.delete('/packages/:id', { preValidation: fastify.authenticate }, deletePackagesHandler);
 }
 
 //Rotte per I Piani/Tipi di Abbonamento dei Pacchetti

@@ -133,3 +133,9 @@
   outline: none !important;
   color: #000639 !important; /* colore coerente con il tema */
 }
+
+.ant-popconfirm {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  max-height: 216px !important;
+  max-width: 214px !important;
+}

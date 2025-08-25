@@ -46,6 +46,7 @@ export type ClosingPeriod = {
 export type Package = {
   id: number; // Primary key database
   name: string; // Nome del pacchetto
+  isActive: boolean; // Stato attivo/inattivo del pacchetto
   description?: string; // Descrizione estesa (opzionale)
   squareMetres: number; // Metratura spazio
   capacity: number; // Capacità massima persone

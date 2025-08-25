@@ -21,7 +21,7 @@ const server: FastifyInstance = fastify();
 
 server.register(cors, {
   origin: process.env.APP_HOST,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
 
   credentials: true,
 });

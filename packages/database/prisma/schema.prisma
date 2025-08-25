@@ -84,6 +84,7 @@ model Package {
   squareMetres     Int?
   capacity         Int?
   seats            Int?
+  isActive         Boolean         @default(true)
   services         String[]
   type             typeCoworking //Può essere 1 di questi 2 typeCoworking
   plans            PackagePlan[] //Un pacchetto può avere + Piani = Orario, Giornaliero, Settimanale, Mensile ed Annuale
@@ -102,7 +103,7 @@ model PackagePlan {
   rate      PlansRate
   price     Decimal @db.Decimal(10, 2) //Prezzo del piano
   isEnabled Boolean   @default(false)
-  package   Package   @relation(fields: [packageId], references: [id])
+  package   Package   @relation(fields: [packageId], references: [id], onDelete: Cascade)
   packageId Int
 
   @@index([packageId, isEnabled])

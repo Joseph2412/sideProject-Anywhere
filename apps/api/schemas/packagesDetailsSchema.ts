@@ -10,6 +10,7 @@ export const createPackageSchema = {
       services: { type: 'array', items: { type: 'string' } },
       squareMetres: { type: 'number' },
       type: { type: 'string', enum: ['SALA', 'DESK'] },
+      isActive: { type: 'boolean' },
     },
   },
 };
@@ -57,6 +58,7 @@ export const updatePackageDetailsSchema = {
         enum: ['SALA', 'DESK'],
       },
       seats: { type: 'number' },
+      isActive: { type: 'boolean' },
     },
   },
 };

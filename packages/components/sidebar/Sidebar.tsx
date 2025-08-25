@@ -27,7 +27,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
   // Ordina prima per tipologia (DESK prima di SALA), poi per id crescente
   const sortedPackages = [...packages].sort((a, b) => {
     if (a.type === b.type) return a.id - b.id;
-    if (a.type === 'DESK') return -1;
+    if (a.type === 'SALA') return -1;
     if (b.type === 'DESK') return 1;
     return 0;
   });
