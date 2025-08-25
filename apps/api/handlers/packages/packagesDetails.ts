@@ -58,7 +58,10 @@ export const createPackageHandler = async (request: FastifyRequest, reply: Fasti
   return reply.status(201).send({ ...newPackage, plans });
 };
 
-export const getPackagesDetailsHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+export const getPackagesDetailsHandler: (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => Promise<any> = async (request: FastifyRequest, reply: FastifyReply) => {
   const { id } = request.params as { id: string };
 
   const packageDetails = await prisma.package.findUnique({
@@ -78,10 +81,10 @@ export const getPackagesDetailsHandler = async (request: FastifyRequest, reply: 
   return { ...packageDetails, plans };
 };
 
-export const updatePackagesDetailsHandler = async (
+export const updatePackagesDetailsHandler: (
   request: FastifyRequest,
   reply: FastifyReply
-) => {
+) => Promise<any> = async (request: FastifyRequest, reply: FastifyReply) => {
   const { id } = request.params as { id: string };
   const {
     name,
