@@ -131,7 +131,6 @@ export const PreferencesForm = () => {
       <Card style={{ borderRadius: 8 }} styles={{ body: { padding: 20 } }}>
         {NotificationGroups.map((group, index) => (
           <div key={group.title}>
-            {/* Titolo gruppo */}
             <Row justify="space-between" align="middle" style={{ marginBottom: 8 }}>
               <Col>
                 <Typography.Text strong>{group.title}</Typography.Text>
@@ -160,7 +159,6 @@ export const PreferencesForm = () => {
               </Col>
             </Row>
 
-            {/* Lista notifiche */}
             {group.items.map(key => {
               const label = NotificationItems.find(item => item.key === key)?.label || key;
               return (
@@ -192,7 +190,6 @@ export const PreferencesForm = () => {
               );
             })}
 
-            {/* Divider tra gruppi */}
             {index < NotificationGroups.length - 1 && (
               <Divider style={{ marginTop: 24, marginBottom: 24 }} />
             )}

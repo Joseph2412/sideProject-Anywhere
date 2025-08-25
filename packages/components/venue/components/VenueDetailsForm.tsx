@@ -9,9 +9,11 @@ import { useState } from 'react';
 import { useVenues } from '@repo/hooks';
 
 // Jotai e store
-import { useAtomValue, useAtom, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { messageToast } from '@repo/ui/store/LayoutStore';
 import { PrimaryButton } from './../../buttons/PrimaryButton';
+
+import type { VenueDetails } from '@repo/ui/store/LayoutStore';
 
 export const VenueDetailsForm = () => {
   const [form] = Form.useForm();
@@ -20,7 +22,7 @@ export const VenueDetailsForm = () => {
   const availableServices = ['WiFi', 'Stampante', 'Caffè', 'Reception', 'Parcheggio'];
 
   const [loading, setLoading] = useState(false); // Stato loading
-  const [venueDetails, setVenueDetails] = useState<any>({});
+  const [venueDetails, setVenueDetails] = useState<VenueDetails | null>(null);
   const { data, isLoading } = useVenues();
 
   const setMessage = useSetAtom(messageToast);

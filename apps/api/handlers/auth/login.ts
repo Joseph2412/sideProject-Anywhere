@@ -35,7 +35,8 @@ export const loginHandler = async (request: FastifyRequest, reply: FastifyReply)
       token,
       user: {
         id: user.id,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
         role: user.role,
       },

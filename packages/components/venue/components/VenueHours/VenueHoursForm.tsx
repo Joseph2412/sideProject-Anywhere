@@ -27,7 +27,7 @@ export const VenueHoursForm: React.FC = () => {
     if (data && data.openingDays) {
       const formattedData = weekDays.reduce(
         (acc, day) => {
-          const foundDay = data.openingDays?.find((hour: any) => hour.day === day.value);
+          const foundDay = data.openingDays?.find((hour: OpeningDayData) => hour.day === day.value);
           acc[day.value] = {
             day: day.value,
             isClosed: foundDay?.isClosed ?? true,

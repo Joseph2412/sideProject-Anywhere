@@ -9,7 +9,3 @@ export type TabKey =
   | 'profilo' // Profilo utente
   | 'preferenze' // Notifiche e preferenze
   | 'pacchetti'; // Lista pacchetti
-
-// ...atom rimosso: ora il titolo header si ricava dalla route
-
-// ...atom rimosso: ora la tab attiva si ricava dalla route

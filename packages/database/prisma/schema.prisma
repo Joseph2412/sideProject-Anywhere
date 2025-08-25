@@ -79,13 +79,15 @@ model OpenDays {
 
 model Package {
   id               Int             @id @default(autoincrement())
-  title            String          @db.VarChar(200)
+  name             String          @db.VarChar(200)
   description      String?         @db.VarChar(200)
-  squareMetres     Int
-  capacity         Int
+  squareMetres     Int?
+  capacity         Int?
+  seats            Int?
+  isActive         Boolean         @default(true)
   services         String[]
-  type             typeCoworking //Può essere 1 di questi 3 typeCoworking
-  plans            Plan[] //Un pacchetto può avere + Piani = Orario, Giornaliero, Settimanale, Mensile ed Annuale
+  type             typeCoworking //Può essere 1 di questi 2 typeCoworking
+  plans            PackagePlan[] //Un pacchetto può avere + Piani = Orario, Giornaliero, Settimanale, Mensile ed Annuale
   photos           String[] //Array di URLs S3
   venue           Venue? @relation(fields: [venueId], references: [id])
   venueId       Int?
@@ -95,13 +97,13 @@ model Package {
   @@index([capacity])
 }
 
-model Plan {
+model PackagePlan {
   id        Int       @id @default(autoincrement())
   name      String
   rate      PlansRate
-  price     Int
+  price     Decimal @db.Decimal(10, 2) //Prezzo del piano
   isEnabled Boolean   @default(false)
-  package   Package   @relation(fields: [packageId], references: [id])
+  package   Package   @relation(fields: [packageId], references: [id], onDelete: Cascade)
   packageId Int
 
   @@index([packageId, isEnabled])

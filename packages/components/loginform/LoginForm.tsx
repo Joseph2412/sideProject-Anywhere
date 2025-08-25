@@ -314,25 +314,17 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
   // RENDERING - STRUTTURA VISUALE DEL COMPONENTE
   return (
     <>
-      {/* CONTAINER PRINCIPALE - Centrato e responsive */}
       <div className={styles.container}>
-        {/* CARD - Superficie elevata con bordi arrotondati per il form */}
         <div className={styles.card}>
-          {/* LOGO AZIENDALE - Branding e identità visuale */}
           <img src="/logo.svg" alt="Nibol" className={styles.logo} />
 
-          {/* DIVIDER - Separatore visuale tra logo e contenuto */}
           <Divider />
 
-          {/* TITOLO - Messaggio chiaro dell'azione richiesta */}
           <div className={styles.title}>
             <b>Accedi per gestire il tuo locale su Nibol</b>
           </div>
 
-          {/* FORM COMPONENT - Wrapper Ant Design per validazione automatica */}
-          {/* layout="vertical" = label sopra input (più leggibile su mobile) */}
           <Form form={form} layout="vertical" style={{ width: '100%' }}>
-            {/* INPUT EMAIL - Campo per identificazione utente */}
             <NibolInput
               validateTrigger="onSubmit" // Valida solo al submit, non ad ogni keystroke
               label="Email"
@@ -348,7 +340,6 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
               ]}
             />
 
-            {/* INPUT PASSWORD - Campo per autenticazione */}
             <NibolInput
               validateTrigger="onSubmit"
               label="Password"
@@ -360,9 +351,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
               password // Prop custom per mostrare/nascondere password
             />
 
-            {/* FORM ACTIONS - Bottoni e opzioni alternative */}
             <Form.Item style={{ marginBottom: 12 }}>
-              {/* BOTTONE LOGIN PRINCIPALE */}
               <PrimaryButton
                 loading={loading} // Spinner durante API call
                 disabled={loading} // Previene doppi click
@@ -371,7 +360,6 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
                 text="Continua"
               />
 
-              {/* SEPARATORE "OR" - Divide opzioni login */}
               <Divider
                 plain // Stile semplice senza bordi
                 className={styles.orDivider}
@@ -380,7 +368,6 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
                 OR
               </Divider>
 
-              {/* GOOGLE LOGIN - Autenticazione alternativa OAuth */}
               <GoogleLoginButton
                 className={styles.googleButton}
                 disabled={loading} // Consistenza con bottone principale
@@ -389,7 +376,6 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
           </Form>
         </div>
 
-        {/* LINK AGGIUNTIVI - Azioni secondarie fuori dal form principale */}
         <div
           style={{
             marginTop: '8px',
@@ -399,7 +385,6 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
             gap: '0px', // Nessuno spazio tra bottoni per design compatto
           }}
         >
-          {/* LINK REGISTRAZIONE - Per nuovi utenti */}
           <Button
             type="text" // Stile link, non bottone pieno
             onClick={onGoToSignup} // Callback per navigazione
@@ -409,7 +394,6 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
             Non hai un account? Registrati
           </Button>
 
-          {/* LINK RESET PASSWORD - Per recupero account */}
           <Button
             type="text"
             onClick={handleResetPassword} // Handler reset password

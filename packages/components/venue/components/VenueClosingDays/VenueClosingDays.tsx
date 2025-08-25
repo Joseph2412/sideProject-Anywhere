@@ -19,6 +19,9 @@ import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
 import { messageToast } from '@repo/ui/store/ToastStore';
 
+import type { FormListFieldData } from 'antd/es/form/FormList';
+import { FormInstance } from 'antd/lib';
+
 // Tipi per periodi di chiusura e festività
 
 type ClosingPeriod = {
@@ -26,6 +29,12 @@ type ClosingPeriod = {
   dates?: [Dayjs, Dayjs];
   singleDate?: Dayjs;
   isRange?: boolean;
+};
+
+type ClosingPeriodRaw = {
+  id?: number;
+  start: string;
+  end: string;
 };
 
 type FormValues = {
@@ -41,7 +50,7 @@ type Holiday = {
 
 // Hook per gestire il toggle tra singolo giorno e range giorni
 const useDatePickerToggle = (
-  form: any,
+  form: FormInstance<FormValues>,
   fieldName: (string | number)[],
   initialIsRange: boolean
 ) => {
@@ -49,11 +58,11 @@ const useDatePickerToggle = (
   const handleSwitchChange = (checked: boolean) => {
     setIsRange(checked);
     if (checked) {
-      form.setFieldValue([...fieldName, 'singleDate'], undefined);
-      form.setFieldValue([...fieldName, 'isRange'], true);
+      form.setFieldsValue({ [fieldName.concat('singleDate').join('.')]: undefined });
+      form.setFieldsValue({ [fieldName.concat('isRange').join('.')]: true });
     } else {
-      form.setFieldValue([...fieldName, 'dates'], undefined);
-      form.setFieldValue([...fieldName, 'isRange'], false);
+      form.setFieldsValue({ [fieldName.concat('dates').join('.')]: undefined });
+      form.setFieldsValue({ [fieldName.concat('isRange').join('.')]: false });
     }
   };
   return { isRange, handleSwitchChange };
@@ -75,20 +84,24 @@ const COUNTRIES = [
 
 export const VenueClosingDays: React.FC = () => {
   const [originalPeriods, setOriginalPeriods] = useState<ClosingPeriod[]>([]);
+
   const [form] = Form.useForm<FormValues>();
   const { RangePicker } = DatePicker;
+
   const addRef = useRef<((payload?: ClosingPeriod) => void) | null>(null);
+
   // Stati per il modal di importazione festività
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string>('IT');
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [loadingHolidays, setLoadingHolidays] = useState(false);
+
   // Hook per impostare i messaggi toast
   const setMessageToast = useSetAtom(messageToast);
   const { data, isLoading } = useVenueClosingPeriods();
   useEffect(() => {
     if (data && data.closingPeriods) {
-      const formatted = data.closingPeriods.map((p: any) => {
+      const formatted = (data.closingPeriods as ClosingPeriodRaw[]).map(p => {
         const startDate = dayjs(p.start);
         const endDate = dayjs(p.end);
         const isSameDay = startDate.isSame(endDate, 'day');
@@ -108,7 +121,7 @@ export const VenueClosingDays: React.FC = () => {
   // Componente per ogni periodo
   const PeriodRow: React.FC<{
     name: number;
-    restField: any;
+    restField: FormListFieldData;
     remove: (name: number) => void;
   }> = ({ name, restField, remove }) => {
     // Ottieni il valore isRange dal form per questo campo specifico
@@ -301,7 +314,7 @@ export const VenueClosingDays: React.FC = () => {
 
       if (updatedResponse.ok) {
         const updatedData = await updatedResponse.json();
-        const formatted = updatedData.closingPeriods.map((p: any) => {
+        const formatted = (updatedData.closingPeriods as ClosingPeriodRaw[]).map(p => {
           const startDate = dayjs(p.start);
           const endDate = dayjs(p.end);
           const isSameDay = startDate.isSame(endDate, 'day');
@@ -319,6 +332,7 @@ export const VenueClosingDays: React.FC = () => {
         setOriginalPeriods(formatted);
       }
     } catch (err) {
+      console.error('Errore durante il salvataggio:', err);
       setMessageToast({
         type: 'error',
         message: 'Errore',
@@ -360,8 +374,13 @@ export const VenueClosingDays: React.FC = () => {
                 addRef.current = add;
                 return (
                   <div>
-                    {fields.map(({ key, name, ...restField }) => (
-                      <PeriodRow key={key} name={name} restField={restField} remove={remove} />
+                    {fields.map(field => (
+                      <PeriodRow
+                        key={field.key}
+                        name={field.name}
+                        restField={field}
+                        remove={remove}
+                      />
                     ))}
                   </div>
                 );

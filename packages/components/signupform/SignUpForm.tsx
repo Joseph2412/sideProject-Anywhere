@@ -191,11 +191,9 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        {/* BRANDING - Logo aziendale per identità visuale */}
         <img src="/logo.svg" alt="Nibol" className={styles.logo} />
         <Divider />
 
-        {/* TITOLO - Messaggio chiaro dell'azione (registrazione per gestori) */}
         <div className={styles.title}>
           <b>
             Crea un nuovo account
@@ -204,17 +202,13 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
           </b>
         </div>
 
-        {/* FORM PRINCIPALE - onFinish si attiva al submit del form */}
-        {/* Ant Design gestisce automaticamente prevent default e validazione */}
         <Form
           form={form}
           layout="vertical"
           style={{ width: '100%' }}
           onFinish={handleSubmit} // Chiamato solo se validazione passa
         >
-          {/* SEZIONE NOME/COGNOME - Layout a due colonne per ottimizzazione spazio */}
           <div className={styles.doubleInput}>
-            {/* INPUT NOME */}
             <NibolInput
               label="Nome"
               name="firstName" // Nome campo nel form object
@@ -223,7 +217,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
               rules={[{ required: true, message: 'Inserisci il nome' }]}
               hideAsterisk={true} // Design pulito senza asterisco rosso
             />
-            {/* INPUT COGNOME */}
+
             <NibolInput
               label="Cognome"
               name="lastName"
@@ -234,7 +228,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
             />
           </div>
 
-          {/* INPUT EMAIL - Con validazione formato automatica */}
           <NibolInput
             label="Email"
             name="email"
@@ -247,7 +240,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
             hideAsterisk={true}
           />
 
-          {/* INPUT PASSWORD - Con validazione complessa custom */}
           <NibolInput
             label="Password"
             name="password"
@@ -271,12 +263,10 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
             ]}
           />
 
-          {/* HINT PASSWORD - Guida utente per requisiti */}
           <div className={styles.passwordNote}>
             Almeno 8 caratteri, 1 maiuscola, 1 simbolo e 1 numero.
           </div>
 
-          {/* CHECKBOX TERMINI - Campo obbligatorio con link legali */}
           <Form.Item
             name="terms"
             valuePropName="checked" // Ant Design: usa 'checked' invece di 'value' per checkbox
@@ -300,7 +290,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
             </Checkbox>
           </Form.Item>
 
-          {/* BOTTONE SUBMIT - Trigger del form con loading state */}
           <Form.Item>
             <PrimaryButton
               text="Crea account"
@@ -312,16 +301,13 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
           </Form.Item>
         </Form>
 
-        {/* SEPARATORE "OR" per opzioni alternative */}
         <Divider plain className={styles.orDivider}>
           OR
         </Divider>
 
-        {/* GOOGLE SIGNUP - Registrazione OAuth alternativa */}
         <GoogleLoginButton style={{ height: 32, width: 380 }} />
       </div>
 
-      {/* LINK LOGIN - Per utenti che hanno già account */}
       <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
         <Button
           type="text" // Stile link

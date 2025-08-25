@@ -23,7 +23,7 @@ export const NibolInput: React.FC<NibolInputProps> = ({
   hideAsterisk = false,
   ...rest
 }) => {
-  const { ref, ...safeRest } = rest as any;
+  const { ...safeRest } = rest;
 
   //forse necessita miglioria....
   return (

@@ -24,7 +24,7 @@ export type ClosingPeriod = {
  *
  * STRUTTURA DATI:
  * @param id - Identificativo unico del pacchetto nel database
- * @param title - Nome del pacchetto (es. "Postazione singola", "Sala riunioni")
+ * @param name - Nome del pacchetto (es. "Postazione singola", "Sala riunioni")
  * @param description - Descrizione dettagliata opzionale
  * @param squareMetres - Metratura dello spazio in metri quadri
  * @param capacity - Numero massimo di persone che può ospitare
@@ -45,7 +45,8 @@ export type ClosingPeriod = {
  */
 export type Package = {
   id: number; // Primary key database
-  title: string; // Nome del pacchetto
+  name: string; // Nome del pacchetto
+  isActive: boolean; // Stato attivo/inattivo del pacchetto
   description?: string; // Descrizione estesa (opzionale)
   squareMetres: number; // Metratura spazio
   capacity: number; // Capacità massima persone
