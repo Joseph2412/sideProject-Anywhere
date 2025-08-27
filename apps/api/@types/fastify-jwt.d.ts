@@ -26,5 +26,13 @@ declare module '@fastify/jwt' {
 declare module 'fastify' {
   interface FastifyInstance {
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+    s3: {
+      uploadFile: (bucket: string, file: any, key: string, mimetype: string) => Promise<string>;
+      deleteFile: (bucket: string, key: string) => Promise<void>;
+      getSignedUrl: (bucket: string, key: string) => Promise<string>;
+    };
+  }
+  interface FastifyRequest {
+    s3: FastifyInstance['s3'];
   }
 }

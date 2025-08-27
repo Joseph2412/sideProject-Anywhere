@@ -18,7 +18,7 @@ import {
   venuePayments,
 } from './routes/venues/venues';
 import { packagesRoutes } from './routes/packages/packagesRoutes';
-import { imagesRoutes } from 'routes/images/images';
+import { imagesRoutes } from './routes/images/images';
 
 //Ricorda di importare prisma in ogni handler senza istanziarlo sempre
 

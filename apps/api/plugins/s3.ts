@@ -8,7 +8,7 @@ import { FastifyInstance, FastifyPluginAsync, FastifyPluginOptions } from 'fasti
 import fastifyPlugin from 'fastify-plugin';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-const FASTIFY_VERSION = '5.4.0';
+const FASTIFY_VERSION = '5.5.0';
 
 export class S3Service {
   // private s3: S3;
@@ -55,6 +55,7 @@ export class S3Service {
       });
     } catch (err) {
       this.instance.log.error(err);
+      throw new Error('Error uploading file to S3');
     }
   };
 
@@ -64,11 +65,6 @@ export class S3Service {
   }
 }
 
-//
-//  * S3 bucket service plugin
-//  * @param {FastifyInstance} instance
-//  * @param {FastifyPluginOptions} options
-//
 const plugin: FastifyPluginAsync = async (
   instance: FastifyInstance,
   _options: FastifyPluginOptions

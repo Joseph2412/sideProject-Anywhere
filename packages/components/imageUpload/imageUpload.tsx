@@ -1,67 +1,65 @@
 import React, { useState } from 'react';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { Card, message, Upload } from 'antd';
-import type { GetProp, UploadProps } from 'antd';
+import { Card, Upload } from 'antd';
+import type { GetProp, UploadProps, UploadFile } from 'antd';
 import styles from './imageUpload.module.css';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { authUserAtom } from '@repo/ui';
+import { useParams } from 'next/navigation';
+import { messageToast } from '@repo/ui/store/ToastStore';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
-/**
- * Converte file immagine in base64 per preview
- * Utilizza FileReader API per conversione asincrona
- * @param img - File immagine da convertire
- * @param callback - Funzione chiamata con il risultato base64
- */
-const getBase64 = (img: FileType, callback: (url: string) => void) => {
-  const reader = new FileReader();
-  reader.addEventListener('load', () => callback(reader.result as string));
-  reader.readAsDataURL(img);
-};
-
-/**
- * Validazione pre-upload per file immagini
- * Pattern: validazione client-side per UX immediata
- * Controlli: formato (JPG/PNG) e dimensione (max 2MB)
- * @param file - File da validare
- * @returns boolean - true se il file passa la validazione
- */
 const beforeUpload = (file: FileType) => {
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
   if (!isJpgOrPng) {
-    message.error('You can only upload JPG/PNG file!');
+    console.log('Formato non valido:', file.type);
   }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    message.error('Image must smaller than 2MB!');
+  const isLt1GB = file.size / 1024 / 1024 < 1024;
+  if (!isLt1GB) {
+    console.log('File troppo grande:', file.size);
   }
-  return isJpgOrPng && isLt2M;
+  return isJpgOrPng && isLt1GB;
 };
 
-/**
- * Componente per upload multiplo di immagini venue
- * Pattern: gestione stati upload + preview con base64
- * Features: validazione client, loading states, preview immediato
- * Limite: max 12 immagini per venue
- */
+const UPLOAD_ENDPOINT = `${process.env.NEXT_PUBLIC_API_HOST}/media/images`;
+
 export const ImageUpload: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string>();
+  const [fileList, setFileList] = useState<UploadFile<string>[]>([]);
+  const authUser = useAtomValue(authUserAtom);
+  const userId = authUser?.id;
+  const setToast = useSetAtom(messageToast);
 
-  /**
-   * Gestisce i cambi di stato durante l'upload
-   * Pattern: switch su status per gestire stati diversi di upload
-   */
+  const params = useParams();
+  const packageId = params.packageId ? Number(params.packageId) : undefined;
+
   const handleChange: UploadProps['onChange'] = info => {
-    if (info.file.status === 'uploading') {
-      setLoading(true);
-      return;
-    }
+    console.log('Upload info:', info);
+
+    setLoading(info.file.status === 'uploading');
+    setFileList(info.fileList.slice(-12)); // Limita a 12 immagini
+
     if (info.file.status === 'done') {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj as FileType, url => {
-        setLoading(false);
-        setImageUrl(url);
+      setLoading(false);
+      setToast({
+        type: 'success',
+        message: 'Upload completato!',
+        description: `L'immagine "${info.file.name}" è stata caricata con successo su S3.`,
+        duration: 4,
+        placement: 'bottomRight',
       });
+      console.log('Upload success:', info.file.response);
+    } else if (info.file.status === 'error') {
+      setLoading(false);
+      setToast({
+        type: 'error',
+        message: 'Errore upload',
+        description: `Errore durante l'upload di "${info.file.name}".`,
+        duration: 4,
+        placement: 'bottomRight',
+      });
+      console.error('Upload error:', info.file.error);
     }
   };
 
@@ -77,14 +75,24 @@ export const ImageUpload: React.FC = () => {
       <Upload
         maxCount={12}
         className={styles.upload207}
-        name="venuePhotos"
+        name="galleryPhotos"
         listType="picture-card"
-        showUploadList={false}
-        action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+        showUploadList
+        action={UPLOAD_ENDPOINT}
+        headers={{
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        }}
         beforeUpload={beforeUpload}
         onChange={handleChange}
+        data={file => ({
+          type: 'gallery',
+          id: packageId ?? userId,
+          filename: file.name,
+        })}
+        fileList={fileList}
+        multiple
       >
-        {imageUrl ? <img src={imageUrl} alt="venuePhoto" /> : uploadButton}
+        {fileList.length >= 12 ? null : uploadButton}
       </Upload>
     </Card>
   );
