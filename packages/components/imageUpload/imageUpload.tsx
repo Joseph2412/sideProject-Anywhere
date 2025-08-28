@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { Card, Upload } from 'antd';
 import type { GetProp, UploadProps, UploadFile } from 'antd';
 import styles from './imageUpload.module.css';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { authUserAtom } from '@repo/ui';
+import { useSetAtom } from 'jotai';
 import { useParams } from 'next/navigation';
 import { messageToast } from '@repo/ui/store/ToastStore';
+import { usePathname } from 'next/navigation';
+import { useVenues } from '@repo/hooks';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -22,21 +23,35 @@ const beforeUpload = (file: FileType) => {
   return isJpgOrPng && isLt1GB;
 };
 
-const UPLOAD_ENDPOINT = `${process.env.NEXT_PUBLIC_API_HOST}/media/images`;
+const UPLOAD_ENDPOINT = `${process.env.NEXT_PUBLIC_API_HOST}/media/upload`;
 
 export const ImageUpload: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState<UploadFile<string>[]>([]);
-  const authUser = useAtomValue(authUserAtom);
-  const userId = authUser?.id;
+
+  const { data } = useVenues();
+  const venueId = data?.venue?.id;
+
   const setToast = useSetAtom(messageToast);
 
+  const pathname = usePathname();
   const params = useParams();
-  const packageId = params.packageId ? Number(params.packageId) : undefined;
+
+  let id: number | undefined;
+
+  if (pathname.startsWith('/packages/')) {
+    id = params.packageId ? Number(params.packageId) : undefined;
+  } else if (pathname.startsWith('/venue')) {
+    id = venueId;
+  }
+
+  // Logga il valore di id che verrà inviato e altre variabili utili per debug
+  console.log('venueDetails:', data?.venue);
+  console.log('ID inviato per upload:', id);
+  console.log('pathname:', pathname);
+  console.log('params:', params);
 
   const handleChange: UploadProps['onChange'] = info => {
-    console.log('Upload info:', info);
-
     setLoading(info.file.status === 'uploading');
     setFileList(info.fileList.slice(-12)); // Limita a 12 immagini
 
@@ -63,6 +78,35 @@ export const ImageUpload: React.FC = () => {
     }
   };
 
+  // const handleRemove = (file: UploadFile<string>) => {};
+  //TODO: Devi implementare funzione per Cancellare la Singola Foto
+  //Cancello la foto a DB o comando su S3? Don't Know
+
+  useEffect(() => {
+    async function fetchGallery() {
+      if (!venueId || !data?.venue?.photos) return;
+      const files = await Promise.all(
+        data.venue.photos.map(async (key: string) => {
+          // Estrai filename dalla chiave (es: "gallery/12/filename.jpg")
+          const filename = key.split('/').pop();
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_HOST}/media/get?type=gallery&id=${venueId}&filename=${filename}`,
+            { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+          );
+          const { url } = await res.json();
+          return {
+            uid: key,
+            name: filename,
+            status: 'done',
+            url,
+          };
+        })
+      );
+      setFileList(files);
+    }
+    fetchGallery();
+  }, [venueId, data?.venue?.photos]);
+
   const uploadButton = (
     <button style={{ border: 0, background: 'none' }} type="button">
       {loading ? <LoadingOutlined /> : <PlusOutlined />}
@@ -75,7 +119,7 @@ export const ImageUpload: React.FC = () => {
       <Upload
         maxCount={12}
         className={styles.upload207}
-        name="galleryPhotos"
+        name="file"
         listType="picture-card"
         showUploadList
         action={UPLOAD_ENDPOINT}
@@ -84,9 +128,10 @@ export const ImageUpload: React.FC = () => {
         }}
         beforeUpload={beforeUpload}
         onChange={handleChange}
+        //disabled={!id} serve per testare se passi l'Id. Si abilita se presente
         data={file => ({
           type: 'gallery',
-          id: packageId ?? userId,
+          id,
           filename: file.name,
         })}
         fileList={fileList}

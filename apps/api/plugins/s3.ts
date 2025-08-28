@@ -33,6 +33,7 @@ export class S3Service {
   };
 
   public uploadFile = async (bucket: string, file: any, fileName: string, type: string) => {
+    console.log('UPLOAD FILE CALLED'); // LOG DI TEST
     try {
       const params = {
         Bucket: bucket,
@@ -40,6 +41,7 @@ export class S3Service {
         Body: file,
         ContentType: type,
       };
+      console.log('S3 upload params:', params); // LOG DETTAGLIATO
       //put to s3 bucket
       const putCommand = new PutObjectCommand(params);
       await this.client.send(putCommand);
@@ -54,6 +56,7 @@ export class S3Service {
         expiresIn: this.expirationSignedUrl,
       });
     } catch (err) {
+      console.error('S3 upload error:', err); // LOG ERRORE ORIGINALE
       this.instance.log.error(err);
       throw new Error('Error uploading file to S3');
     }
@@ -72,6 +75,10 @@ const plugin: FastifyPluginAsync = async (
   const s3: S3Service = new S3Service(instance);
 
   instance.decorate('s3', s3);
+  instance.addHook('onRequest', (request, _reply, done) => {
+    request.s3 = s3;
+    done();
+  });
 };
 
 /**

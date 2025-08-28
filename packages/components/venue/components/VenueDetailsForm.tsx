@@ -23,6 +23,7 @@ export const VenueDetailsForm = () => {
 
   const [loading, setLoading] = useState(false); // Stato loading
   const [venueDetails, setVenueDetails] = useState<VenueDetails | null>(null);
+
   const { data, isLoading } = useVenues();
 
   const setMessage = useSetAtom(messageToast);

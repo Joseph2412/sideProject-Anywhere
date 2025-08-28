@@ -98,37 +98,3 @@ export type VenueDetails = {
   closingPeriods: ClosingPeriod[]; // Chiusure straordinarie
   packages: Package[]; // Pacchetti/servizi offerti
 };
-
-/**
- * ATOM PERSISTENTE: venueAtom
- *
- * Atom principale che contiene tutti i dati della venue gestita dall'host.
- * Utilizza atomWithStorage per persistenza offline nel localStorage.
- *
- * PERSISTENZA:
- * - Chiave localStorage: 'venueDetails'
- * - Dati sopravvivono al reload/chiusura browser
- * - Permette lavoro offline e sync successiva
- *
- * CICLO DI VITA:
- * 1. Iniziale: null (nessuna venue caricata)
- * 2. Dopo login: caricamento dati venue da API
- * 3. Durante editing: aggiornamenti parziali via form
- * 4. Dopo save: sincronizzazione con database
- * 5. Al logout: reset a null
- *
- * UTILIZZO:
- * - Form components: lettura/scrittura sezioni specifiche
- * - Layout: display nome venue in header/sidebar
- * - Business logic: calcoli su orari, disponibilità, pricing
- *
- * TIPO: VenueDetails | null
- * - null = nessuna venue caricata o utente non host
- * - VenueDetails = dati completi venue caricati
- *
- * NOTA TECNICA:
- * Questo è un "super-atom" che contiene molti dati correlati.
- * In applicazioni più grandi si potrebbe considerare di dividere
- * in atom separati per performance, ma per questa scala è ottimale.
- */
-// ...atom rimosso: ora la venue è gestita da TanStack Query

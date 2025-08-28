@@ -1,90 +1,80 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { prisma } from './../../libs/prisma';
 
 import { generateS3Key } from './../../utils/generateS3Key';
-import { MultipartFile } from '@fastify/multipart';
 
 type UploadImageBody = {
-  type: 'host' | 'venue' | 'package';
+  type: 'avatar' | 'logo' | 'gallery';
   id: string | number;
   filename: string;
-  photoType: 'avatar' | 'logo' | 'gallery';
 };
 
 export const imagesHandler = {
   upload: async (request: FastifyRequest, reply: FastifyReply) => {
-    const { type, id, filename, photoType } = request.body as UploadImageBody;
+    console.log('BODY: ', request.body);
+    const { type, id, filename, file } = request.body as Record<string, any>;
 
-    //Estrazione file da tipop di richeista
-    let file: MultipartFile | undefined;
-
-    switch (true) {
-      case typeof request.file === 'object':
-        file = request.file;
-        break;
-
-      case typeof request.files === 'function':
-        for await (const part of request.parts()) {
-          if (part.type === 'file') {
-            file = part;
-            break;
-          }
-        }
-        break;
-      default:
-        reply.status(400).send({ error: 'Invalid file upload' });
-    }
-    if (!file) {
-      return reply.status(400).send({ error: 'File is required' });
+    if (!type || !id || !filename || !file) {
+      return reply.status(400).send({ error: 'Missing type, id, filename or file' });
     }
 
-    const s3Key = generateS3Key({
-      type,
-      id,
-      filename,
-    });
+    // Estrai i valori reali dai campi multipart
+    const typeValue = type.value ?? type;
+    const idValue = id.value ?? id;
+    const filenameValue = filename.value ?? filename;
 
-    // Upload file to S3
-    const signedUrl = await request.s3.uploadFile('your-bucket-name', file, s3Key, file.mimetype);
+    const s3Key = generateS3Key({ type: typeValue, id: idValue, filename: filenameValue });
+    const fileBuffer = await file.toBuffer(); // stream
+    const signedUrl = await request.s3.uploadFile(
+      'nibol-anywhere',
+      fileBuffer,
+      s3Key,
+      file.mimetype
+    );
+
+    if (typeValue === 'gallery') {
+      await prisma.venue.update({
+        where: { id: Number(idValue) },
+        data: {
+          photos: {
+            push: s3Key, // oppure push: signedUrl....Dubbio Amletico. Pugia tu che dici?
+          },
+        },
+      });
+    }
 
     return reply.send({ url: signedUrl });
   },
 
   delete: async (request: FastifyRequest, reply: FastifyReply) => {
-    const { type, id, filename } = request.query as {
-      type: 'host' | 'venue' | 'package';
-      id: string;
-      filename: string;
-    };
+    const { type, id, filename } = request.query as any;
 
-    if (!type || !id || !filename) {
+    // Estrai i valori reali se presenti
+    const typeValue = type?.value ?? type;
+    const idValue = id?.value ?? id;
+    const filenameValue = filename?.value ?? filename;
+
+    if (!typeValue || !idValue || !filenameValue) {
       return reply.status(400).send({ error: 'Missing type, id or filename' });
     }
 
-    const key = `${type}/${id}/${filename}`;
-    const { S3_BUCKET } = process.env;
+    const key = `${typeValue}/${idValue}/${filenameValue}`;
+    const { S3_REPORTS_BUCKET } = process.env;
 
     // Cancella il file da S3
-    await request.s3.deleteFile(S3_BUCKET!, key);
+    await request.s3.deleteFile(S3_REPORTS_BUCKET!, key);
 
     return { success: true };
   },
 
   get: async (request: FastifyRequest, reply: FastifyReply) => {
-    const { type, id, filename } = request.query as {
-      type: 'host' | 'venue' | 'package';
-      id: string;
-      filename: string;
-    };
-
-    if (!type || !id || !filename) {
-      return reply.status(400).send({ error: 'Missing type, id or filename' });
+    const { key } = request.query as any;
+    if (!key) {
+      return reply.status(400).send({ error: 'Missing key' });
     }
-
-    const key = `${type}/${id}/${filename}`;
-    const { S3_BUCKET } = process.env;
-
-    // Ottieni la signed URL
-    const url = await request.s3.getSignedUrl(S3_BUCKET!, key);
+    console.log('S3 GET key:', key);
+    const { S3_REPORTS_BUCKET } = process.env;
+    const url = await request.s3.getSignedUrl(S3_REPORTS_BUCKET!, key);
     return { url };
   },
 };

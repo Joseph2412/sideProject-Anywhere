@@ -19,6 +19,7 @@ import {
 } from './routes/venues/venues';
 import { packagesRoutes } from './routes/packages/packagesRoutes';
 import { imagesRoutes } from './routes/images/images';
+import fastifyMultipart from '@fastify/multipart';
 
 //Ricorda di importare prisma in ogni handler senza istanziarlo sempre
 
@@ -56,8 +57,8 @@ server.get('/ping', async (request, reply) => {
   return { message: 'pong' };
 });
 
-server.register(multipart);
 server.register(s3Plugin);
+server.register(fastifyMultipart, { attachFieldsToBody: true });
 
 //Rotte di AUTENTICAZIONE (Rotte di Servizio)
 server.register(authRoutes, { prefix: '/auth' });
