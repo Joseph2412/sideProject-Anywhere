@@ -84,28 +84,21 @@ export const ImageUpload: React.FC = () => {
 
   useEffect(() => {
     async function fetchGallery() {
-      if (!venueId || !data?.venue?.photos) return;
-      const files = await Promise.all(
-        data.venue.photos.map(async (key: string) => {
-          // Estrai filename dalla chiave (es: "gallery/12/filename.jpg")
-          const filename = key.split('/').pop();
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_HOST}/media/get?type=gallery&id=${venueId}&filename=${filename}`,
-            { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-          );
-          const { url } = await res.json();
-          return {
-            uid: key,
-            name: filename,
-            status: 'done',
-            url,
-          };
-        })
-      );
+      if (!venueId) return;
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/media/gallery/${venueId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      const { urls } = await res.json();
+      const files = (urls || []).map((url: string, idx: number) => ({
+        uid: url,
+        name: `Immagine ${idx + 1}`,
+        status: 'done',
+        url,
+      }));
       setFileList(files);
     }
     fetchGallery();
-  }, [venueId, data?.venue?.photos]);
+  }, [venueId]);
 
   const uploadButton = (
     <button style={{ border: 0, background: 'none' }} type="button">

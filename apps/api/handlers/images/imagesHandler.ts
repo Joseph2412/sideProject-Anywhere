@@ -10,6 +10,22 @@ type UploadImageBody = {
 };
 
 export const imagesHandler = {
+  getGallery: async (request: FastifyRequest, reply: FastifyReply) => {
+    const { venueId } = request.params as { venueId: string };
+    const { S3_REPORTS_BUCKET } = process.env;
+    if (!venueId) {
+      return reply.status(400).send({ error: 'Missing venueId' });
+    }
+    const venue = await prisma.venue.findUnique({ where: { id: Number(venueId) } });
+    if (!venue) {
+      return reply.status(404).send({ error: 'Venue not found' });
+    }
+    const photos = venue.photos || [];
+    const urls = await Promise.all(
+      photos.map((key: string) => request.s3.getSignedUrl(S3_REPORTS_BUCKET!, key))
+    );
+    return reply.send({ urls });
+  },
   upload: async (request: FastifyRequest, reply: FastifyReply) => {
     console.log('BODY: ', request.body);
     const { type, id, filename, file } = request.body as Record<string, any>;
