@@ -45,7 +45,7 @@ export const ImageUpload: React.FC = () => {
     id = venueId;
   }
 
-  // Logga il valore di id che verrà inviato e altre variabili utili per debug
+  // Console Log Per DEBUG
   console.log('venueDetails:', data?.venue);
   console.log('ID inviato per upload:', id);
   console.log('pathname:', pathname);
@@ -78,9 +78,89 @@ export const ImageUpload: React.FC = () => {
     }
   };
 
-  // const handleRemove = (file: UploadFile<string>) => {};
-  //TODO: Devi implementare funzione per Cancellare la Singola Foto
-  //Cancello la foto a DB o comando su S3? Don't Know
+  //Serve per fare il match corretto con il filename e l'url di amazon
+  function extractS3KeyFromUrl(url: string) {
+    const match = url.match(/\.amazonaws\.com\/(.+?)(\?|$)/);
+    return match ? match[1] : null;
+  }
+
+  const handleRemove = async (file: UploadFile<string>) => {
+    const key = extractS3KeyFromUrl(file.url || '');
+    if (!key) {
+      setToast({
+        type: 'error',
+        message: 'Errore rimozione',
+        description: "Impossibile estrarre la chiave S3 dall'URL.",
+        duration: 4,
+        placement: 'bottomRight',
+      });
+      return false;
+    }
+    const parts = key.split('/');
+    if (parts.length < 4) {
+      setToast({
+        type: 'error',
+        message: 'Errore rimozione',
+        description: 'Chiave S3 non valida.',
+        duration: 4,
+        placement: 'bottomRight',
+      });
+      return false;
+    }
+    const id = parts[1];
+    const filename = parts.slice(3).join('/');
+
+    let url = '';
+    if (pathname.startsWith('/venue')) {
+      // Per venue: aggiungi entity=venues
+      url = `${process.env.NEXT_PUBLIC_API_HOST}/media/delete?entity=venues&id=${id}&filename=${encodeURIComponent(filename)}`;
+    } else if (pathname.startsWith('/packages/')) {
+      // TODO: Gestione delete per packages
+      setToast({
+        type: 'error',
+        message: 'Non ancora implementato',
+        description: 'La cancellazione immagini per i pacchetti non è ancora supportata.',
+        duration: 4,
+        placement: 'bottomRight',
+      });
+      return false;
+    } else {
+      setToast({
+        type: 'error',
+        message: 'Errore rimozione',
+        description: 'Path non supportato.',
+        duration: 4,
+        placement: 'bottomRight',
+      });
+      return false;
+    }
+
+    try {
+      const res = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      if (!res.ok) throw new Error('Errore durante la cancellazione');
+      setToast({
+        type: 'success',
+        message: 'Immagine eliminata!',
+        duration: 3,
+        placement: 'bottomRight',
+      });
+      return true;
+    } catch (err) {
+      setToast({
+        type: 'error',
+        message: 'Errore rimozione',
+        description: (err as Error).message,
+        duration: 4,
+        placement: 'bottomRight',
+      });
+      return false;
+    }
+  };
 
   useEffect(() => {
     async function fetchGallery() {
@@ -121,6 +201,7 @@ export const ImageUpload: React.FC = () => {
         }}
         beforeUpload={beforeUpload}
         onChange={handleChange}
+        onRemove={handleRemove}
         //disabled={!id} serve per testare se passi l'Id. Si abilita se presente
         data={file => ({
           type: 'gallery',

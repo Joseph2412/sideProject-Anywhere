@@ -13,5 +13,5 @@ export async function imagesRoutes(fastify: FastifyInstance) {
   fastify.post('/upload', { preValidation: fastify.auth }, imagesHandler.upload);
 
   // Delete a file
-  fastify.delete('/file', { preValidation: fastify.auth }, imagesHandler.delete);
+  fastify.delete('/delete', { preValidation: fastify.auth }, imagesHandler.delete);
 }

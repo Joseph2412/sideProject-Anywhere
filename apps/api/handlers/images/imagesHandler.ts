@@ -63,22 +63,36 @@ export const imagesHandler = {
   },
 
   delete: async (request: FastifyRequest, reply: FastifyReply) => {
-    const { type, id, filename } = request.query as any;
+    const { entity, id, filename } = request.query as any;
 
-    // Estrai i valori reali se presenti
-    const typeValue = type?.value ?? type;
+    const entityValue = entity?.value ?? entity;
     const idValue = id?.value ?? id;
     const filenameValue = filename?.value ?? filename;
 
-    if (!typeValue || !idValue || !filenameValue) {
-      return reply.status(400).send({ error: 'Missing type, id or filename' });
+    if (!entityValue || !idValue || !filenameValue) {
+      return reply.status(400).send({ error: 'Missing entity, id or filename' });
     }
 
-    const key = `${typeValue}/${idValue}/${filenameValue}`;
+    // Costruisci la chiave S3 secondo la struttura reale
+    const key = `${entityValue}/${idValue}/photos/${filenameValue}`;
     const { S3_REPORTS_BUCKET } = process.env;
 
-    // Cancella il file da S3
     await request.s3.deleteFile(S3_REPORTS_BUCKET!, key);
+    // Rimuovi la chiave dal campo photos della venue se entity è venues
+    //è un fix temporaneo. Dobbiamo fare la stessa cosa anche per Packages
+    if (entityValue === 'venues') {
+      await prisma.venue.update({
+        where: { id: Number(idValue) },
+        data: {
+          photos: {
+            set:
+              (await prisma.venue.findUnique({ where: { id: Number(idValue) } }))?.photos?.filter(
+                (k: string) => k !== key
+              ) || [],
+          },
+        },
+      });
+    }
 
     return { success: true };
   },
