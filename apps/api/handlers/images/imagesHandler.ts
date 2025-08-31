@@ -3,44 +3,53 @@ import { prisma } from './../../libs/prisma';
 
 import { generateS3Key } from './../../utils/generateS3Key';
 
-type UploadImageBody = {
-  type: 'avatar' | 'logo' | 'gallery';
-  id: string | number;
-  filename: string;
-};
-
 export const imagesHandler = {
   getGallery: async (request: FastifyRequest, reply: FastifyReply) => {
-    const { venueId } = request.params as { venueId: string };
+    const { entity, id } = request.params as { entity: string; id: string };
     const { S3_REPORTS_BUCKET } = process.env;
-    if (!venueId) {
-      return reply.status(400).send({ error: 'Missing venueId' });
+    if (!entity || !id) {
+      return reply.status(400).send({ error: 'Missing entity or id' });
     }
-    const venue = await prisma.venue.findUnique({ where: { id: Number(venueId) } });
-    if (!venue) {
-      return reply.status(404).send({ error: 'Venue not found' });
+    let record: any = null;
+    if (entity === 'venues') {
+      record = await prisma.venue.findUnique({ where: { id: Number(id) } });
+      if (!record) return reply.status(404).send({ error: 'Venue not found' });
+    } else if (entity === 'packages') {
+      record = await prisma.package.findUnique({ where: { id: Number(id) } });
+      if (!record) return reply.status(404).send({ error: 'Package not found' });
+    } else {
+      return reply.status(400).send({ error: 'Invalid entity' });
     }
-    const photos = venue.photos || [];
+    const photos = record.photos || [];
     const urls = await Promise.all(
       photos.map((key: string) => request.s3.getSignedUrl(S3_REPORTS_BUCKET!, key))
     );
     return reply.send({ urls });
   },
+
   upload: async (request: FastifyRequest, reply: FastifyReply) => {
     console.log('BODY: ', request.body);
-    const { type, id, filename, file } = request.body as Record<string, any>;
+    const { type, id, filename, file, entity } = request.body as Record<string, any>;
 
-    if (!type || !id || !filename || !file) {
-      return reply.status(400).send({ error: 'Missing type, id, filename or file' });
+    if (!type || !id || !filename || !file || !entity) {
+      return reply.status(400).send({ error: 'Missing type, id, filename, entity or file' });
     }
 
     // Estrai i valori reali dai campi multipart
     const typeValue = type.value ?? type;
     const idValue = id.value ?? id;
     const filenameValue = filename.value ?? filename;
+    const entityValue = entity.value ?? entity;
 
-    const s3Key = generateS3Key({ type: typeValue, id: idValue, filename: filenameValue });
-    const fileBuffer = await file.toBuffer(); // stream
+    const s3Key = generateS3Key({
+      type: typeValue,
+      id: idValue,
+      filename: filenameValue,
+      entity: entityValue === 'packages' ? 'package' : 'venue',
+    });
+
+    const fileBuffer = await file.toBuffer();
+
     const signedUrl = await request.s3.uploadFile(
       'nibol-anywhere',
       fileBuffer,
@@ -49,14 +58,25 @@ export const imagesHandler = {
     );
 
     if (typeValue === 'gallery') {
-      await prisma.venue.update({
-        where: { id: Number(idValue) },
-        data: {
-          photos: {
-            push: s3Key, // oppure push: signedUrl....Dubbio Amletico. Pugia tu che dici?
+      if (entityValue === 'venues') {
+        await prisma.venue.update({
+          where: { id: Number(idValue) },
+          data: {
+            photos: {
+              push: s3Key,
+            },
           },
-        },
-      });
+        });
+      } else if (entityValue === 'packages') {
+        await prisma.package.update({
+          where: { id: Number(idValue) },
+          data: {
+            photos: {
+              push: s3Key,
+            },
+          },
+        });
+      }
     }
 
     return reply.send({ url: signedUrl });
@@ -80,6 +100,7 @@ export const imagesHandler = {
     await request.s3.deleteFile(S3_REPORTS_BUCKET!, key);
     // Rimuovi la chiave dal campo photos della venue se entity è venues
     //è un fix temporaneo. Dobbiamo fare la stessa cosa anche per Packages
+
     if (entityValue === 'venues') {
       await prisma.venue.update({
         where: { id: Number(idValue) },
@@ -87,6 +108,18 @@ export const imagesHandler = {
           photos: {
             set:
               (await prisma.venue.findUnique({ where: { id: Number(idValue) } }))?.photos?.filter(
+                (k: string) => k !== key
+              ) || [],
+          },
+        },
+      });
+    } else if (entityValue === 'packages') {
+      await prisma.package.update({
+        where: { id: Number(idValue) },
+        data: {
+          photos: {
+            set:
+              (await prisma.package.findUnique({ where: { id: Number(idValue) } }))?.photos?.filter(
                 (k: string) => k !== key
               ) || [],
           },

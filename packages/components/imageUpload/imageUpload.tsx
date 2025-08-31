@@ -37,12 +37,18 @@ export const ImageUpload: React.FC = () => {
   const pathname = usePathname();
   const params = useParams();
 
+  // Dichiara id ed entity PRIMA di qualsiasi useEffect
   let id: number | undefined;
+  let entity: 'venues' | 'packages' | undefined;
 
+  console.log('DEBUG params:', params);
   if (pathname.startsWith('/packages/')) {
-    id = params.packageId ? Number(params.packageId) : undefined;
+    // Gestione robusta: usa params.id se presente (route /packages/[id])
+    id = params.id ? Number(params.id) : undefined;
+    entity = 'packages';
   } else if (pathname.startsWith('/venue')) {
     id = venueId;
+    entity = 'venues';
   }
 
   // Console Log Per DEBUG
@@ -115,15 +121,7 @@ export const ImageUpload: React.FC = () => {
       // Per venue: aggiungi entity=venues
       url = `${process.env.NEXT_PUBLIC_API_HOST}/media/delete?entity=venues&id=${id}&filename=${encodeURIComponent(filename)}`;
     } else if (pathname.startsWith('/packages/')) {
-      // TODO: Gestione delete per packages
-      setToast({
-        type: 'error',
-        message: 'Non ancora implementato',
-        description: 'La cancellazione immagini per i pacchetti non è ancora supportata.',
-        duration: 4,
-        placement: 'bottomRight',
-      });
-      return false;
+      url = `${process.env.NEXT_PUBLIC_API_HOST}/media/delete?entity=packages&id=${id}&filename=${encodeURIComponent(filename)}`;
     } else {
       setToast({
         type: 'error',
@@ -163,9 +161,10 @@ export const ImageUpload: React.FC = () => {
   };
 
   useEffect(() => {
+    // id ed entity sono già nello scope del componente
     async function fetchGallery() {
-      if (!venueId) return;
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/media/gallery/${venueId}`, {
+      if (!id || !entity) return;
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/media/gallery/${entity}/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       const { urls } = await res.json();
@@ -178,7 +177,7 @@ export const ImageUpload: React.FC = () => {
       setFileList(files);
     }
     fetchGallery();
-  }, [venueId]);
+  }, [id, entity]);
 
   const uploadButton = (
     <button style={{ border: 0, background: 'none' }} type="button">
@@ -205,6 +204,7 @@ export const ImageUpload: React.FC = () => {
         //disabled={!id} serve per testare se passi l'Id. Si abilita se presente
         data={file => ({
           type: 'gallery',
+          entity,
           id,
           filename: file.name,
         })}
