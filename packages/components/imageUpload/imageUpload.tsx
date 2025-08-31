@@ -173,6 +173,7 @@ export const ImageUpload: React.FC = () => {
         name: `Immagine ${idx + 1}`,
         status: 'done',
         url,
+        key: extractS3KeyFromUrl(url),
       }));
       setFileList(files);
     }
