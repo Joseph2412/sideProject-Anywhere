@@ -14,6 +14,8 @@ import { messageToast } from '@repo/ui/store/ToastStore';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { packagesAtom, fetchPackagesAtom } from '@repo/ui/store/PackageFormStore';
 
+import { useVenues } from '@repo/hooks';
+
 const { Sider } = Layout;
 
 interface SidebarProps {
@@ -23,9 +25,15 @@ interface SidebarProps {
 export default function Sidebar({ onLogout }: SidebarProps) {
   console.log('SIDEBAR RENDER'); // DEBUG LOG
 
+  const { data } = useVenues();
+  console.log(data?.venues); // DEBUG LOG
+  console.log(data?.venues.venue.id); // DEBUG LOG. Testa su altri utenti
+  const idVenue = data?.venues.venue.id; // usa il primo venue
   const packages = useAtomValue(packagesAtom);
   // Ordina prima per tipologia (DESK prima di SALA), poi per id crescente
-  const sortedPackages = [...packages].sort((a, b) => {
+
+  const filteredPackages = packages.filter(pkg => pkg.venueId === idVenue);
+  const sortedPackages = [...filteredPackages].sort((a, b) => {
     if (a.type === b.type) return a.id - b.id;
     if (a.type === 'SALA') return -1;
     if (b.type === 'DESK') return 1;
@@ -68,7 +76,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify({ name: values.name, type: values.type }),
+        body: JSON.stringify({ name: values.name, type: values.type, venueId: idVenue }),
       });
       if (!res.ok) throw new Error('Errore creazione pacchetto');
       const data = await res.json();

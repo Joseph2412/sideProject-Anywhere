@@ -30,12 +30,12 @@ export const VenueDetailsForm = () => {
 
   // useEffect per caricamento dati venue esistenti
   useEffect(() => {
-    if (data && data.venue) {
+    if (data && data.venues) {
       form.setFieldsValue({
-        ...data.venue,
-        avatarUrl: data.venue.avatarURL || '',
+        ...data.venues[0],
+        avatarUrl: data.venues[0].avatarURL || '',
       });
-      setVenueDetails(data.venue);
+      setVenueDetails(data.venues[0]);
     }
   }, [data, form]);
 

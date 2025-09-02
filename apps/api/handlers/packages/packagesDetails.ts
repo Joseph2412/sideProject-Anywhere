@@ -15,9 +15,10 @@ export const getAllPackagesHandler = async (request: FastifyRequest, reply: Fast
 
 // Handler per la creazione di un nuovo pacchetto
 export const createPackageHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-  const { name, type } = request.body as {
+  const { name, type, venueId } = request.body as {
     name: string;
     type: 'SALA' | 'DESK';
+    venueId: number;
   };
 
   // Crea il pacchetto
@@ -25,6 +26,7 @@ export const createPackageHandler = async (request: FastifyRequest, reply: Fasti
     data: {
       name,
       type,
+      venueId,
     },
   });
 

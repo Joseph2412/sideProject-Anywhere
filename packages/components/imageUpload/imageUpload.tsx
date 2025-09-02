@@ -30,7 +30,7 @@ export const ImageUpload: React.FC = () => {
   const [fileList, setFileList] = useState<UploadFile<string>[]>([]);
 
   const { data } = useVenues();
-  const venueId = data?.venue?.id;
+  const venueId = data?.venues.venue.id;
 
   const setToast = useSetAtom(messageToast);
 
@@ -52,7 +52,7 @@ export const ImageUpload: React.FC = () => {
   }
 
   // Console Log Per DEBUG
-  console.log('venueDetails:', data?.venue);
+  console.log('venueDetails:', data?.venues);
   console.log('ID inviato per upload:', id);
   console.log('pathname:', pathname);
   console.log('params:', params);

@@ -18,7 +18,7 @@ export function useVenues() {
       const venues = await venuesRes.json();
       const payments = await paymentsRes.json();
       // Unisci i dati, aggiungendo payments come proprietà
-      return { ...venues, payments };
+      return { venues, payments };
     },
     staleTime: 5 * 60 * 1000,
   });

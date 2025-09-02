@@ -54,6 +54,7 @@ export type Package = {
   type: string; // Categoria pacchetto
   plans: string[]; // Piani tariffari disponibili
   photos: string[]; // Array URL foto
+  venueId: number; // ID della venue a cui appartiene il pacchetto
 };
 
 /**
