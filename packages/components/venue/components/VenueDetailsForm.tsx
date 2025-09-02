@@ -30,12 +30,15 @@ export const VenueDetailsForm = () => {
 
   // useEffect per caricamento dati venue esistenti
   useEffect(() => {
-    if (data && data.venues) {
+    if (data && data.venues.venue) {
       form.setFieldsValue({
-        ...data.venues[0],
-        avatarUrl: data.venues[0].avatarURL || '',
+        name: data.venues.venue.name,
+        address: data.venues.venue.address,
+        description: data.venues.venue.description,
+        services: data.venues.venue.services,
+        // avatarUrl: data.venues[0].avatarURL || '',
       });
-      setVenueDetails(data.venues[0]);
+      setVenueDetails(data.venues.venue);
     }
   }, [data, form]);
 
@@ -128,7 +131,7 @@ export const VenueDetailsForm = () => {
               <NibolInput
                 validateTrigger="onSubmit"
                 label="Indirizzo"
-                name="address"
+                value="address"
                 hideAsterisk={true}
                 required={true}
                 style={{ height: 32, width: '100%' }}
