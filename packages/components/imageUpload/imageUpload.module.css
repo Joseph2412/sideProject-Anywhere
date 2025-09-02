@@ -3,3 +3,9 @@
   width: 207px !important;
   height: 207px !important;
 }
+.upload207 {
+  display: flex;
+  align-items: center;
+  padding: 0px;
+  margin: 0px;
+}

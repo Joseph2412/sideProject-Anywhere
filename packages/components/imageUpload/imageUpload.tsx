@@ -1,69 +1,184 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { Card, message, Upload } from 'antd';
-import type { GetProp, UploadProps } from 'antd';
+import { Card, Upload } from 'antd';
+import type { GetProp, UploadProps, UploadFile } from 'antd';
 import styles from './imageUpload.module.css';
+import { useSetAtom } from 'jotai';
+import { useParams } from 'next/navigation';
+import { messageToast } from '@repo/ui/store/ToastStore';
+import { usePathname } from 'next/navigation';
+import { useVenues } from '@repo/hooks';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
-/**
- * Converte file immagine in base64 per preview
- * Utilizza FileReader API per conversione asincrona
- * @param img - File immagine da convertire
- * @param callback - Funzione chiamata con il risultato base64
- */
-const getBase64 = (img: FileType, callback: (url: string) => void) => {
-  const reader = new FileReader();
-  reader.addEventListener('load', () => callback(reader.result as string));
-  reader.readAsDataURL(img);
-};
-
-/**
- * Validazione pre-upload per file immagini
- * Pattern: validazione client-side per UX immediata
- * Controlli: formato (JPG/PNG) e dimensione (max 2MB)
- * @param file - File da validare
- * @returns boolean - true se il file passa la validazione
- */
 const beforeUpload = (file: FileType) => {
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
   if (!isJpgOrPng) {
-    message.error('You can only upload JPG/PNG file!');
+    console.log('Formato non valido:', file.type);
   }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    message.error('Image must smaller than 2MB!');
+  const isLt1GB = file.size / 1024 / 1024 < 1024;
+  if (!isLt1GB) {
+    console.log('File troppo grande:', file.size);
   }
-  return isJpgOrPng && isLt2M;
+  return isJpgOrPng && isLt1GB;
 };
 
-/**
- * Componente per upload multiplo di immagini venue
- * Pattern: gestione stati upload + preview con base64
- * Features: validazione client, loading states, preview immediato
- * Limite: max 12 immagini per venue
- */
+const UPLOAD_ENDPOINT = `${process.env.NEXT_PUBLIC_API_HOST}/media/upload`;
+
 export const ImageUpload: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string>();
+  const [fileList, setFileList] = useState<UploadFile<string>[]>([]);
 
-  /**
-   * Gestisce i cambi di stato durante l'upload
-   * Pattern: switch su status per gestire stati diversi di upload
-   */
+  const { data } = useVenues();
+  const venueId = data?.venues.venue.id;
+
+  const setToast = useSetAtom(messageToast);
+
+  const pathname = usePathname();
+  const params = useParams();
+
+  // Dichiara id ed entity PRIMA di qualsiasi useEffect
+  let id: number | undefined;
+  let entity: 'venues' | 'packages' | undefined;
+
+  console.log('DEBUG params:', params);
+  if (pathname.startsWith('/packages/')) {
+    // Gestione robusta: usa params.id se presente (route /packages/[id])
+    id = params.id ? Number(params.id) : undefined;
+    entity = 'packages';
+  } else if (pathname.startsWith('/venue')) {
+    id = venueId;
+    entity = 'venues';
+  }
+
+  // Console Log Per DEBUG
+  console.log('venueDetails:', data?.venues);
+  console.log('ID inviato per upload:', id);
+  console.log('pathname:', pathname);
+  console.log('params:', params);
+
   const handleChange: UploadProps['onChange'] = info => {
-    if (info.file.status === 'uploading') {
-      setLoading(true);
-      return;
-    }
+    setLoading(info.file.status === 'uploading');
+    setFileList(info.fileList.slice(-12)); // Limita a 12 immagini
+
     if (info.file.status === 'done') {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj as FileType, url => {
-        setLoading(false);
-        setImageUrl(url);
+      setLoading(false);
+      setToast({
+        type: 'success',
+        message: 'Upload completato!',
+        description: `L'immagine "${info.file.name}" è stata caricata con successo su S3.`,
+        duration: 4,
+        placement: 'bottomRight',
       });
+      console.log('Upload success:', info.file.response);
+    } else if (info.file.status === 'error') {
+      setLoading(false);
+      setToast({
+        type: 'error',
+        message: 'Errore upload',
+        description: `Errore durante l'upload di "${info.file.name}".`,
+        duration: 4,
+        placement: 'bottomRight',
+      });
+      console.error('Upload error:', info.file.error);
     }
   };
+
+  //Serve per fare il match corretto con il filename e l'url di amazon
+  function extractS3KeyFromUrl(url: string) {
+    const match = url.match(/\.amazonaws\.com\/(.+?)(\?|$)/);
+    return match ? match[1] : null;
+  }
+
+  const handleRemove = async (file: UploadFile<string>) => {
+    const key = extractS3KeyFromUrl(file.url || '');
+    if (!key) {
+      setToast({
+        type: 'error',
+        message: 'Errore rimozione',
+        description: "Impossibile estrarre la chiave S3 dall'URL.",
+        duration: 4,
+        placement: 'bottomRight',
+      });
+      return false;
+    }
+    const parts = key.split('/');
+    if (parts.length < 4) {
+      setToast({
+        type: 'error',
+        message: 'Errore rimozione',
+        description: 'Chiave S3 non valida.',
+        duration: 4,
+        placement: 'bottomRight',
+      });
+      return false;
+    }
+    const id = parts[1];
+    const filename = parts.slice(3).join('/');
+
+    let url = '';
+    if (pathname.startsWith('/venue')) {
+      // Per venue: aggiungi entity=venues
+      url = `${process.env.NEXT_PUBLIC_API_HOST}/media/delete?entity=venues&id=${id}&filename=${encodeURIComponent(filename)}`;
+    } else if (pathname.startsWith('/packages/')) {
+      url = `${process.env.NEXT_PUBLIC_API_HOST}/media/delete?entity=packages&id=${id}&filename=${encodeURIComponent(filename)}`;
+    } else {
+      setToast({
+        type: 'error',
+        message: 'Errore rimozione',
+        description: 'Path non supportato.',
+        duration: 4,
+        placement: 'bottomRight',
+      });
+      return false;
+    }
+
+    try {
+      const res = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      if (!res.ok) throw new Error('Errore durante la cancellazione');
+      setToast({
+        type: 'success',
+        message: 'Immagine eliminata!',
+        duration: 3,
+        placement: 'bottomRight',
+      });
+      return true;
+    } catch (err) {
+      setToast({
+        type: 'error',
+        message: 'Errore rimozione',
+        description: (err as Error).message,
+        duration: 4,
+        placement: 'bottomRight',
+      });
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    // id ed entity sono già nello scope del componente
+    async function fetchGallery() {
+      if (!id || !entity) return;
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/media/gallery/${entity}/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      const { urls } = await res.json();
+      const files = (urls || []).map((url: string, idx: number) => ({
+        uid: url,
+        name: `Immagine ${idx + 1}`,
+        status: 'done',
+        url,
+        key: extractS3KeyFromUrl(url),
+      }));
+      setFileList(files);
+    }
+    fetchGallery();
+  }, [id, entity]);
 
   const uploadButton = (
     <button style={{ border: 0, background: 'none' }} type="button">
@@ -77,14 +192,27 @@ export const ImageUpload: React.FC = () => {
       <Upload
         maxCount={12}
         className={styles.upload207}
-        name="venuePhotos"
+        name="file"
         listType="picture-card"
-        showUploadList={false}
-        action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+        showUploadList
+        action={UPLOAD_ENDPOINT}
+        headers={{
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        }}
         beforeUpload={beforeUpload}
         onChange={handleChange}
+        onRemove={handleRemove}
+        //disabled={!id} serve per testare se passi l'Id. Si abilita se presente
+        data={file => ({
+          type: 'gallery',
+          entity,
+          id,
+          filename: file.name,
+        })}
+        fileList={fileList}
+        multiple
       >
-        {imageUrl ? <img src={imageUrl} alt="venuePhoto" /> : uploadButton}
+        {fileList.length >= 12 ? null : uploadButton}
       </Upload>
     </Card>
   );

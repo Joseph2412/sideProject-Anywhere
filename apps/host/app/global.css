@@ -139,3 +139,10 @@
   max-height: 216px !important;
   max-width: 214px !important;
 }
+
+.ant-upload-list-item-container {
+  height: 207px !important;
+  width: 270px !important;
+}
+
+/* Controlla perchè su dev tools funziona */

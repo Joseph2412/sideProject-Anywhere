@@ -23,18 +23,19 @@ export const VenueDetailsForm = () => {
 
   const [loading, setLoading] = useState(false); // Stato loading
   const [venueDetails, setVenueDetails] = useState<VenueDetails | null>(null);
+
   const { data, isLoading } = useVenues();
 
   const setMessage = useSetAtom(messageToast);
 
   // useEffect per caricamento dati venue esistenti
   useEffect(() => {
-    if (data && data.venue) {
+    if (data && data.venues) {
       form.setFieldsValue({
-        ...data.venue,
-        avatarUrl: data.venue.avatarURL || '',
+        ...data.venues[0],
+        avatarUrl: data.venues[0].avatarURL || '',
       });
-      setVenueDetails(data.venue);
+      setVenueDetails(data.venues[0]);
     }
   }, [data, form]);
 
