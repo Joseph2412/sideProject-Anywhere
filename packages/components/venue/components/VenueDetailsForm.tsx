@@ -33,7 +33,7 @@ export const VenueDetailsForm = () => {
     if (data && data.venues) {
       form.setFieldsValue({
         ...data.venues[0],
-        avatarUrl: data.venues[0].avatarURL || '',
+        // avatarUrl: data.venues[0].avatarURL || '',
       });
       setVenueDetails(data.venues[0]);
     }
