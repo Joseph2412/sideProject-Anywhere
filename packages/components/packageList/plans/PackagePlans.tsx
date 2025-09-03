@@ -204,9 +204,14 @@ export const PackagePlans = () => {
   };
 
   return (
-    <Form layout="vertical" form={form} onFinish={onFinish}>
+    <Form layout="vertical" form={form} onFinish={onFinish} style={{ marginRight: 16 }}>
       {plans.map(plan => (
-        <Card key={plan.value} style={{ marginBottom: 16 }}>
+        <Card
+          key={plan.value}
+          style={{
+            marginBottom: 16,
+          }}
+        >
           <Row align="middle" style={{ marginBottom: 0, marginTop: 0 }}>
             <Col flex="auto">
               <span style={{ fontWeight: 'bold' }}>{plan.name}</span>
@@ -263,7 +268,6 @@ export const PackagePlans = () => {
           )}
         </Card>
       ))}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 24 }}></div>
     </Form>
   );
 };

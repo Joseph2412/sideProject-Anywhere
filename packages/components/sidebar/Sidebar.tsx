@@ -14,6 +14,7 @@ import { messageToast } from '@repo/ui/store/ToastStore';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { packagesAtom, fetchPackagesAtom } from '@repo/ui/store/PackageFormStore';
 
+import sidebarStyles from './Sidebar.module.css';
 import { useVenues } from '@repo/hooks';
 
 const { Sider } = Layout;
@@ -54,7 +55,6 @@ export default function Sidebar({ onLogout }: SidebarProps) {
     }
   };
 
-  // (rimosso: dichiarazione duplicata)
   const fetchPackages = useSetAtom(fetchPackagesAtom);
 
   const isEmpty = packages.length === 0; //Controlliamo se ci sono Pacchetti da Mostrare nella sidebar
@@ -101,23 +101,22 @@ export default function Sidebar({ onLogout }: SidebarProps) {
   }, [fetchPackages]);
 
   return (
-    <Sider width={220} style={{ background: '#fff', height: '100vh' }}>
-      <div style={{ padding: 16 }}>
-        <Avatar size="large" style={{ marginBottom: 8 }} />
-        <div style={{ fontWeight: 600 }}>PlaceHolder</div>
-      </div>
-
+    <Sider width={248} style={{ background: '#fff', height: '100vh' }}>
       <Menu mode="inline" onClick={handleMenuClick}>
+        <div style={{ padding: 16 }}>
+          <Avatar size="large" style={{ marginBottom: 8 }} />
+          <div style={{ fontWeight: 600 }}>PlaceHolder</div>
+        </div>
         {/* Sezioni statiche */}
         <Menu.Item key="calendar" icon={<CalendarOutlined />}>
           <Link href="/calendar">Calendario</Link>
         </Menu.Item>
         <Menu.Divider />
         <Menu.SubMenu key="venue" icon={<ShopOutlined />} title="Locale">
-          <Menu.Item key="venue-general">
+          <Menu.Item key="venue-general" className={sidebarStyles['my-tab']}>
             <Link href="/venue">Generali</Link>
           </Menu.Item>
-          <Menu.Item key="payments">
+          <Menu.Item key="payments" className={sidebarStyles['my-tab']}>
             <Link href="/payments">Pagamenti</Link>
           </Menu.Item>
         </Menu.SubMenu>
@@ -224,6 +223,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
               onClick={() => {
                 setModalOpen(false);
               }}
+              style={{ borderColor: '#D9D9D9' }}
             >
               Annulla
             </Button>

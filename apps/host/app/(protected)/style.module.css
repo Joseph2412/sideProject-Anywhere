@@ -1,25 +1,26 @@
 .header {
   grid-area: header;
-  background: #ffff;
+  /* background: #ffff; */
   border-bottom: 1px solid #f0f0f0;
-  padding: 16px 24px;
+  height: 49px;
+  width: auto;
+  padding: 0px 0px;
+  margin-top: 16px;
+  margin-right: 16px;
+
+  margin-left: 16px;
   grid-area: header;
 }
 
 .layout-container {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 248px 1fr;
   grid-template-rows: auto 1fr;
   grid-template-areas: 'sidebar main';
   height: 100vh;
 }
 
-.sidebar {
-  grid-area: sidebar;
-}
-
 .content-container {
-  grid-area: main;
   overflow: hidden;
   display: grid;
   grid-template-rows: auto 1fr;
@@ -29,8 +30,8 @@
 }
 
 .main-content {
-  grid-area: main;
-  padding: 24px;
-  overflow-y: auto;
+  padding-top: 10px;
+  margin-left: 16px;
+  /* overflow-y: auto; */
   /* border:; */
 }

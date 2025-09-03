@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Divider, Button, Space, Spin } from 'antd';
+import { Form, Divider, Button, Space, Spin, Card } from 'antd';
 import { OpeningDayData, weekDays } from './openingHours.types';
 import { DayOpeningHours } from './DayOpeningHours';
 import { useAtom } from 'jotai';
@@ -90,30 +90,32 @@ export const VenueHoursForm: React.FC = () => {
   }
 
   return (
-    <Form layout="vertical">
-      {weekDays.map(day => (
-        <div key={day.value}>
-          <DayOpeningHours
-            day={day.label}
-            dayKey={day.value}
-            openingDayData={{
-              isClosed: openingDaysState[day.value]?.isClosed ?? true,
-              periods: openingDaysState[day.value]?.periods || [],
-            }}
-            onUpdateDay={handleUpdateDay}
-          />
-          <Divider />
-        </div>
-      ))}
+    <Card style={{ marginRight: 16 }}>
+      <Form layout="vertical">
+        {weekDays.map(day => (
+          <div key={day.value}>
+            <DayOpeningHours
+              day={day.label}
+              dayKey={day.value}
+              openingDayData={{
+                isClosed: openingDaysState[day.value]?.isClosed ?? true,
+                periods: openingDaysState[day.value]?.periods || [],
+              }}
+              onUpdateDay={handleUpdateDay}
+            />
+            <Divider style={{ marginTop: '16px' }} />
+          </div>
+        ))}
 
-      <Space style={{ marginTop: 24 }}>
-        <Button onClick={handleReset} disabled={saving}>
-          Annulla
-        </Button>
-        <PrimaryButton type="primary" onClick={handleSave} loading={saving}>
-          Salva
-        </PrimaryButton>
-      </Space>
-    </Form>
+        <Space>
+          <Button onClick={handleReset} disabled={saving} style={{ borderColor: '#D9D9D9' }}>
+            Annulla
+          </Button>
+          <PrimaryButton type="primary" onClick={handleSave} loading={saving}>
+            Salva
+          </PrimaryButton>
+        </Space>
+      </Form>
+    </Card>
   );
 };

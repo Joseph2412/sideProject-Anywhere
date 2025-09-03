@@ -1,4 +1,4 @@
-import { Form, Button, Upload, Avatar, Space, message, Row, Col, Card } from 'antd';
+import { Form, Button, Upload, Avatar, Space, message, Row, Card } from 'antd';
 import { UploadOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
 import { NibolInput } from '../inputs/Input';
 import { useState, useEffect } from 'react';
@@ -102,7 +102,7 @@ export const ProfileForm = () => {
       style={{ width: '100%', borderRadius: 8 }}
       onFinish={onFinish}
     >
-      <Card>
+      <Card style={{ marginRight: 16 }}>
         <Form.Item label="Foto profilo">
           <Space>
             <Avatar size={64} icon={!avatarUrl && <UserOutlined />} src={avatarUrl ?? undefined} />
@@ -128,40 +128,33 @@ export const ProfileForm = () => {
           </Space>
         </Form.Item>
 
-        <Row gutter={[0, 0]}>
-          <Col span={12}>
-            <Form.Item name="firstName" rules={[{ required: true, message: 'Inserisci il nome' }]}>
-              <NibolInput
-                name="firstName"
-                validateTrigger="onSubmit"
-                label="Nome"
-                hideAsterisk={true}
-                required={true}
-                style={{ height: 32, width: '100%' }}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="lastName"
-              rules={[{ required: true, message: 'Inserisci il cognome' }]}
-            >
-              <NibolInput
-                validateTrigger="onSubmit"
-                label="Cognome"
-                hideAsterisk={true}
-                required={true}
-                style={{ height: 32, width: '100%' }}
-              />
-            </Form.Item>
-          </Col>
+        <Row style={{ gap: 16 }}>
+          <Form.Item name="firstName" rules={[{ required: true, message: 'Inserisci il nome' }]}>
+            <NibolInput
+              name="firstName"
+              validateTrigger="onSubmit"
+              label="Nome"
+              hideAsterisk={true}
+              required={true}
+              style={{ height: 32, width: '990px' }}
+            />
+          </Form.Item>
+          <Form.Item name="lastName" rules={[{ required: true, message: 'Inserisci il cognome' }]}>
+            <NibolInput
+              validateTrigger="onSubmit"
+              label="Cognome"
+              hideAsterisk={true}
+              required={true}
+              style={{ height: 32, width: '990px' }}
+            />
+          </Form.Item>
         </Row>
 
         <Form.Item name="email">
           <NibolInput
             label="Email"
             disabled
-            style={{ height: 32, width: '49%' }}
+            style={{ height: 32, width: '990px' }}
             hideAsterisk={true}
           />
         </Form.Item>

@@ -195,7 +195,7 @@ export const PackageDetails = () => {
       }}
       onFinish={handleFinish}
     >
-      <Card>
+      <Card style={{ marginRight: 16 }}>
         <Form.Item label="Attivo">
           <Popconfirm
             title="Disattiva Pacchetto?"
@@ -226,44 +226,36 @@ export const PackageDetails = () => {
             />
           </Popconfirm>
         </Form.Item>
-        <Row gutter={[0, 0]}>
-          <Col span={12}>
-            <Form.Item name="name" rules={requiredRule('Inserisci il Nome del Piano')}>
-              <NibolInput
-                validateTrigger="onSubmit"
-                label="Nome del Piano"
-                name="name"
-                hideAsterisk={true}
-                required={true}
-                style={{ height: 32, width: '100%' }}
-                disabled={isDisabled}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="type"
-              rules={requiredRule('Specifica la Tipologia')}
-              label="Tipologia"
-              style={{ marginTop: 10 }}
-            >
-              <Select
-                style={{ width: '100%', height: 32 }}
-                options={[
-                  { value: 'SALA', label: 'Sala' },
-                  { value: 'DESK', label: 'Desk' },
-                ]}
-                onChange={value => {
-                  if (value === 'desk') {
-                    form.setFieldsValue({ seats: undefined });
-                  } else {
-                    form.setFieldsValue({ capacity: undefined, squareMetres: undefined });
-                  }
-                }}
-                disabled={isDisabled}
-              />
-            </Form.Item>
-          </Col>
+        <Row style={{ gap: 16 }}>
+          <Form.Item name="name" rules={requiredRule('Inserisci il Nome del Piano')}>
+            <NibolInput
+              validateTrigger="onSubmit"
+              label="Nome del Piano"
+              name="name"
+              hideAsterisk={true}
+              required={true}
+              style={{ height: 32, width: '990px' }}
+              disabled={isDisabled}
+            />
+          </Form.Item>
+
+          <Form.Item name="type" rules={requiredRule('Specifica la Tipologia')} label="Tipologia">
+            <Select
+              style={{ width: '990px', height: 32 }}
+              options={[
+                { value: 'SALA', label: 'Sala' },
+                { value: 'DESK', label: 'Desk' },
+              ]}
+              onChange={value => {
+                if (value === 'desk') {
+                  form.setFieldsValue({ seats: undefined });
+                } else {
+                  form.setFieldsValue({ capacity: undefined, squareMetres: undefined });
+                }
+              }}
+              disabled={isDisabled}
+            />
+          </Form.Item>
         </Row>
         <Form.Item
           name="description"
@@ -329,7 +321,17 @@ export const PackageDetails = () => {
           </Space>
         </Form.Item>
       </Card>
-      <Card style={{ marginTop: 10 }}>
+      <Card
+        style={{
+          marginTop: 16,
+          marginRight: 16,
+          padding: 0,
+          height: 64,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'left',
+        }}
+      >
         <Popconfirm
           title="Elimina Pacchetto?"
           description="Una volta eliminato, tutte le prenotazioni future ricevute su questo pacchetto verranno cancellate e gli utenti riceveranno una notifica"
@@ -338,7 +340,7 @@ export const PackageDetails = () => {
           okText="Si"
           cancelText="No"
         >
-          <Button type="primary" danger disabled={loading || !details?.id}>
+          <Button type="primary" danger disabled={loading || !details?.id} style={{ height: 32 }}>
             Elimina Pacchetto
           </Button>
         </Popconfirm>

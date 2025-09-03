@@ -26,10 +26,6 @@
   border-color: white !important; /* Colore della spunta */
 }
 
-.ant-form-item {
-  margin: 5px;
-}
-
 .ant-menu-submenu-selected > .ant-menu-submenu-title {
   color: black !important;
 }
@@ -87,13 +83,6 @@
   border-radius: 10px !important;
 }
 
-/* Menu item hover: blu scuro, testo bianco */
-.ant-menu-item:hover {
-  background: #00063e !important;
-  color: #fff !important;
-  border-radius: 10px !important;
-}
-
 /* Icone coerenti */
 .ant-menu-item .anticon {
   color: #00063e !important;
@@ -104,7 +93,7 @@
 }
 
 .ant-picker,
-.ant-picker-input > input,
+ù .ant-picker-input > input,
 .ant-picker-dropdown,
 .ant-picker-dropdown .ant-picker-time-panel,
 .ant-picker-dropdown .ant-picker-content th,
@@ -145,4 +134,7 @@
   width: 270px !important;
 }
 
-/* Controlla perchè su dev tools funziona */
+.ant-tabs-tab {
+  padding-top: 8px !important;
+  padding-bottom: 24px !important;
+}
