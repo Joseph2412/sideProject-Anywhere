@@ -87,9 +87,13 @@ export const ProfileForm = () => {
       <Card style={{ marginRight: 16 }}>
         <ProfilePhotoUpload size={80} showTitle={true} title="Foto Profilo" />
 
-        <Row gutter={[16, 0]}>
+        <Row gutter={[16, 0]} style={{ marginBottom: 0, marginTop: 16 }}>
           <Col span={12}>
-            <Form.Item name="firstName" rules={[{ required: true, message: 'Inserisci il nome' }]}>
+            <Form.Item
+              name="firstName"
+              rules={[{ required: true, message: 'Inserisci il nome' }]}
+              style={{ marginBottom: 16 }}
+            >
               <NibolInput
                 name="firstName"
                 validateTrigger="onSubmit"
@@ -104,6 +108,7 @@ export const ProfileForm = () => {
             <Form.Item
               name="lastName"
               rules={[{ required: true, message: 'Inserisci il cognome' }]}
+              style={{ marginBottom: 16 }}
             >
               <NibolInput
                 validateTrigger="onSubmit"
@@ -116,7 +121,7 @@ export const ProfileForm = () => {
           </Col>
         </Row>
 
-        <Form.Item name="email">
+        <Form.Item name="email" style={{ marginBottom: 8 }}>
           <NibolInput
             label="Email"
             disabled
@@ -124,10 +129,10 @@ export const ProfileForm = () => {
             hideAsterisk={true}
           />
         </Form.Item>
-        <div style={{ color: '#8c8c8c', fontSize: 12, marginTop: 4 }}>
+        <div style={{ color: '#8c8c8c', fontSize: 12, marginTop: -8, marginBottom: 16 }}>
           Per modificare la mail, scrivi a support@nibol.com.
         </div>
-        <Form.Item>
+        <Form.Item style={{ marginBottom: 0 }}>
           <Space>
             <Button
               htmlType="button"

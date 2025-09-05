@@ -58,8 +58,8 @@
 }
 
 .upload-button :global(.ant-upload > button) {
-  height: 207px !important;
-  width: 270px !important;
+  height: 100% !important;
+  width: 100% !important;
 }
 
 .image-container :global(.ant-card .ant-card-body) {

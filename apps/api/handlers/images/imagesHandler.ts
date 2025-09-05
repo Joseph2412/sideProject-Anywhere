@@ -116,7 +116,7 @@ export const imagesHandler = {
 
     // Gestisci i diversi tipi di delete
     if (typeValue === 'avatar') {
-      // Per avatar: host/profile/{id}_avatar_{timestamp}_{filename}
+      // Per avatar: host/{id}/profile/avatar/{timestamp}_{filename}
       key = filenameValue; // Il filename è già la chiave S3 completa
 
       await request.s3.deleteFile(S3_REPORTS_BUCKET!, key);

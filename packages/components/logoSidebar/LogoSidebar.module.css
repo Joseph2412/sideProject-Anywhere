@@ -10,10 +10,6 @@
   border-radius: 8px !important; /* Rende il logo quadrato con angoli leggermente arrotondati */
 }
 
-.logo:hover {
-  border-color: #1890ff;
-}
-
 .name {
   font-weight: 500;
   color: #262626;
