@@ -67,6 +67,15 @@ export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: 
     select: { venueId: true },
   });
 
+  // Se stiamo aggiornando, recupera i dati esistenti per preservare logoURL se non fornito
+  let existingVenue = null;
+  if (user?.venueId) {
+    existingVenue = await prisma.venue.findUnique({
+      where: { id: user.venueId },
+      select: { logoURL: true },
+    });
+  }
+
   const venue = await prisma.venue.upsert({
     where: { id: user?.venueId ?? 0 },
     create: {
@@ -84,7 +93,8 @@ export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: 
       description: description ?? null,
       services: services ?? [],
       photos: photos ?? [],
-      logoURL: logoURL ?? null,
+      // Preserva il logoURL esistente se non viene fornito un nuovo valore
+      logoURL: logoURL !== undefined ? logoURL : (existingVenue?.logoURL ?? null),
     },
     select: {
       id: true,

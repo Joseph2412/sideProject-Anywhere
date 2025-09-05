@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Upload, Button, Avatar, message, Typography } from 'antd';
-import { UploadOutlined, UserOutlined } from '@ant-design/icons';
-import { usePathname } from 'next/navigation';
+import { UploadOutlined, ShopOutlined } from '@ant-design/icons';
 import { useSetAtom } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
 import { messageToast } from '@repo/ui/store/LayoutStore';
-import { useVenues, useUserProfile } from '@repo/hooks';
+import { useVenues } from '@repo/hooks';
 import { UploadChangeParam, UploadFile } from 'antd/es/upload';
+import { RcFile } from 'antd/es/upload/interface';
 import styles from './LogoUpload.module.css';
-
-type UploadType = 'avatar' | 'logo';
 
 interface LogoUploadProps {
   size?: number;
@@ -25,29 +23,26 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const pathname = usePathname();
   const setToast = useSetAtom(messageToast);
   const queryClient = useQueryClient();
 
   // Hooks per dati
   const { data: venueData } = useVenues();
-  const { data: profileData } = useUserProfile();
 
-  // Determina tipo upload basato su URL
-  const uploadType: UploadType = pathname.includes('/profile') ? 'avatar' : 'logo';
-  const isProfileUpload = uploadType === 'avatar';
+  // SEMPRE gestisce SOLO il logo della venue, mai l'avatar
+  const uploadType = 'logo';
 
-  // ID per upload
-  const uploadId = isProfileUpload ? profileData?.user.id : venueData?.venues.venue.id;
+  // ID per upload (sempre venue)
+  const uploadId = venueData?.venues.venue.id;
 
-  // Carica immagine esistente
+  // Carica immagine esistente (sempre logo della venue)
   useEffect(() => {
-    if (isProfileUpload && profileData?.user.avatarUrl) {
-      setImageUrl(profileData.user.avatarUrl);
-    } else if (!isProfileUpload && venueData?.venues.venue.logoURL) {
+    if (venueData?.venues.venue.logoURL) {
       setImageUrl(venueData.venues.venue.logoURL);
+    } else {
+      setImageUrl(null);
     }
-  }, [isProfileUpload, profileData, venueData]);
+  }, [venueData]);
 
   // Validazione file
   const beforeUpload = (file: File) => {
@@ -66,8 +61,17 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
 
   // Handler upload
   const handleUpload = async (info: UploadChangeParam<UploadFile>) => {
-    const file = info.file.originFileObj;
-    if (!file || !uploadId) return;
+    // Verifica se il file è disponibile (con fallback come ProfilePhotoUpload)
+    const file = info.file.originFileObj || (info.file as RcFile);
+    if (!file) {
+      console.error('Nessun file selezionato.');
+      return;
+    }
+
+    if (!uploadId) {
+      console.error('Upload ID non disponibile (venue ID mancante).');
+      return;
+    }
 
     setLoading(true);
 
@@ -76,6 +80,8 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
       formData.append('file', file);
       formData.append('type', uploadType);
       formData.append('id', uploadId.toString());
+      formData.append('filename', file.name);
+      formData.append('entity', 'venues');
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/media/upload`, {
         method: 'POST',
@@ -92,17 +98,13 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
       const data = await response.json();
       setImageUrl(data.url);
 
-      // Invalida la cache per aggiornare i dati
-      if (isProfileUpload) {
-        await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      } else {
-        await queryClient.invalidateQueries({ queryKey: ['venues'] });
-      }
+      // Invalida la cache per aggiornare i dati della venue
+      await queryClient.invalidateQueries({ queryKey: ['venues'] });
 
       setToast({
         type: 'success',
         message: 'Upload completato!',
-        description: `${isProfileUpload ? 'Foto profilo' : 'Logo'} caricato con successo.`,
+        description: 'Logo caricato con successo.',
         duration: 3,
         placement: 'bottomRight',
       });
@@ -149,17 +151,13 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
 
       setImageUrl(null);
 
-      // Invalida la cache per aggiornare i dati
-      if (isProfileUpload) {
-        await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      } else {
-        await queryClient.invalidateQueries({ queryKey: ['venues'] });
-      }
+      // Invalida la cache per aggiornare i dati della venue
+      await queryClient.invalidateQueries({ queryKey: ['venues'] });
 
       setToast({
         type: 'success',
         message: 'Immagine rimossa!',
-        description: `${isProfileUpload ? 'Foto profilo' : 'Logo'} rimosso con successo.`,
+        description: 'Logo rimosso con successo.',
         duration: 3,
         placement: 'bottomRight',
       });
@@ -189,7 +187,8 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
         <Avatar
           size={size}
           src={imageUrl || undefined} // Passa undefined invece di null per evitare icona di errore
-          icon={!imageUrl && <UserOutlined />}
+          icon={!imageUrl && <ShopOutlined />}
+          shape="square" // Rende l'avatar quadrato
           className={styles.avatar}
         />
         <div className={styles.buttonsContainer}>
@@ -205,7 +204,7 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
               disabled={loading}
               style={{ borderColor: '#D9D9D9', minWidth: 100 }}
             >
-              {isProfileUpload ? 'Carica Foto' : 'Upload'}
+              Upload
             </Button>
           </Upload>
 

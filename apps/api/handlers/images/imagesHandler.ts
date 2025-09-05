@@ -129,7 +129,7 @@ export const imagesHandler = {
         },
       });
     } else if (typeValue === 'logo') {
-      // Per logo: venue/{id}/logo_{timestamp}_{filename}
+      // Per logo: venues/{id}/logo/{timestamp}_{filename}
       key = filenameValue; // Il filename è già la chiave S3 completa
 
       await request.s3.deleteFile(S3_REPORTS_BUCKET!, key);

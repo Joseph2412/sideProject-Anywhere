@@ -7,6 +7,7 @@ import { LogoUpload } from '../../logoUpload';
 import styles from './VenueDetailsForm.module.css';
 import { useState } from 'react';
 import { useVenues } from '@repo/hooks';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Jotai e store
 import { useSetAtom } from 'jotai';
@@ -17,6 +18,7 @@ import type { VenueDetails } from '@repo/ui/store/LayoutStore';
 
 export const VenueDetailsForm = () => {
   const [form] = Form.useForm();
+  const queryClient = useQueryClient();
 
   // Array servizi disponibili per venue
   const availableServices = ['WiFi', 'Stampante', 'Caffè', 'Reception', 'Parcheggio'];
@@ -56,6 +58,10 @@ export const VenueDetailsForm = () => {
       if (res.ok) {
         const data = await res.json();
         setVenueDetails(data.venue);
+
+        // Invalida la query per aggiornare tutti i componenti che usano venue data (inclusa la sidebar)
+        await queryClient.invalidateQueries({ queryKey: ['venues'] });
+
         setMessage({
           type: 'success',
           message: 'Dettagli aggiornati',

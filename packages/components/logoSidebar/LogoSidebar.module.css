@@ -7,6 +7,7 @@
 .logo {
   border: 1px solid #f0f0f0;
   transition: border-color 0.3s ease;
+  border-radius: 8px !important; /* Rende il logo quadrato con angoli leggermente arrotondati */
 }
 
 .logo:hover {

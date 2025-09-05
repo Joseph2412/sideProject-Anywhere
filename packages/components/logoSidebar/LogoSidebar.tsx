@@ -24,11 +24,30 @@ export const LogoSidebar: React.FC<LogoSidebarProps> = ({
     <div className={`${styles.container} ${className || ''}`}>
       <Avatar
         size={size}
-        src={imageUrl || undefined} // Passa undefined invece di null per evitare icona di errore
+        src={imageUrl || undefined}
         icon={!imageUrl && <ShopOutlined />}
+        shape="square"
         className={styles.logo}
       />
-      {showName && displayName && <span className={styles.name}>{displayName}</span>}
+      {showName && displayName && (
+        <span
+          className={styles.name}
+          style={{
+            color: 'black',
+            padding: '4px',
+            height: '35px',
+            lineHeight: '24px',
+            display: 'inline-block',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: '4px',
+            fontSize: '14px',
+            fontWeight: '700',
+          }}
+        >
+          {displayName}
+        </span>
+      )}
     </div>
   );
 };
