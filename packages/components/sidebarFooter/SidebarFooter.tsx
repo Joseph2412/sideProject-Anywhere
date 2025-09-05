@@ -24,7 +24,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({ avatarSize = 32, c
     <div className={`${styles.container} ${className || ''}`}>
       <Avatar
         size={avatarSize}
-        src={avatarUrl}
+        src={avatarUrl || undefined} // Passa undefined invece di null per evitare icona di errore
         icon={!avatarUrl && <UserOutlined />}
         className={styles.avatar}
       />

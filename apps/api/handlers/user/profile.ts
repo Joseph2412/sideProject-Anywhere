@@ -23,13 +23,20 @@ export const profileHandler = async (request: FastifyRequest, reply: FastifyRepl
     return reply.code(404).send({ message: 'Profilo non trovato' });
   }
 
+  // Genera URL signed per l'avatar se esiste
+  let avatarUrl = null;
+  if (user.avatarUrl) {
+    const { S3_REPORTS_BUCKET } = process.env;
+    avatarUrl = await request.s3.getSignedUrl(S3_REPORTS_BUCKET!, user.avatarUrl);
+  }
+
   return reply.send({
     user: {
       id: user.id,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      avatarUrl: user.avatarUrl,
+      avatarUrl,
       preferences: user.preferences,
       role: user.role,
       venue: user.venue ?? null,

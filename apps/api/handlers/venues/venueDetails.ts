@@ -31,7 +31,20 @@ export const getVenueDetailsHandler = async (request: FastifyRequest, reply: Fas
 
   if (!user?.venue) return reply.code(404).send({ venue: null });
 
-  return reply.code(200).send({ venue: user.venue });
+  // Genera URL signed per il logo se esiste
+  const venue = user.venue;
+  let logoURL = null;
+  if (venue.logoURL) {
+    const { S3_REPORTS_BUCKET } = process.env;
+    logoURL = await request.s3.getSignedUrl(S3_REPORTS_BUCKET!, venue.logoURL);
+  }
+
+  return reply.code(200).send({
+    venue: {
+      ...venue,
+      logoURL,
+    },
+  });
 };
 
 export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: FastifyReply) => {

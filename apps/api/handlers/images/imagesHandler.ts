@@ -57,6 +57,7 @@ export const imagesHandler = {
       file.mimetype
     );
 
+    // Gestione salvataggio nel DB basato sul tipo
     if (typeValue === 'gallery') {
       if (entityValue === 'venues') {
         await prisma.venue.update({
@@ -77,57 +78,108 @@ export const imagesHandler = {
           },
         });
       }
+    } else if (typeValue === 'avatar') {
+      // Salva la CHIAVE S3 dell'avatar nel campo avatarUrl dell'utente
+      await prisma.user.update({
+        where: { id: Number(idValue) },
+        data: {
+          avatarUrl: s3Key, // Salviamo la chiave S3, non l'URL signed
+        },
+      });
+    } else if (typeValue === 'logo') {
+      // Salva la CHIAVE S3 del logo nel campo logoURL della venue
+      await prisma.venue.update({
+        where: { id: Number(idValue) },
+        data: {
+          logoURL: s3Key, // Salviamo la chiave S3, non l'URL signed
+        },
+      });
     }
 
     return reply.send({ url: signedUrl });
   },
 
   delete: async (request: FastifyRequest, reply: FastifyReply) => {
-    const { entity, id, filename } = request.query as any;
+    const { entity, id, filename, type } = request.query as any;
 
     const entityValue = entity?.value ?? entity;
     const idValue = id?.value ?? id;
     const filenameValue = filename?.value ?? filename;
+    const typeValue = type?.value ?? type;
 
-    if (!entityValue || !idValue || !filenameValue) {
-      return reply.status(400).send({ error: 'Missing entity, id or filename' });
+    if (!idValue || !filenameValue) {
+      return reply.status(400).send({ error: 'Missing id or filename' });
     }
 
-    // Costruisci la chiave S3 secondo la struttura reale
-    const key = `${entityValue}/${idValue}/photos/${filenameValue}`;
     const { S3_REPORTS_BUCKET } = process.env;
+    let key: string;
 
-    await request.s3.deleteFile(S3_REPORTS_BUCKET!, key);
-    // Rimuovi la chiave dal campo photos della venue se entity è venues
-    //è un fix temporaneo. Dobbiamo fare la stessa cosa anche per Packages
+    // Gestisci i diversi tipi di delete
+    if (typeValue === 'avatar') {
+      // Per avatar: host/profile/{id}_avatar_{timestamp}_{filename}
+      key = filenameValue; // Il filename è già la chiave S3 completa
 
-    if (entityValue === 'venues') {
+      await request.s3.deleteFile(S3_REPORTS_BUCKET!, key);
+
+      // Pulisci il campo avatarUrl dell'utente
+      await prisma.user.update({
+        where: { id: Number(idValue) },
+        data: {
+          avatarUrl: null,
+        },
+      });
+    } else if (typeValue === 'logo') {
+      // Per logo: venue/{id}/logo_{timestamp}_{filename}
+      key = filenameValue; // Il filename è già la chiave S3 completa
+
+      await request.s3.deleteFile(S3_REPORTS_BUCKET!, key);
+
+      // Pulisci il campo logoURL della venue
       await prisma.venue.update({
         where: { id: Number(idValue) },
         data: {
-          photos: {
-            set:
-              (await prisma.venue.findUnique({ where: { id: Number(idValue) } }))?.photos?.filter(
-                (k: string) => k !== key
-              ) || [],
-          },
+          logoURL: null,
         },
       });
-    } else if (entityValue === 'packages') {
-      await prisma.package.update({
-        where: { id: Number(idValue) },
-        data: {
-          photos: {
-            set:
-              (await prisma.package.findUnique({ where: { id: Number(idValue) } }))?.photos?.filter(
-                (k: string) => k !== key
-              ) || [],
+    } else if (entityValue && (entityValue === 'venues' || entityValue === 'packages')) {
+      // Per gallery: venues/{id}/photos/{filename} o packages/{id}/photos/{filename}
+      key = `${entityValue}/${idValue}/photos/${filenameValue}`;
+
+      await request.s3.deleteFile(S3_REPORTS_BUCKET!, key);
+
+      // Rimuovi la chiave dal campo photos della venue o package
+      if (entityValue === 'venues') {
+        await prisma.venue.update({
+          where: { id: Number(idValue) },
+          data: {
+            photos: {
+              set:
+                (await prisma.venue.findUnique({ where: { id: Number(idValue) } }))?.photos?.filter(
+                  (k: string) => k !== key
+                ) || [],
+            },
           },
-        },
-      });
+        });
+      } else if (entityValue === 'packages') {
+        await prisma.package.update({
+          where: { id: Number(idValue) },
+          data: {
+            photos: {
+              set:
+                (
+                  await prisma.package.findUnique({ where: { id: Number(idValue) } })
+                )?.photos?.filter((k: string) => k !== key) || [],
+            },
+          },
+        });
+      }
+    } else {
+      return reply
+        .status(400)
+        .send({ error: 'Invalid delete parameters. Must specify type or entity.' });
     }
 
-    return { success: true };
+    return reply.send({ success: true });
   },
 
   get: async (request: FastifyRequest, reply: FastifyReply) => {

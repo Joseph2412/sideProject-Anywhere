@@ -3,6 +3,7 @@ import { Upload, Button, Avatar, message, Typography } from 'antd';
 import { UploadOutlined, UserOutlined } from '@ant-design/icons';
 import { usePathname } from 'next/navigation';
 import { useSetAtom } from 'jotai';
+import { useQueryClient } from '@tanstack/react-query';
 import { messageToast } from '@repo/ui/store/LayoutStore';
 import { useVenues, useUserProfile } from '@repo/hooks';
 import { UploadChangeParam, UploadFile } from 'antd/es/upload';
@@ -26,6 +27,7 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
 
   const pathname = usePathname();
   const setToast = useSetAtom(messageToast);
+  const queryClient = useQueryClient();
 
   // Hooks per dati
   const { data: venueData } = useVenues();
@@ -42,8 +44,8 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
   useEffect(() => {
     if (isProfileUpload && profileData?.user.avatarUrl) {
       setImageUrl(profileData.user.avatarUrl);
-    } else if (!isProfileUpload && venueData?.venues.venue.logoUrl) {
-      setImageUrl(venueData.venues.venue.logoUrl);
+    } else if (!isProfileUpload && venueData?.venues.venue.logoURL) {
+      setImageUrl(venueData.venues.venue.logoURL);
     }
   }, [isProfileUpload, profileData, venueData]);
 
@@ -89,6 +91,13 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
 
       const data = await response.json();
       setImageUrl(data.url);
+
+      // Invalida la cache per aggiornare i dati
+      if (isProfileUpload) {
+        await queryClient.invalidateQueries({ queryKey: ['profile'] });
+      } else {
+        await queryClient.invalidateQueries({ queryKey: ['venues'] });
+      }
 
       setToast({
         type: 'success',
@@ -140,6 +149,13 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
 
       setImageUrl(null);
 
+      // Invalida la cache per aggiornare i dati
+      if (isProfileUpload) {
+        await queryClient.invalidateQueries({ queryKey: ['profile'] });
+      } else {
+        await queryClient.invalidateQueries({ queryKey: ['venues'] });
+      }
+
       setToast({
         type: 'success',
         message: 'Immagine rimossa!',
@@ -172,7 +188,7 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
       <div className={styles.logoContainer}>
         <Avatar
           size={size}
-          src={imageUrl}
+          src={imageUrl || undefined} // Passa undefined invece di null per evitare icona di errore
           icon={!imageUrl && <UserOutlined />}
           className={styles.avatar}
         />

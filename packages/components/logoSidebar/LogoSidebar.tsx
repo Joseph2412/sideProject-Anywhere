@@ -1,7 +1,6 @@
 import { Avatar } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
-import { useVenues, useUserProfile } from '@repo/hooks';
-import { usePathname } from 'next/navigation';
+import { ShopOutlined } from '@ant-design/icons';
+import { useVenues } from '@repo/hooks';
 import styles from './LogoSidebar.module.css';
 
 interface LogoSidebarProps {
@@ -15,25 +14,18 @@ export const LogoSidebar: React.FC<LogoSidebarProps> = ({
   showName = false,
   className,
 }) => {
-  const pathname = usePathname();
   const { data: venueData } = useVenues();
-  const { data: profileData } = useUserProfile();
 
-  // Determina quale immagine mostrare basato sul contesto
-  const isVenueContext = pathname.includes('/venue') || pathname.includes('/packages');
-
-  const imageUrl = isVenueContext ? venueData?.venues.venue.logoUrl : profileData?.user.avatarUrl;
-
-  const displayName = isVenueContext
-    ? venueData?.venues.venue.name
-    : `${profileData?.user.firstName} ${profileData?.user.lastName}`;
+  // SEMPRE mostra logo e nome del venue, mai la foto profilo
+  const imageUrl = venueData?.venues.venue.logoURL;
+  const displayName = venueData?.venues.venue.name;
 
   return (
     <div className={`${styles.container} ${className || ''}`}>
       <Avatar
         size={size}
-        src={imageUrl}
-        icon={!imageUrl && <UserOutlined />}
+        src={imageUrl || undefined} // Passa undefined invece di null per evitare icona di errore
+        icon={!imageUrl && <ShopOutlined />}
         className={styles.logo}
       />
       {showName && displayName && <span className={styles.name}>{displayName}</span>}

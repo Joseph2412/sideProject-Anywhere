@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { Upload, Button, Avatar, message, Typography } from 'antd';
 import { UploadOutlined, UserOutlined } from '@ant-design/icons';
 import { useSetAtom } from 'jotai';
+import { useQueryClient } from '@tanstack/react-query';
 import { messageToast } from '@repo/ui/store/LayoutStore';
 import { useUserProfile } from '@repo/hooks';
 import { UploadChangeParam, UploadFile } from 'antd/es/upload';
 import styles from './ProfilePhotoUpload.module.css';
+import { RcFile } from 'antd/es/upload/interface';
 
 const { Text } = Typography;
 
@@ -30,6 +32,7 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
   const [loading, setLoading] = useState(false);
 
   const setToast = useSetAtom(messageToast);
+  const queryClient = useQueryClient();
   const { data: profileData } = useUserProfile();
 
   // Carica immagine esistente
@@ -41,6 +44,7 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
 
   // Validazione file
   const beforeUpload = (file: File) => {
+    console.log('Validazione file:', file);
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     if (!isJpgOrPng) {
       message.error('Puoi caricare solo file JPG/PNG!');
@@ -56,16 +60,39 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
 
   // Handler upload
   const handleUpload = async (info: UploadChangeParam<UploadFile>) => {
-    const file = info.file.originFileObj;
-    if (!file || !profileData?.user.id) return;
+    console.log('Evento onChange attivato:', info);
+
+    // Verifica se il file è disponibile
+    const file = info.file.originFileObj || (info.file as RcFile); // Usa RcFile come fallback
+    if (!file) {
+      console.error('Nessun file selezionato.');
+      return;
+    }
+
+    console.log('File selezionato:', file);
+
+    if (!profileData?.user.id) {
+      console.error('ID utente non disponibile.');
+      return;
+    }
 
     setLoading(true);
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('type', 'avatar');
-      formData.append('id', profileData.user.id.toString());
+      formData.append('file', file); // File originale
+      formData.append('type', 'avatar'); // Tipo di upload
+      formData.append('id', profileData.user.id.toString()); // ID utente
+      formData.append('filename', file.name); // Nome del file
+      formData.append('entity', 'users'); // Entità (es. 'users' per foto profilo)
+
+      console.log('Dati inviati al backend:', {
+        file: file.name,
+        type: 'avatar',
+        id: profileData.user.id.toString(),
+        filename: file.name,
+        entity: 'users',
+      });
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/media/upload`, {
         method: 'POST',
@@ -75,12 +102,19 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
         body: formData,
       });
 
+      console.log('Risposta backend:', response);
+
       if (!response.ok) {
+        const errorData = await response.json().catch(() => null); // Prova a leggere il messaggio di errore
+        console.error('Errore dal backend:', errorData || response.statusText);
         throw new Error("Errore durante l'upload");
       }
 
       const data = await response.json();
       setImageUrl(data.url);
+
+      // Invalida la cache per aggiornare i dati del profilo
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
 
       setToast({
         type: 'success',
@@ -132,6 +166,9 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
 
       setImageUrl(null);
 
+      // Invalida la cache per aggiornare i dati del profilo
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
+
       setToast({
         type: 'success',
         message: 'Immagine rimossa!',
@@ -177,7 +214,7 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
       <div className={styles.profileContainer}>
         <Avatar
           size={size}
-          src={imageUrl}
+          src={imageUrl || undefined} // Passa undefined invece di null per evitare icona di errore
           icon={!imageUrl && <UserOutlined />}
           className={styles.avatar}
         />
