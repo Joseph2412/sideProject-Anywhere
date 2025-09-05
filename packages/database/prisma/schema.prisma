@@ -47,9 +47,12 @@ enum Role {
 //Modelli Componenti Locale, Pacchetti e Piani
 
 model Venue {
+
   id           Int           @id @default(autoincrement())
   name         String
   address      String        @db.VarChar(200)
+  latitude     Float  @default(0)
+  longitude    Float  @default(0)
   services     String[]
   description  String?        @db.VarChar(200)
   photos       String[] //URLs di S3
@@ -62,8 +65,14 @@ model Venue {
   user User? //Senza questa Prisma mi da errore. Se provo ad eliminarlo mi ritorna
   //Error validating field `venue` in model `User`: The relation field `venue` on model `User` is missing an opposite relation field on the model `Venue`. Either run `prisma format` or add it manually.Prisma
 
+  bookings Booking[]
+
+  venueRatings  Int   @default(0)//Valutazione di recensioni totali
+  reviewsCounter Float  @default(0) //Contatore di recensioni QUANTE RECENSIONI Ha la VENUE
   @@index([name])
 }
+
+
 
 model OpenDays {
   id       Int             @id @default(autoincrement())
@@ -91,6 +100,7 @@ model Package {
   photos           String[] //Array di URLs S3
   venue           Venue? @relation(fields: [venueId], references: [id])
   venueId       Int?
+  bookings        Booking[]
 
   @@index([venueId])
   @@index([type])
@@ -162,3 +172,43 @@ model PaymentInfo {
 
 }
 
+
+
+
+
+model Booking {
+
+  id        Int      @id @default(autoincrement())
+  
+  start     DateTime
+  end       DateTime
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  people Int @default(1)
+  userId  Int
+
+  status String 
+  // Reserved, Confirmed, Canceled, Completed, in Review, Reviewed
+
+
+  venue     Venue    @relation(fields: [venueId], references: [id])
+  venueId   Int
+  
+  package   Package  @relation(fields: [packageId], references: [id])
+  packageId Int
+
+
+  //Campi Valutazione 
+  reviewWifi Int @default(0) //Valutazione Wifi
+  reviewStaff Int @default(0) //Valutazione Personale
+  reviewQuiet Int @default(0) //Valutazione Traquillità
+  reviewComfort Int @default(0) //Valutazione Comfort
+
+
+  @@index([venueId])
+  @@index([packageId])
+  @@index([start, end])
+
+}

@@ -1,42 +1,37 @@
-/* 1) Azzeriamo il padding interno del Card in questo blocco */
-.image-container :global(.ant-card-body) {
-  padding: 12px !important; /* usa 0 se vuoi a filo, 12px come nel mock */
-}
-
 /* 2) Griglia FULL-WIDTH: 4 colonne desktop, 3 tablet, 2 mobile */
 .centeredUpload :global(.ant-upload-list-picture-card) {
   display: grid !important;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important; /* 4 per riga */
-  gap: 16px !important; /* gutter come nel mock */
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 16px !important;
   width: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
-  justify-content: stretch !important; /* niente spazi laterali */
+  justify-content: stretch !important;
 }
 
-/* breakpoints responsivi */
 @media (max-width: 1200px) {
   .centeredUpload :global(.ant-upload-list-picture-card) {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   }
 }
+
 @media (max-width: 768px) {
   .centeredUpload :global(.ant-upload-list-picture-card) {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 
-/* 3) Gli item DEVONO riempire la colonna (niente width fissi) */
+/* 3) Gli item DEVONO riempire la colonna */
 .centeredUpload :global(.ant-upload-list-item-container),
 .centeredUpload :global(.ant-upload),
 .centeredUpload :global(.ant-upload-select),
 .centeredUpload :global(.ant-upload-select-picture-card) {
   width: 100% !important;
   height: auto !important;
-  aspect-ratio: 270 / 207 !important; /* mantiene proporzioni del tuo tile */
+  aspect-ratio: 270 / 207 !important;
 }
 
-/* 4) Annulla i vecchi 100% sugli item che sballano il layout */
+/* 4) Reset item dimensions */
 .centeredUpload :global(.ant-upload-list-item),
 .centeredUpload :global(.ant-upload-list-picture-card-container) {
   width: auto !important;
@@ -44,7 +39,7 @@
   padding: 0 !important;
 }
 
-/* 5) L’immagine riempie il tile e resta arrotondata */
+/* 5) Image styling */
 .centeredUpload :global(.ant-upload-list-item-image),
 .centeredUpload :global(.ant-upload-list-item-thumbnail),
 .centeredUpload :global(.ant-upload-list-item-thumbnail img),
@@ -52,12 +47,21 @@
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
-  border-radius: 12px !important; /* come nel mock */
+  border-radius: 12px !important;
   margin: 0 !important;
   padding: 0 !important;
 }
 
-/* (opzionale) rendi il bordo del “+ Upload” coerente */
+/* Upload button styling */
 .centeredUpload :global(.ant-upload-select-picture-card) {
   border-radius: 12px !important;
+}
+
+.upload-button :global(.ant-upload > button) {
+  height: 207px !important;
+  width: 270px !important;
+}
+
+.image-container :global(.ant-card .ant-card-body) {
+  padding: 12px 0 12px 12px !important;
 }

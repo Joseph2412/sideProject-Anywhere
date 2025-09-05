@@ -72,6 +72,9 @@ server.register(venueOpeningDaysRoute, { prefix: '/api' });
 server.register(venueClosingPeriods, { prefix: '/api' });
 server.register(venuePayments, { prefix: '/api' });
 
+//Rotte Sezione Recensioni
+//server.register(reviewsRoutes, { prefix: '/api' });
+
 //Rotte Sezione Pacchetti
 server.register(packagesRoutes, { prefix: '/api' });
 

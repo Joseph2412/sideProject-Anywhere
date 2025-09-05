@@ -59,7 +59,16 @@ export const ImageUpload: React.FC = () => {
 
   const handleChange: UploadProps['onChange'] = info => {
     setLoading(info.file.status === 'uploading');
-    setFileList(info.fileList.slice(-12)); // Limita a 12 immagini
+    setFileList(
+      info.fileList
+        .map(file => {
+          if (file.status === 'done' && file.response?.url) {
+            return { ...file, url: file.response.url, thumbUrl: file.response.url };
+          }
+          return file;
+        })
+        .slice(-12)
+    );
 
     if (info.file.status === 'done') {
       setLoading(false);
@@ -91,6 +100,10 @@ export const ImageUpload: React.FC = () => {
   }
 
   const handleRemove = async (file: UploadFile<string>) => {
+    if (!file.url) {
+      setFileList(prev => prev.filter(f => f.uid !== file.uid));
+      return true;
+    }
     const key = extractS3KeyFromUrl(file.url || '');
     if (!key) {
       setToast({
@@ -181,17 +194,40 @@ export const ImageUpload: React.FC = () => {
   }, [id, entity]);
 
   const uploadButton = (
-    <button style={{ border: 0, background: 'none' }} type="button">
+    <button
+      style={{
+        border: 20,
+        background: 'none',
+        minWidth: '270px',
+        minHeight: '202px',
+        width: '270px',
+        height: '202px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+      }}
+      type="button"
+    >
       {loading ? <LoadingOutlined /> : <PlusOutlined />}
       <div style={{ marginTop: 8 }}>Upload</div>
     </button>
   );
 
   return (
-    <Card style={{ paddingRight: '0px !important', height: '100%', width: 'fit-content' }}>
+    <Card
+      style={{
+        paddingRight: '0px !important',
+        height: '100%',
+        minWidth: '100%',
+        width: 'fit-content',
+      }}
+    >
       <div className={styles.centeredUpload}>
         <Upload
           maxCount={12}
+          className="upload-Button"
           name="file"
           listType="picture-card"
           showUploadList
