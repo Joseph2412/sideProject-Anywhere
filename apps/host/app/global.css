@@ -40,6 +40,12 @@
   font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans', sans-serif !important;
 }
 
+html,
+body {
+  min-height: 100vh !important;
+  overflow-y: auto !important;
+  /* se disattivi l'overflow-y,l'header rimane sticky ma il mainContent scrolla. Valuta tu*/
+}
 .ant-tabs-tab-active,
 .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
   color: #000639 !important;
@@ -137,4 +143,63 @@
 .ant-tabs-tab {
   padding-top: 8px !important;
   padding-bottom: 24px !important;
+}
+
+/* Forza la griglia delle immagini upload Ant Design */
+.ant-upload-list-picture-card {
+  display: flex !important;
+  justify-content: start !important;
+  width: 100% !important;
+  max-width: none !important;
+  padding: 0 !important;
+}
+
+.ant-upload-list-picture-card-container {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.ant-upload-list-item {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.ant-upload-list-picture-card {
+  width: 100% !important;
+  justify-items: center !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  margin-left: 0 !important;
+}
+
+/* Immagine upload: riempi tutto lo spazio disponibile */
+.ant-upload-list-item-image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 8px; /* opzionale, per arrotondare */
+}
+
+/* Rimuovi padding dal contenitore */
+.ant-upload-list-item-thumbnail {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.ant-upload {
+  height: 207px !important;
+  width: 270px !important;
+}
+
+.ant-upload-list-item-thumbnail img,
+.ant-upload-list-item-image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 8px;
 }

@@ -195,7 +195,7 @@ export const PackageDetails = () => {
       }}
       onFinish={handleFinish}
     >
-      <Card style={{ marginRight: 16 }}>
+      <Card>
         <Form.Item label="Attivo">
           <Popconfirm
             title="Disattiva Pacchetto?"
@@ -226,36 +226,39 @@ export const PackageDetails = () => {
             />
           </Popconfirm>
         </Form.Item>
-        <Row style={{ gap: 16 }}>
-          <Form.Item name="name" rules={requiredRule('Inserisci il Nome del Piano')}>
-            <NibolInput
-              validateTrigger="onSubmit"
-              label="Nome del Piano"
-              name="name"
-              hideAsterisk={true}
-              required={true}
-              style={{ height: 32, width: '990px' }}
-              disabled={isDisabled}
-            />
-          </Form.Item>
-
-          <Form.Item name="type" rules={requiredRule('Specifica la Tipologia')} label="Tipologia">
-            <Select
-              style={{ width: '990px', height: 32 }}
-              options={[
-                { value: 'SALA', label: 'Sala' },
-                { value: 'DESK', label: 'Desk' },
-              ]}
-              onChange={value => {
-                if (value === 'desk') {
-                  form.setFieldsValue({ seats: undefined });
-                } else {
-                  form.setFieldsValue({ capacity: undefined, squareMetres: undefined });
-                }
-              }}
-              disabled={isDisabled}
-            />
-          </Form.Item>
+        <Row gutter={[16, 0]}>
+          <Col span={12}>
+            <Form.Item name="name" rules={requiredRule('Inserisci il Nome del Piano')}>
+              <NibolInput
+                validateTrigger="onSubmit"
+                label="Nome del Piano"
+                name="name"
+                hideAsterisk={true}
+                required={true}
+                style={{ height: 32, width: '100%' }}
+                disabled={isDisabled}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item name="type" rules={requiredRule('Specifica la Tipologia')} label="Tipologia">
+              <Select
+                style={{ width: '100%', height: 32 }}
+                options={[
+                  { value: 'SALA', label: 'Sala' },
+                  { value: 'DESK', label: 'Desk' },
+                ]}
+                onChange={value => {
+                  if (value === 'desk') {
+                    form.setFieldsValue({ seats: undefined });
+                  } else {
+                    form.setFieldsValue({ capacity: undefined, squareMetres: undefined });
+                  }
+                }}
+                disabled={isDisabled}
+              />
+            </Form.Item>
+          </Col>
         </Row>
         <Form.Item
           name="description"

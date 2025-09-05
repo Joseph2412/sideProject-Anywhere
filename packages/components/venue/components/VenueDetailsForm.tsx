@@ -1,6 +1,6 @@
 import { useEffect } from 'react'; // React
 
-import { Form, Button, Upload, Avatar, Space, Row, Card, Select, Tag, Input } from 'antd';
+import { Form, Button, Upload, Avatar, Space, Row, Card, Select, Tag, Input, Col } from 'antd';
 
 import { DeleteOutlined } from '@ant-design/icons';
 import { NibolInput } from '../../inputs/Input';
@@ -89,7 +89,7 @@ export const VenueDetailsForm = () => {
   return (
     <Form
       layout="vertical"
-      style={{ width: '100%', borderRadius: 8 }}
+      style={{ width: '100%', borderRadius: 8, height: '100%' }}
       form={form}
       initialValues={venueDetails || {}}
       onFinish={onFinish}
@@ -99,7 +99,11 @@ export const VenueDetailsForm = () => {
           <div className={styles.profileContainer}>
             <Avatar size={64} />
             <div className={styles.buttonColumn}>
-              <Upload showUploadList={false} beforeUpload={() => false}>
+              <Upload
+                showUploadList={false}
+                beforeUpload={() => false}
+                style={{ display: 'contents' }}
+              >
                 <Button style={{ borderColor: '#D9D9D9' }}>Carica</Button>
               </Upload>
               <Button icon={<DeleteOutlined />} style={{ borderColor: '#D9D9D9' }}>
@@ -109,33 +113,37 @@ export const VenueDetailsForm = () => {
           </div>
         </Form.Item>
 
-        <Row style={{ gap: '16px' }}>
-          <Form.Item
-            name="name"
-            rules={[{ required: true, message: 'Inserisci il Nome de Locale' }]}
-          >
-            <NibolInput
-              validateTrigger="onSubmit"
-              label="Nome del Locale"
+        <Row gutter={[16, 0]}>
+          <Col span={12}>
+            <Form.Item
               name="name"
-              hideAsterisk={true}
-              required={true}
-              style={{ height: '32px', width: '999px' }}
-            />
-          </Form.Item>
-          <Form.Item
-            name="address"
-            rules={[{ required: true, message: "Inserisci L'indirizzo del Locale" }]}
-          >
-            <NibolInput
-              validateTrigger="onSubmit"
-              label="Indirizzo"
-              value="address"
-              hideAsterisk={true}
-              required={true}
-              style={{ height: '32px', width: '999px' }}
-            />
-          </Form.Item>
+              rules={[{ required: true, message: 'Inserisci il Nome de Locale' }]}
+            >
+              <NibolInput
+                validateTrigger="onSubmit"
+                label="Nome del Locale"
+                name="name"
+                hideAsterisk={true}
+                required={true}
+                style={{ height: '32px', width: '100%' }}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="address"
+              rules={[{ required: true, message: "Inserisci L'indirizzo del Locale" }]}
+            >
+              <NibolInput
+                validateTrigger="onSubmit"
+                label="Indirizzo"
+                value="address"
+                hideAsterisk={true}
+                required={true}
+                style={{ height: '32px', width: '100%' }}
+              />
+            </Form.Item>
+          </Col>
         </Row>
 
         <Form.Item name="description" label="Descrizione">

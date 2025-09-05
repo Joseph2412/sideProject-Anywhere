@@ -188,32 +188,30 @@ export const ImageUpload: React.FC = () => {
   );
 
   return (
-    <Card className={styles.upload207}>
-      <Upload
-        maxCount={12}
-        className={styles.upload207}
-        name="file"
-        listType="picture-card"
-        showUploadList
-        action={UPLOAD_ENDPOINT}
-        headers={{
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        }}
-        beforeUpload={beforeUpload}
-        onChange={handleChange}
-        onRemove={handleRemove}
-        //disabled={!id} serve per testare se passi l'Id. Si abilita se presente
-        data={file => ({
-          type: 'gallery',
-          entity,
-          id,
-          filename: file.name,
-        })}
-        fileList={fileList}
-        multiple
-      >
-        {fileList.length >= 12 ? null : uploadButton}
-      </Upload>
+    <Card style={{ paddingRight: '0px !important', height: '100%', width: 'fit-content' }}>
+      <div className={styles.centeredUpload}>
+        <Upload
+          maxCount={12}
+          name="file"
+          listType="picture-card"
+          showUploadList
+          action={UPLOAD_ENDPOINT}
+          headers={{ Authorization: `Bearer ${localStorage.getItem('token')}` }}
+          beforeUpload={beforeUpload}
+          onChange={handleChange}
+          onRemove={handleRemove}
+          data={file => ({
+            type: 'gallery',
+            entity,
+            id,
+            filename: file.name,
+          })}
+          fileList={fileList}
+          multiple
+        >
+          {fileList.length >= 12 ? null : uploadButton}
+        </Upload>
+      </div>
     </Card>
   );
 };

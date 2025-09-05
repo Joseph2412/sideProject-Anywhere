@@ -90,7 +90,7 @@ export const VenueHoursForm: React.FC = () => {
   }
 
   return (
-    <Card style={{ marginRight: 16 }}>
+    <Card>
       <Form layout="vertical">
         {weekDays.map(day => (
           <div key={day.value}>

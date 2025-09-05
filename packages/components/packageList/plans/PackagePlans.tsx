@@ -204,7 +204,7 @@ export const PackagePlans = () => {
   };
 
   return (
-    <Form layout="vertical" form={form} onFinish={onFinish} style={{ marginRight: 16 }}>
+    <Form layout="vertical" form={form} onFinish={onFinish}>
       {plans.map(plan => (
         <Card
           key={plan.value}

@@ -1,6 +1,5 @@
 .header {
   grid-area: header;
-  /* background: #ffff; */
   border-bottom: 1px solid #f0f0f0;
   height: 49px;
   width: auto;
@@ -21,7 +20,7 @@
 }
 
 .content-container {
-  overflow: hidden;
+  overflow-y: auto !important;
   display: grid;
   grid-template-rows: auto 1fr;
   grid-template-areas:
@@ -32,6 +31,6 @@
 .main-content {
   padding-top: 10px;
   margin-left: 16px;
-  /* overflow-y: auto; */
-  /* border:; */
+  margin-right: 16px;
+  overflow-y: auto;
 }
