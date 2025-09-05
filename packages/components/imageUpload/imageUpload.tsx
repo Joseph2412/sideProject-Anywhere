@@ -197,7 +197,10 @@ export const ImageUpload: React.FC = () => {
     <button
       style={{
         border: 20,
-        background: 'none',
+        borderRadius: 8,
+        borderWidth: 2,
+        borderStyle: 'dashed',
+        borderColor: '#d9d9d9',
         minWidth: '270px',
         minHeight: '202px',
         width: '270px',

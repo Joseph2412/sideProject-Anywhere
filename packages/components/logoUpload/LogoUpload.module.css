@@ -1,0 +1,26 @@
+.container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.avatar {
+  border: 2px solid #f0f0f0;
+  transition: border-color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.buttonsContainer {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.avatar:hover {
+  border-color: #1890ff;
+}

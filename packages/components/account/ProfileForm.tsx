@@ -1,17 +1,15 @@
-import { Form, Button, Upload, Avatar, Space, message, Row, Card, Col } from 'antd';
-import { UploadOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
+import { Form, Button, Space, message, Row, Card, Col } from 'antd';
 import { NibolInput } from '../inputs/Input';
 import { useState, useEffect } from 'react';
 import { useSetAtom } from 'jotai';
 import { messageToast } from '@repo/ui/store/LayoutStore';
 import { useUserProfile } from '@repo/hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ProfilePhotoUpload } from '../profilePhotoUpload';
 import styles from './profile.module.css';
-import { UploadChangeParam, UploadFile } from 'antd/es/upload';
 
 export const ProfileForm = () => {
   const [form] = Form.useForm();
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null); // Stato avatar
   const [loading, setLoading] = useState(false); // Stato loading
 
   const { data, isLoading } = useUserProfile();
@@ -59,20 +57,6 @@ export const ProfileForm = () => {
     }
   };
 
-  // Gestisce upload e preview avatar utente (solo preview locale)
-  const handleAvatarChange = (info: UploadChangeParam<UploadFile>) => {
-    // TODO: passare oggetto info completo in futuro
-
-    const file = info.file.originFileObj;
-
-    if (file) {
-      // Controllo che file esista
-      const reader = new FileReader();
-      reader.onload = () => setAvatarUrl(reader.result as string);
-      reader.readAsDataURL(file); // In futuro: integrazione S3
-    } // TODO: implementare upload S3
-  };
-
   /**
    * useEffect per sincronizzazione form con dati globali
    * Pattern: pre-popolamento form quando authUser è disponibile
@@ -89,8 +73,6 @@ export const ProfileForm = () => {
     }
   }, [data, form]);
 
-  const handleRemoveAvatar = () => setAvatarUrl(null); // In futuro: rimuovere da S3
-
   if (isLoading) {
     return <div>Caricamento profilo...</div>;
   }
@@ -103,35 +85,7 @@ export const ProfileForm = () => {
       onFinish={onFinish}
     >
       <Card style={{ marginRight: 16 }}>
-        <Form.Item label="Foto profilo">
-          <Space>
-            <Avatar size={64} icon={!avatarUrl && <UserOutlined />} src={avatarUrl ?? undefined} />
-            <Upload
-              showUploadList={false}
-              beforeUpload={() => false}
-              onChange={handleAvatarChange}
-              style={{ display: 'contents' }}
-            >
-              <Button
-                icon={<UploadOutlined />}
-                className={styles.buttonUpload}
-                style={{
-                  height: 32,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                Carica
-              </Button>
-            </Upload>
-            {avatarUrl && (
-              <Button icon={<DeleteOutlined />} danger onClick={handleRemoveAvatar}>
-                Rimuovi
-              </Button>
-            )}
-          </Space>
-        </Form.Item>
+        <ProfilePhotoUpload size={80} showTitle={true} title="Foto Profilo" />
 
         <Row gutter={[16, 0]}>
           <Col span={12}>

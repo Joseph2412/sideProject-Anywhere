@@ -2,13 +2,13 @@
 
 //COMPONENTE SIDEBAR
 
-import { Menu, Layout, Avatar, Modal, Select, Space, Button, Typography, Input, Form } from 'antd';
+import { Menu, Layout, Modal, Select, Space, Button, Typography, Input, Form } from 'antd';
 import { CalendarOutlined, ShopOutlined, UserOutlined, PlusOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { PrimaryButton } from '@repo/components';
+import { PrimaryButton, LogoSidebar, SidebarFooter } from '@repo/components';
 import { messageToast } from '@repo/ui/store/ToastStore';
 
 import { useSetAtom, useAtomValue } from 'jotai';
@@ -104,8 +104,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
     <Sider width={248} style={{ background: '#fff', height: '100vh' }}>
       <Menu mode="inline" onClick={handleMenuClick}>
         <div style={{ padding: 16 }}>
-          <Avatar size="large" style={{ marginBottom: 8 }} />
-          <div style={{ fontWeight: 600 }}>PlaceHolder</div>
+          <LogoSidebar size={48} showName={true} />
         </div>
         {/* Sezioni statiche */}
         <Menu.Item key="calendar" icon={<CalendarOutlined />}>
@@ -263,12 +262,17 @@ export default function Sidebar({ onLogout }: SidebarProps) {
           </Form.Item>
         </Form>
       </Modal>
-      <div style={{ position: 'absolute', bottom: 16, paddingLeft: 16 }}>
-        <Avatar />
-        <br />
-        <small>Marco Cattaneo</small>
-        <br />
-        <small>marco@pausa.it</small>
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 16,
+          left: 0,
+          right: 0,
+          paddingLeft: 16,
+          paddingRight: 16,
+        }}
+      >
+        <SidebarFooter avatarSize={32} />
       </div>
     </Sider>
   );

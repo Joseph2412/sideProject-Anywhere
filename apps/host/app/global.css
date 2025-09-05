@@ -203,3 +203,7 @@ body {
   object-fit: cover !important;
   border-radius: 8px;
 }
+
+.ant-upload-select {
+  display: contents !important;
+}

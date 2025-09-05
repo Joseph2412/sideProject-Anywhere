@@ -1,0 +1,43 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.avatar {
+  border: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0; /* Permette text-overflow */
+  flex: 1;
+}
+
+.name {
+  font-weight: 500;
+  color: #262626 !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.email {
+  font-size: 12px !important;
+  color: #8c8c8c !important;
+  line-height: 1.2 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}

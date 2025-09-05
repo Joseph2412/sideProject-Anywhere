@@ -29,6 +29,8 @@ export * from './venue';
 
 // Media Components
 export * from './imageUpload';
+export * from './logoUpload';
+export * from './profilePhotoUpload';
 
 // Navigation Components
 export * from './tabs';
@@ -39,3 +41,8 @@ export * from './calendar';
 // Bundle Components
 export * from './packageList/PackageForm';
 export * from './packageList/PackagesList';
+
+// Sidebar Components
+export * from './logoSidebar';
+export * from './profileSidebar';
+export * from './sidebarFooter';

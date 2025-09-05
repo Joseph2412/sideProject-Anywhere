@@ -1,9 +1,9 @@
 import { useEffect } from 'react'; // React
 
-import { Form, Button, Upload, Avatar, Space, Row, Card, Select, Tag, Input, Col } from 'antd';
+import { Form, Button, Space, Row, Card, Select, Tag, Input, Col } from 'antd';
 
-import { DeleteOutlined } from '@ant-design/icons';
 import { NibolInput } from '../../inputs/Input';
+import { LogoUpload } from '../../logoUpload';
 import styles from './VenueDetailsForm.module.css';
 import { useState } from 'react';
 import { useVenues } from '@repo/hooks';
@@ -95,25 +95,9 @@ export const VenueDetailsForm = () => {
       onFinish={onFinish}
     >
       <Card>
-        <Form.Item name="avatarUrl" label="Foto profilo" className={styles.profileUpload}>
-          <div className={styles.profileContainer}>
-            <Avatar size={64} />
-            <div className={styles.buttonColumn}>
-              <Upload
-                showUploadList={false}
-                beforeUpload={() => false}
-                style={{ display: 'contents' }}
-              >
-                <Button style={{ borderColor: '#D9D9D9' }}>Carica</Button>
-              </Upload>
-              <Button icon={<DeleteOutlined />} style={{ borderColor: '#D9D9D9' }}>
-                Rimuovi
-              </Button>
-            </div>
-          </div>
-        </Form.Item>
+        <LogoUpload size={80} showRemove={true} />
 
-        <Row gutter={[16, 0]}>
+        <Row gutter={[16, 0]} style={{ marginTop: 16 }}>
           <Col span={12}>
             <Form.Item
               name="name"
