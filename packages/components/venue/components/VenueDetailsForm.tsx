@@ -34,10 +34,13 @@ export const VenueDetailsForm = () => {
   useEffect(() => {
     if (data && data.venues.venue) {
       form.setFieldsValue({
+
         name: data.venues.venue.name,
         address: data.venues.venue.address,
         description: data.venues.venue.description,
         services: data.venues.venue.services,
+
+
         // avatarUrl: data.venues[0].avatarURL || '',
       });
       setVenueDetails(data.venues.venue);
