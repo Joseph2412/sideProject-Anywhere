@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Checkbox, TimePicker, Button, Space, Typography, Row, Col } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import dayjs from 'dayjs';
 import { parsePeriodString, formatPeriodString } from './openingHours.types';
-import { PrimaryButton } from './../../../buttons/PrimaryButton';
+import { useUpdateVenueOpeningDays } from '@repo/hooks';
 
 interface DayOpeningHoursProps {
   day: string;
@@ -22,203 +22,160 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
   onUpdateDay,
 }) => {
   const { isClosed, periods } = openingDayData;
+  const updateOpeningDays = useUpdateVenueOpeningDays();
 
-  // Stato per il periodo in corso di modifica (non ancora confermato)
-  const [pendingPeriod, setPendingPeriod] = useState<string | null>(null);
-
-  const handleToggleClosed = (e: CheckboxChangeEvent) => {
+  // Quando flaggo la checkbox, aggiunge periodo 08:00-18:00 e salva
+  const handleToggleClosed = async (e: CheckboxChangeEvent) => {
     const isChecked = e.target.checked;
-
     if (isChecked) {
-      // Se chiude, rimuovi anche il periodo pendente
-      setPendingPeriod(null);
+      // Chiuso: nessun periodo
       onUpdateDay(dayKey, {
         isClosed: true,
         periods: [],
       });
+      await updateOpeningDays.mutateAsync([
+        {
+          day: dayKey,
+          isClosed: true,
+          periods: [],
+        },
+      ]);
     } else {
-      // Da chiuso ad aperto: crea subito un periodo pendente (non salvato)
-      setTimeout(() => {
-        setPendingPeriod('08:00-18:00');
-      }, 0);
+      // Aperto: aggiungi periodo 08:00-18:00
+      const defaultPeriod = formatPeriodString('08:00', '18:00');
       onUpdateDay(dayKey, {
         isClosed: false,
-        periods: [], // Reset periodi quando riapri
+        periods: [defaultPeriod],
       });
+      await updateOpeningDays.mutateAsync([
+        {
+          day: dayKey,
+          isClosed: false,
+          periods: [defaultPeriod],
+        },
+      ]);
     }
   };
 
-  // Conferma il periodo pendente
-  const handleConfirmPeriod = () => {
-    if (pendingPeriod) {
-      const newPeriods = [...periods, pendingPeriod];
-      onUpdateDay(dayKey, {
-        isClosed: false,
+  // Modifica periodo esistente
+  const handlePeriodChange = async (index: number, timeStrings: [string, string] | null) => {
+    if (!timeStrings || !timeStrings[0] || !timeStrings[1]) return;
+    const newPeriods = [...periods];
+    newPeriods[index] = formatPeriodString(timeStrings[0], timeStrings[1]);
+    onUpdateDay(dayKey, {
+      isClosed,
+      periods: newPeriods,
+    });
+    await updateOpeningDays.mutateAsync([
+      {
+        day: dayKey,
+        isClosed,
         periods: newPeriods,
-      });
-      // Dopo la conferma, riapri subito un nuovo periodo pending
-      setPendingPeriod('08:00-18:00');
-    }
+      },
+    ]);
   };
 
-  const handleRemovePeriod = (index: number) => {
+  // Aggiungi periodo 08:00-18:00 e salva
+  const handleAddPeriod = async () => {
+    const defaultPeriod = formatPeriodString('08:00', '18:00');
+    const updatedPeriods = [...periods, defaultPeriod];
+    onUpdateDay(dayKey, {
+      isClosed: false,
+      periods: updatedPeriods,
+    });
+    await updateOpeningDays.mutateAsync([
+      {
+        day: dayKey,
+        isClosed: false,
+        periods: updatedPeriods,
+      },
+    ]);
+  };
+
+  // Rimuovi periodo
+  const handleRemovePeriod = async (index: number) => {
     const newPeriods = periods.filter((_, i) => i !== index);
     onUpdateDay(dayKey, {
       isClosed,
       periods: newPeriods,
     });
-  };
-
-  const handlePeriodChange = (index: number, timeStrings: [string, string] | null) => {
-    if (!timeStrings || !timeStrings[0] || !timeStrings[1]) return;
-
-    const newPeriods = [...periods];
-    newPeriods[index] = formatPeriodString(timeStrings[0], timeStrings[1]);
-
-    onUpdateDay(dayKey, {
-      isClosed,
-      periods: newPeriods,
-    });
-  };
-
-  // Gestisci cambio del periodo pendente
-  const handlePendingPeriodChange = (timeStrings: [string, string] | null) => {
-    if (timeStrings && timeStrings[0] && timeStrings[1]) {
-      setPendingPeriod(formatPeriodString(timeStrings[0], timeStrings[1]));
-    }
+    await updateOpeningDays.mutateAsync([
+      {
+        day: dayKey,
+        isClosed,
+        periods: newPeriods,
+      },
+    ]);
   };
 
   return (
-    <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
+    <Row justify="space-between" align="middle">
       <Col flex="auto">
-        <div style={{ marginBottom: 6 }}>
+        <div
+          style={{
+            marginBottom: 6,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            justifyContent: 'space-between',
+          }}
+        >
           <Typography.Text strong>{day}</Typography.Text>
+          <Checkbox checked={isClosed} onChange={handleToggleClosed}>
+            Chiuso
+          </Checkbox>
         </div>
+        <Space direction="vertical">
+          {/* Periodi confermati */}
+          {periods.map((period, index) => {
+            const parsed = parsePeriodString(period);
+            const timeRange: [dayjs.Dayjs | null, dayjs.Dayjs | null] = parsed
+              ? [dayjs(parsed.start, 'HH:mm'), dayjs(parsed.end, 'HH:mm')]
+              : [null, null];
 
-        {!isClosed && (
-          <Space direction="vertical">
-            {/* Periodi confermati */}
-            {periods.map((period, index) => {
-              const parsed = parsePeriodString(period);
-              const timeRange: [dayjs.Dayjs | null, dayjs.Dayjs | null] = parsed
-                ? [dayjs(parsed.start, 'HH:mm'), dayjs(parsed.end, 'HH:mm')]
-                : [null, null];
-
-              return (
-                <div key={index}>
-                  <Typography.Text
-                    style={{
-                      fontSize: '12px',
-                      display: 'block',
-                      marginBottom: '4px',
-                    }}
-                  >
-                    Dalle - Alle
-                  </Typography.Text>
-                  <Row gutter={8} align="middle">
+            return (
+              <div key={index}>
+                <Typography.Text
+                  style={{
+                    fontSize: '12px',
+                    display: 'block',
+                    marginBottom: '4px',
+                  }}
+                >
+                  Dalle - Alle
+                </Typography.Text>
+                <Row gutter={8} align="middle">
+                  <Col>
+                    <TimePicker.RangePicker
+                      format="HH:mm"
+                      value={timeRange}
+                      onChange={(_, timeStrings) =>
+                        handlePeriodChange(index, timeStrings as [string, string])
+                      }
+                      disabled={isClosed}
+                    />
+                  </Col>
+                  {!isClosed && (
                     <Col>
-                      <TimePicker.RangePicker
-                        format="HH:mm"
-                        value={timeRange}
-                        onChange={(_, timeStrings) =>
-                          handlePeriodChange(index, timeStrings as [string, string])
-                        }
-                      />
-                    </Col>
-                    <Col>
-                      {/* Mostra "Rimuovi" solo dal secondo periodo in poi */}
-                      {index > 0 && (
-                        <Button onClick={() => handleRemovePeriod(index)}>Rimuovi</Button>
-                      )}
-                    </Col>
-                  </Row>
-                </div>
-              );
-            })}
-
-            {/* Range picker per aggiungere nuovo periodo (sempre in fondo se non pendingPeriod null) */}
-            {!isClosed && (
-              <Space direction="vertical">
-                {pendingPeriod ? (
-                  <div>
-                    <Typography.Text
-                      style={{
-                        fontSize: '12px',
-                        display: 'block',
-                        marginBottom: '4px',
-                      }}
-                    >
-                      Dalle - Alle
-                    </Typography.Text>
-                    <Row gutter={8} align="middle">
-                      <Col>
-                        <TimePicker.RangePicker
-                          format="HH:mm"
-                          value={(() => {
-                            const parsed = parsePeriodString(pendingPeriod);
-                            return parsed
-                              ? [dayjs(parsed.start, 'HH:mm'), dayjs(parsed.end, 'HH:mm')]
-                              : [dayjs('08:00', 'HH:mm'), dayjs('18:00', 'HH:mm')];
-                          })()}
-                          onChange={(_, timeStrings) =>
-                            handlePendingPeriodChange(timeStrings as [string, string])
-                          }
-                        />
-                      </Col>
-                      <Col>
-                        <PrimaryButton type="primary" onClick={handleConfirmPeriod}>
-                          Aggiungi periodo
-                        </PrimaryButton>
-                      </Col>
-                    </Row>
-                  </div>
-                ) : (
-                  // Mostra SEMPRE il timepicker pending se non c'è, precompilato
-                  <div>
-                    <Typography.Text
-                      style={{
-                        fontSize: '12px',
-                        display: 'block',
-                        marginBottom: '4px',
-                      }}
-                    >
-                      Dalle - Alle
-                    </Typography.Text>
-                    <Row gutter={8} align="middle">
-                      <Col>
-                        <TimePicker.RangePicker
-                          format="HH:mm"
-                          value={[dayjs('08:00', 'HH:mm'), dayjs('18:00', 'HH:mm')]}
-                          onChange={(_, timeStrings) =>
-                            setPendingPeriod(formatPeriodString(timeStrings[0], timeStrings[1]))
-                          }
-                        />
-                      </Col>
-                      <Col>
-                        <Button
-                          type="primary"
-                          onClick={() => {
-                            // Conferma direttamente se l'utente ha già selezionato un orario
-                            setPendingPeriod('08:00-18:00');
-                            handleConfirmPeriod();
-                          }}
-                        >
+                      {index === 0 ? (
+                        <Button onClick={handleAddPeriod} style={{ borderColor: '#D9D9D9' }}>
                           Aggiungi periodo
                         </Button>
-                      </Col>
-                    </Row>
-                  </div>
-                )}
-              </Space>
-            )}
-          </Space>
-        )}
-      </Col>
-
-      <Col>
-        <Checkbox checked={isClosed} onChange={handleToggleClosed}>
-          Chiuso
-        </Checkbox>
+                      ) : (
+                        <Button
+                          onClick={() => handleRemovePeriod(index)}
+                          style={{ borderColor: '#D9D9D9' }}
+                        >
+                          Rimuovi
+                        </Button>
+                      )}
+                    </Col>
+                  )}
+                </Row>
+              </div>
+            );
+          })}
+        </Space>
       </Col>
     </Row>
   );

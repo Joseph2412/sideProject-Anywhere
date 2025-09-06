@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react'; // React
+import { useEffect } from 'react'; // React
 
-import { Form, Button, Upload, Avatar, Space, Row, Col, Card, Select, Tag, Input } from 'antd';
+import { Form, Button, Space, Row, Card, Select, Tag, Input, Col } from 'antd';
 
-import { DeleteOutlined } from '@ant-design/icons';
 import { NibolInput } from '../../inputs/Input';
+import { LogoUpload } from '../../logoUpload';
 import styles from './VenueDetailsForm.module.css';
 import { useState } from 'react';
 import { useVenues } from '@repo/hooks';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Jotai e store
 import { useSetAtom } from 'jotai';
@@ -17,6 +18,7 @@ import type { VenueDetails } from '@repo/ui/store/LayoutStore';
 
 export const VenueDetailsForm = () => {
   const [form] = Form.useForm();
+  const queryClient = useQueryClient();
 
   // Array servizi disponibili per venue
   const availableServices = ['WiFi', 'Stampante', 'Caffè', 'Reception', 'Parcheggio'];
@@ -30,12 +32,18 @@ export const VenueDetailsForm = () => {
 
   // useEffect per caricamento dati venue esistenti
   useEffect(() => {
-    if (data && data.venues) {
+    if (data && data.venues.venue) {
       form.setFieldsValue({
-        ...data.venues[0],
+
+        name: data.venues.venue.name,
+        address: data.venues.venue.address,
+        description: data.venues.venue.description,
+        services: data.venues.venue.services,
+
+
         // avatarUrl: data.venues[0].avatarURL || '',
       });
-      setVenueDetails(data.venues[0]);
+      setVenueDetails(data.venues.venue);
     }
   }, [data, form]);
 
@@ -53,6 +61,10 @@ export const VenueDetailsForm = () => {
       if (res.ok) {
         const data = await res.json();
         setVenueDetails(data.venue);
+
+        // Invalida la query per aggiornare tutti i componenti che usano venue data (inclusa la sidebar)
+        await queryClient.invalidateQueries({ queryKey: ['venues'] });
+
         setMessage({
           type: 'success',
           message: 'Dettagli aggiornati',
@@ -86,25 +98,15 @@ export const VenueDetailsForm = () => {
   return (
     <Form
       layout="vertical"
-      style={{ width: '100%', borderRadius: 8 }}
+      style={{ width: '100%', borderRadius: 8, height: '100%' }}
       form={form}
       initialValues={venueDetails || {}}
       onFinish={onFinish}
     >
       <Card>
-        <Form.Item name="avatarUrl" label="Foto profilo" className={styles.profileUpload}>
-          <div className={styles.profileContainer}>
-            <Avatar size={64} />
-            <div className={styles.buttonColumn}>
-              <Upload showUploadList={false} beforeUpload={() => false}>
-                <Button>Carica</Button>
-              </Upload>
-              <Button icon={<DeleteOutlined />}>Rimuovi</Button>
-            </div>
-          </div>
-        </Form.Item>
+        <LogoUpload size={80} showRemove={true} />
 
-        <Row gutter={[0, 0]}>
+        <Row gutter={[16, 0]} style={{ marginTop: 16 }}>
           <Col span={12}>
             <Form.Item
               name="name"
@@ -116,7 +118,7 @@ export const VenueDetailsForm = () => {
                 name="name"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: 32, width: '100%' }}
+                style={{ height: '32px', width: '100%' }}
               />
             </Form.Item>
           </Col>
@@ -128,10 +130,10 @@ export const VenueDetailsForm = () => {
               <NibolInput
                 validateTrigger="onSubmit"
                 label="Indirizzo"
-                name="address"
+                value="address"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: 32, width: '100%' }}
+                style={{ height: '32px', width: '100%' }}
               />
             </Form.Item>
           </Col>
@@ -151,7 +153,14 @@ export const VenueDetailsForm = () => {
             }))}
           />
         </Form.Item>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 12 }}>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            marginTop: '8px',
+            marginLeft: '4px',
+          }}
+        >
           {availableServices.map(service => (
             <Tag
               key={service}
@@ -164,7 +173,18 @@ export const VenueDetailsForm = () => {
                 }
               }}
             >
-              + {service}
+              <span
+                style={{
+                  display: 'flex',
+                  marginBottom: '3px',
+                  marginRight: '4px',
+                  fontSize: '14px',
+                }}
+              >
+                +
+              </span>
+
+              {service}
             </Tag>
           ))}
         </div>
@@ -183,6 +203,7 @@ export const VenueDetailsForm = () => {
                 }
               }}
               className={styles.secondary}
+              style={{ borderColor: '#D9D9D9' }}
             >
               Annulla
             </Button>

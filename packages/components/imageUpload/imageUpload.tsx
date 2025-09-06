@@ -59,7 +59,16 @@ export const ImageUpload: React.FC = () => {
 
   const handleChange: UploadProps['onChange'] = info => {
     setLoading(info.file.status === 'uploading');
-    setFileList(info.fileList.slice(-12)); // Limita a 12 immagini
+    setFileList(
+      info.fileList
+        .map(file => {
+          if (file.status === 'done' && file.response?.url) {
+            return { ...file, url: file.response.url, thumbUrl: file.response.url };
+          }
+          return file;
+        })
+        .slice(-12)
+    );
 
     if (info.file.status === 'done') {
       setLoading(false);
@@ -91,6 +100,10 @@ export const ImageUpload: React.FC = () => {
   }
 
   const handleRemove = async (file: UploadFile<string>) => {
+    if (!file.url) {
+      setFileList(prev => prev.filter(f => f.uid !== file.uid));
+      return true;
+    }
     const key = extractS3KeyFromUrl(file.url || '');
     if (!key) {
       setToast({
@@ -181,39 +194,63 @@ export const ImageUpload: React.FC = () => {
   }, [id, entity]);
 
   const uploadButton = (
-    <button style={{ border: 0, background: 'none' }} type="button">
+    <button
+      style={{
+        border: 20,
+        borderRadius: 8,
+        borderWidth: 2,
+        borderStyle: 'dashed',
+        borderColor: '#d9d9d9',
+        minWidth: '350px',
+        minHeight: '260px',
+        width: '350px',
+        height: '260px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+      }}
+      type="button"
+    >
       {loading ? <LoadingOutlined /> : <PlusOutlined />}
       <div style={{ marginTop: 8 }}>Upload</div>
     </button>
   );
 
   return (
-    <Card className={styles.upload207}>
-      <Upload
-        maxCount={12}
-        className={styles.upload207}
-        name="file"
-        listType="picture-card"
-        showUploadList
-        action={UPLOAD_ENDPOINT}
-        headers={{
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        }}
-        beforeUpload={beforeUpload}
-        onChange={handleChange}
-        onRemove={handleRemove}
-        //disabled={!id} serve per testare se passi l'Id. Si abilita se presente
-        data={file => ({
-          type: 'gallery',
-          entity,
-          id,
-          filename: file.name,
-        })}
-        fileList={fileList}
-        multiple
-      >
-        {fileList.length >= 12 ? null : uploadButton}
-      </Upload>
+    <Card
+      style={{
+        paddingRight: '0px !important',
+        height: '100%',
+        minWidth: '100%',
+        width: 'fit-content',
+      }}
+    >
+      <div className={styles.centeredUpload}>
+        <Upload
+          maxCount={12}
+          className="upload-Button"
+          name="file"
+          listType="picture-card"
+          showUploadList
+          action={UPLOAD_ENDPOINT}
+          headers={{ Authorization: `Bearer ${localStorage.getItem('token')}` }}
+          beforeUpload={beforeUpload}
+          onChange={handleChange}
+          onRemove={handleRemove}
+          data={file => ({
+            type: 'gallery',
+            entity,
+            id,
+            filename: file.name,
+          })}
+          fileList={fileList}
+          multiple
+        >
+          {fileList.length >= 12 ? null : uploadButton}
+        </Upload>
+      </div>
     </Card>
   );
 };

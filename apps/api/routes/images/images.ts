@@ -4,14 +4,18 @@ import { imagesHandler } from './../../handlers/images/imagesHandler';
 
 export async function imagesRoutes(fastify: FastifyInstance) {
   // Get gallery images (presigned URLs) based on entity and id
-  fastify.get('/gallery/:entity/:id', { preValidation: fastify.auth }, imagesHandler.getGallery);
+  fastify.get(
+    '/gallery/:entity/:id',
+    { preValidation: fastify.authenticate },
+    imagesHandler.getGallery
+  );
 
   // Get signed URL for a file
-  fastify.get('/file', { preValidation: fastify.auth }, imagesHandler.get);
+  fastify.get('/file', { preValidation: fastify.authenticate }, imagesHandler.get);
 
   // Upload
-  fastify.post('/upload', { preValidation: fastify.auth }, imagesHandler.upload);
+  fastify.post('/upload', { preValidation: fastify.authenticate }, imagesHandler.upload);
 
   // Delete a file
-  fastify.delete('/delete', { preValidation: fastify.auth }, imagesHandler.delete);
+  fastify.delete('/delete', { preValidation: fastify.authenticate }, imagesHandler.delete);
 }

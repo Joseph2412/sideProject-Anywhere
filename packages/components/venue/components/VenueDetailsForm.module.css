@@ -3,17 +3,13 @@
   border-width: 1px;
   border-color: #d9d9d9;
   cursor: pointer;
-  padding: 1px, 8px;
-  min-width: 80px; /* sufficiente per “Aria condizionata” */
-  max-width: 100%; /* non sforare container */
-  text-wrap: balance;
+  padding: 1px 8px;
   height: 20px;
   display: inline-flex;
   justify-content: center;
+  text-align: center;
   align-items: center;
-  white-space: nowrap; /* evita a capo singole parole */
-  overflow: hidden; /* taglia se troppo lungo */
-  text-overflow: ellipsis; /* ... se esce fuori */
+  word-wrap: break-word;
 }
 
 .profileContainer {

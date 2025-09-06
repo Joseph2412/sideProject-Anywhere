@@ -8,10 +8,10 @@ export function generateS3Key(params: {
 
   switch (type) {
     case 'avatar':
-      return `host/profile/${id}_avatar_${Date.now()}_${filename}`;
+      return `host/${id}/profile/avatar/${Date.now()}_${filename}`;
 
     case 'logo':
-      return `venue/${id}/logo_${Date.now()}_${filename}`;
+      return `venues/${id}/logo/${Date.now()}_${filename}`;
 
     case 'gallery':
       if (entity === 'package') {

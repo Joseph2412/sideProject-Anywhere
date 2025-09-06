@@ -38,3 +38,9 @@
   align-items: center;
   justify-content: center;
 }
+
+.save:hover {
+  border: 1px solid #00063e;
+  color: white !important;
+  background-color: #00063e !important;
+}

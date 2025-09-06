@@ -12,7 +12,9 @@ type Props = {
 };
 
 const CustomTab: React.FC<Props> = ({ tabs }) => {
-  return <Tabs defaultActiveKey={tabs[0]?.key} items={tabs} />;
+  return (
+    <Tabs defaultActiveKey={tabs[0]?.key} items={tabs} style={{ marginRight: '16px !important' }} />
+  );
 };
 
 export default CustomTab;

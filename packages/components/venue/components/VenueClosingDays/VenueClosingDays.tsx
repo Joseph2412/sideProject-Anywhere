@@ -142,7 +142,7 @@ export const VenueClosingDays: React.FC = () => {
       >
         <Row gutter={16} align="top">
           <Col flex="0 0 auto">
-            <Switch onChange={handleSwitchChange} checked={isRange} style={{ marginTop: 10 }} />
+            <Switch onChange={handleSwitchChange} checked={isRange} style={{ marginTop: 0 }} />
           </Col>
           <Col flex="0 0 auto">
             <Space.Compact size="middle">
@@ -198,7 +198,8 @@ export const VenueClosingDays: React.FC = () => {
                 style={{
                   borderTopLeftRadius: 5,
                   borderBottomLeftRadius: 5,
-                  marginTop: 4,
+                  marginTop: 0,
+                  borderColor: '#D9D9D9',
                 }}
               >
                 Rimuovi
@@ -363,8 +364,11 @@ export const VenueClosingDays: React.FC = () => {
       <Form form={form} layout="vertical" onFinish={handleSave}>
         <Card>
           <Row>
-            <PrimaryButton style={{ width: 'auto' }} onClick={() => setIsModalVisible(true)}>
-              Importa Festività Nazionali
+            <PrimaryButton
+              style={{ width: 'auto', fontWeight: '500' }}
+              onClick={() => setIsModalVisible(true)}
+            >
+              Importa festività nazionali
             </PrimaryButton>
           </Row>
           <Divider />
@@ -396,7 +400,9 @@ export const VenueClosingDays: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', gap: 15 }}>
-                <Button onClick={handleCancel}>Annulla</Button>
+                <Button onClick={handleCancel} style={{ borderColor: '#D9D9D9' }}>
+                  Annulla
+                </Button>
                 <PrimaryButton htmlType="submit">Salva</PrimaryButton>
               </div>
               <Col>

@@ -1,17 +1,15 @@
-import { Form, Button, Upload, Avatar, Space, message, Row, Col, Card } from 'antd';
-import { UploadOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
+import { Form, Button, Space, message, Row, Card, Col } from 'antd';
 import { NibolInput } from '../inputs/Input';
 import { useState, useEffect } from 'react';
 import { useSetAtom } from 'jotai';
 import { messageToast } from '@repo/ui/store/LayoutStore';
 import { useUserProfile } from '@repo/hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ProfilePhotoUpload } from '../profilePhotoUpload';
 import styles from './profile.module.css';
-import { UploadChangeParam, UploadFile } from 'antd/es/upload';
 
 export const ProfileForm = () => {
   const [form] = Form.useForm();
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null); // Stato avatar
   const [loading, setLoading] = useState(false); // Stato loading
 
   const { data, isLoading } = useUserProfile();
@@ -59,20 +57,6 @@ export const ProfileForm = () => {
     }
   };
 
-  // Gestisce upload e preview avatar utente (solo preview locale)
-  const handleAvatarChange = (info: UploadChangeParam<UploadFile>) => {
-    // TODO: passare oggetto info completo in futuro
-
-    const file = info.file.originFileObj;
-
-    if (file) {
-      // Controllo che file esista
-      const reader = new FileReader();
-      reader.onload = () => setAvatarUrl(reader.result as string);
-      reader.readAsDataURL(file); // In futuro: integrazione S3
-    } // TODO: implementare upload S3
-  };
-
   /**
    * useEffect per sincronizzazione form con dati globali
    * Pattern: pre-popolamento form quando authUser è disponibile
@@ -89,8 +73,6 @@ export const ProfileForm = () => {
     }
   }, [data, form]);
 
-  const handleRemoveAvatar = () => setAvatarUrl(null); // In futuro: rimuovere da S3
-
   if (isLoading) {
     return <div>Caricamento profilo...</div>;
   }
@@ -102,35 +84,16 @@ export const ProfileForm = () => {
       style={{ width: '100%', borderRadius: 8 }}
       onFinish={onFinish}
     >
-      <Card>
-        <Form.Item label="Foto profilo">
-          <Space>
-            <Avatar size={64} icon={!avatarUrl && <UserOutlined />} src={avatarUrl ?? undefined} />
-            <Upload showUploadList={false} beforeUpload={() => false} onChange={handleAvatarChange}>
-              <Button
-                icon={<UploadOutlined />}
-                className={styles.buttonUpload}
-                style={{
-                  height: 32,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                Carica
-              </Button>
-            </Upload>
-            {avatarUrl && (
-              <Button icon={<DeleteOutlined />} danger onClick={handleRemoveAvatar}>
-                Rimuovi
-              </Button>
-            )}
-          </Space>
-        </Form.Item>
+      <Card style={{ marginRight: 16 }}>
+        <ProfilePhotoUpload size={80} showTitle={true} title="Foto Profilo" />
 
-        <Row gutter={[0, 0]}>
+        <Row gutter={[16, 0]} style={{ marginBottom: 0, marginTop: 16 }}>
           <Col span={12}>
-            <Form.Item name="firstName" rules={[{ required: true, message: 'Inserisci il nome' }]}>
+            <Form.Item
+              name="firstName"
+              rules={[{ required: true, message: 'Inserisci il nome' }]}
+              style={{ marginBottom: 16 }}
+            >
               <NibolInput
                 name="firstName"
                 validateTrigger="onSubmit"
@@ -145,6 +108,7 @@ export const ProfileForm = () => {
             <Form.Item
               name="lastName"
               rules={[{ required: true, message: 'Inserisci il cognome' }]}
+              style={{ marginBottom: 16 }}
             >
               <NibolInput
                 validateTrigger="onSubmit"
@@ -157,18 +121,18 @@ export const ProfileForm = () => {
           </Col>
         </Row>
 
-        <Form.Item name="email">
+        <Form.Item name="email" style={{ marginBottom: 8 }}>
           <NibolInput
             label="Email"
             disabled
-            style={{ height: 32, width: '49%' }}
+            style={{ height: 32, width: '100%' }}
             hideAsterisk={true}
           />
         </Form.Item>
-        <div style={{ color: '#8c8c8c', fontSize: 12, marginTop: 4 }}>
+        <div style={{ color: '#8c8c8c', fontSize: 12, marginTop: -8, marginBottom: 16 }}>
           Per modificare la mail, scrivi a support@nibol.com.
         </div>
-        <Form.Item>
+        <Form.Item style={{ marginBottom: 0 }}>
           <Space>
             <Button
               htmlType="button"

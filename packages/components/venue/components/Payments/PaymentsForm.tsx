@@ -96,21 +96,18 @@ export const PaymentsForm = () => {
       form={form}
       layout="vertical"
       requiredMark={false} // Nasconde gli asterischi globalmente
-      style={{ width: '100%', borderRadius: 8 }}
+      style={{ width: '100%', borderRadius: 8, paddingRight: 16 }}
       onFinish={onFinish}
     >
       <Card
         styles={{
           body: {
-            paddingTop: 10,
-            paddingBottom: 10,
-            paddingLeft: 15,
-            paddingRight: 15,
+            padding: 16,
           },
         }}
-        style={{ marginBottom: 20 }}
+        style={{ marginBottom: 16 }}
       >
-        <Row gutter={[0, 0]}>
+        <Row gutter={[16, 0]}>
           <Col span={12}>
             <Form.Item rules={[{ required: true, message: 'Ragione Sociale Richiesta' }]}>
               <NibolInput
@@ -136,7 +133,7 @@ export const PaymentsForm = () => {
             </Form.Item>
           </Col>
         </Row>
-        <Row gutter={[0, 0]}>
+        <Row gutter={[16, 0]}>
           <Col span={12}>
             <Form.Item
               rules={[
@@ -182,7 +179,7 @@ export const PaymentsForm = () => {
             </Form.Item>
           </Col>
         </Row>
-        <Row gutter={[0, 0]}>
+        <Row gutter={[16, 0]}>
           <Col span={12}>
             <Form.Item
               validateTrigger="onSubmit"

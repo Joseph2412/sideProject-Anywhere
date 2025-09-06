@@ -2,18 +2,19 @@
 
 //COMPONENTE SIDEBAR
 
-import { Menu, Layout, Avatar, Modal, Select, Space, Button, Typography, Input, Form } from 'antd';
+import { Menu, Layout, Modal, Select, Space, Button, Typography, Input, Form } from 'antd';
 import { CalendarOutlined, ShopOutlined, UserOutlined, PlusOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { PrimaryButton } from '@repo/components';
+import { PrimaryButton, LogoSidebar, SidebarFooter } from '@repo/components';
 import { messageToast } from '@repo/ui/store/ToastStore';
 
 import { useSetAtom, useAtomValue } from 'jotai';
 import { packagesAtom, fetchPackagesAtom } from '@repo/ui/store/PackageFormStore';
 
+import sidebarStyles from './Sidebar.module.css';
 import { useVenues } from '@repo/hooks';
 
 const { Sider } = Layout;
@@ -54,7 +55,6 @@ export default function Sidebar({ onLogout }: SidebarProps) {
     }
   };
 
-  // (rimosso: dichiarazione duplicata)
   const fetchPackages = useSetAtom(fetchPackagesAtom);
 
   const isEmpty = packages.length === 0; //Controlliamo se ci sono Pacchetti da Mostrare nella sidebar
@@ -101,116 +101,145 @@ export default function Sidebar({ onLogout }: SidebarProps) {
   }, [fetchPackages]);
 
   return (
-    <Sider width={220} style={{ background: '#fff', height: '100vh' }}>
-      <div style={{ padding: 16 }}>
-        <Avatar size="large" style={{ marginBottom: 8 }} />
-        <div style={{ fontWeight: 600 }}>PlaceHolder</div>
-      </div>
-
-      <Menu mode="inline" onClick={handleMenuClick}>
-        {/* Sezioni statiche */}
-        <Menu.Item key="calendar" icon={<CalendarOutlined />}>
-          <Link href="/calendar">Calendario</Link>
-        </Menu.Item>
-        <Menu.Divider />
-        <Menu.SubMenu key="venue" icon={<ShopOutlined />} title="Locale">
-          <Menu.Item key="venue-general">
-            <Link href="/venue">Generali</Link>
+    <Sider width={248} style={{ background: '#fff', height: '100vh' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          justifyContent: 'space-between',
+          borderRight: '1px solid #f0f0f0',
+        }}
+      >
+        <Menu
+          mode="inline"
+          onClick={handleMenuClick}
+          style={{ borderRight: 'none', flex: 1, overflowY: 'auto' }}
+        >
+          <div style={{ padding: 16 }}>
+            <LogoSidebar size={48} showName={true} />
+          </div>
+          <Menu.Divider style={{ margin: '8px 16px' }} />
+          {/* Sezioni statiche */}
+          <Menu.Item key="calendar" icon={<CalendarOutlined />}>
+            <Link href="/calendar">Calendario</Link>
           </Menu.Item>
-          <Menu.Item key="payments">
-            <Link href="/payments">Pagamenti</Link>
-          </Menu.Item>
-        </Menu.SubMenu>
-        <Menu.Divider />
-        {/* Pacchetti dinamici */}
-        {isEmpty ? (
-          <Menu.Item key="addPackage" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
-            Aggiungi Pacchetto
-          </Menu.Item>
-        ) : (
-          <>
-            <Menu.SubMenu
-              key="packages"
-              icon={
-                // Usa una icona a piacere, qui un esempio con ShopOutlined
-                <ShopOutlined />
-              }
-              title="Pacchetti"
-              style={{
-                marginLeft: 0,
-                paddingLeft: 0,
-                fontWeight: 500,
-              }}
-            >
-              {sortedPackages.map(pkg => (
-                <Menu.Item
-                  key={pkg.id}
-                  style={{
-                    paddingLeft: 40,
-                    paddingRight: 16,
-                    height: 48,
-                    display: 'flex',
-                    alignItems: 'center',
-                    borderRadius: 16,
-                    marginBottom: 5,
-                  }}
-                  onClick={() => router.push(`/packages/${pkg.id}`)}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      width: '100%',
-                    }}
-                  >
-                    <span
-                      style={{
-                        flex: 1,
-                        minWidth: 0,
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {pkg.name}
-                    </span>
-                    <span
-                      style={{
-                        whiteSpace: 'nowrap',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: 6,
-                        height: 20,
-                        minWidth: 50,
-                        padding: '0px 10px',
-                        background: pkg.type === 'SALA' ? '#e6f0ff' : '#fff0f0',
-                        color: pkg.type === 'SALA' ? '#1976d2' : '#e53935',
-                      }}
-                    >
-                      {pkg.type === 'SALA' ? 'Room' : 'Desk'}
-                    </span>
-                  </div>
-                </Menu.Item>
-              ))}
-            </Menu.SubMenu>
+          <Menu.Divider style={{ margin: '8px 16px' }} />
+          <Menu.SubMenu key="venue" icon={<ShopOutlined />} title="Locale">
+            <Menu.Item key="venue-general" className={sidebarStyles['my-tab']}>
+              <Link href="/venue">Generali</Link>
+            </Menu.Item>
+            <Menu.Item key="payments" className={sidebarStyles['my-tab']}>
+              <Link href="/payments">Pagamenti</Link>
+            </Menu.Item>
+          </Menu.SubMenu>
+          <Menu.Divider style={{ margin: '8px 16px' }} />
+          {/* Pacchetti dinamici */}
+          {isEmpty ? (
             <Menu.Item key="addPackage" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
               Aggiungi Pacchetto
             </Menu.Item>
-          </>
-        )}
-        <Menu.Divider />
-        <Menu.SubMenu key="account" icon={<UserOutlined />} title="Account">
-          <Menu.Item key="profile">
-            <Link href="/profile">Profilo</Link>
-          </Menu.Item>
-          <Menu.Item key="preferences">
-            <Link href="/preferences">Notifiche</Link>
-          </Menu.Item>
-          <Menu.Item key="logout">Logout</Menu.Item>
-        </Menu.SubMenu>
-      </Menu>
+          ) : (
+            <>
+              <Menu.SubMenu
+                key="packages"
+                icon={
+                  // Usa una icona a piacere, qui un esempio con ShopOutlined
+                  <ShopOutlined />
+                }
+                title="Pacchetti"
+                style={{
+                  marginLeft: 0,
+                  paddingLeft: 0,
+                  fontWeight: 500,
+                }}
+              >
+                {sortedPackages.map(pkg => (
+                  <Menu.Item
+                    key={pkg.id}
+                    style={{
+                      paddingLeft: 40,
+                      paddingRight: 16,
+                      height: 48,
+                      display: 'flex',
+                      alignItems: 'center',
+                      borderRadius: 16,
+                      marginBottom: 5,
+                    }}
+                    onClick={() => router.push(`/packages/${pkg.id}`)}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}
+                    >
+                      <span
+                        style={{
+                          flex: 1,
+                          minWidth: 0,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {pkg.name}
+                      </span>
+                      <span
+                        style={{
+                          whiteSpace: 'nowrap',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 6,
+                          height: 20,
+                          minWidth: 50,
+                          padding: '0px 10px',
+                          background: pkg.type === 'SALA' ? '#e6f0ff' : '#fff0f0',
+                          color: pkg.type === 'SALA' ? '#1976d2' : '#e53935',
+                        }}
+                      >
+                        {pkg.type === 'SALA' ? 'Room' : 'Desk'}
+                      </span>
+                    </div>
+                  </Menu.Item>
+                ))}
+              </Menu.SubMenu>
+              <Menu.Item
+                key="addPackage"
+                icon={<PlusOutlined />}
+                onClick={() => setModalOpen(true)}
+              >
+                Aggiungi Pacchetto
+              </Menu.Item>
+            </>
+          )}
+          <Menu.Divider style={{ margin: '8px 16px' }} />
+          <Menu.SubMenu key="account" icon={<UserOutlined />} title="Account">
+            <Menu.Item key="profile">
+              <Link href="/profile">Profilo</Link>
+            </Menu.Item>
+            <Menu.Item key="preferences">
+              <Link href="/preferences">Notifiche</Link>
+            </Menu.Item>
+            <Menu.Item key="logout">Logout</Menu.Item>
+          </Menu.SubMenu>
+          <Menu.Divider style={{ margin: '8px 16px' }} />
+        </Menu>
+        <div
+          style={{
+            bottom: 16,
+            left: 0,
+            right: 0,
+            paddingLeft: 16,
+            paddingRight: 16,
+          }}
+        >
+          <SidebarFooter avatarSize={32} />
+        </div>
+      </div>
 
       <Modal
         title="Aggiungi pacchetto"
@@ -224,6 +253,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
               onClick={() => {
                 setModalOpen(false);
               }}
+              style={{ borderColor: '#D9D9D9' }}
             >
               Annulla
             </Button>
@@ -263,13 +293,6 @@ export default function Sidebar({ onLogout }: SidebarProps) {
           </Form.Item>
         </Form>
       </Modal>
-      <div style={{ position: 'absolute', bottom: 16, paddingLeft: 16 }}>
-        <Avatar />
-        <br />
-        <small>Marco Cattaneo</small>
-        <br />
-        <small>marco@pausa.it</small>
-      </div>
     </Sider>
   );
 }
