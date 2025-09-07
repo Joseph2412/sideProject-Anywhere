@@ -95,6 +95,8 @@ export type VenueDetails = {
   services: string[]; // Servizi generali venue
   avatarURL?: string; // Logo/immagine principale (opzionale)
   photos: string[]; // Gallery foto venue
+  latitude?: number; // Latitudine coordinate GPS
+  longitude?: number; // Longitudine coordinate GPS
   openingDays: OpeningDay[]; // Orari settimanali (array 7 elementi)
   closingPeriods: ClosingPeriod[]; // Chiusure straordinarie
   packages: Package[]; // Pacchetti/servizi offerti

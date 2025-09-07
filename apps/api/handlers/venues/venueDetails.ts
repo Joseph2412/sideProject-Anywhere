@@ -15,6 +15,8 @@ export const getVenueDetailsHandler = async (request: FastifyRequest, reply: Fas
           services: true,
           photos: true,
           logoURL: true,
+          latitude: true,
+          longitude: true,
           openingDays: {
             orderBy: [{ day: 'asc' }],
             select: {
@@ -48,14 +50,17 @@ export const getVenueDetailsHandler = async (request: FastifyRequest, reply: Fas
 };
 
 export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-  const { name, address, description, services, logoURL, photos } = request.body as {
-    name: string;
-    address: string;
-    description?: string | null;
-    services?: string[];
-    logoURL?: string | null;
-    photos?: string[];
-  };
+  const { name, address, description, services, logoURL, photos, latitude, longitude } =
+    request.body as {
+      name: string;
+      address: string;
+      description?: string | null;
+      services?: string[];
+      logoURL?: string | null;
+      photos?: string[];
+      latitude?: number | null;
+      longitude?: number | null;
+    };
 
   if (!name || !address) {
     return reply.code(400).send({ message: 'name and address are required' });
@@ -72,7 +77,7 @@ export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: 
   if (user?.venueId) {
     existingVenue = await prisma.venue.findUnique({
       where: { id: user.venueId },
-      select: { logoURL: true },
+      select: { logoURL: true, latitude: true, longitude: true },
     });
   }
 
@@ -86,6 +91,8 @@ export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: 
       services: services ?? [],
       photos: photos ?? [],
       logoURL: logoURL ?? null,
+      latitude: latitude ?? null,
+      longitude: longitude ?? null,
     },
     update: {
       name,
@@ -95,6 +102,9 @@ export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: 
       photos: photos ?? [],
       // Preserva il logoURL esistente se non viene fornito un nuovo valore
       logoURL: logoURL !== undefined ? logoURL : (existingVenue?.logoURL ?? null),
+      // Aggiorna le coordinate se fornite, altrimenti mantieni quelle esistenti
+      latitude: latitude !== undefined ? latitude : (existingVenue?.latitude ?? null),
+      longitude: longitude !== undefined ? longitude : (existingVenue?.longitude ?? null),
     },
     select: {
       id: true,
@@ -104,6 +114,8 @@ export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: 
       services: true,
       photos: true,
       logoURL: true,
+      latitude: true,
+      longitude: true,
     },
   });
 

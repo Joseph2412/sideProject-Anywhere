@@ -17,13 +17,23 @@ export const venueDetailsSchema = {
 export const updateVenueDetailsSchema = {
   body: {
     type: 'object',
-    required: ['name', 'address', 'description'],
+    required: ['name', 'address'],
     properties: {
       name: { type: 'string', minLength: 1 },
       address: { type: 'string', minLength: 1 },
       description: { type: 'string' },
-      services: { type: 'array', items: { type: 'string' } },
-      avatarURL: { type: 'string' }, //Mi aspetto arrivi ma non è required
+      services: {
+        type: 'array',
+        items: { type: 'string' },
+      },
+      photos: {
+        type: 'array',
+        items: { type: 'string' },
+      },
+      logoURL: { type: 'string' },
+      avatarURL: { type: 'string' },
+      latitude: { type: 'number', minimum: -90, maximum: 90 },
+      longitude: { type: 'number', minimum: -180, maximum: 180 },
     },
     additionalProperties: false,
   },
