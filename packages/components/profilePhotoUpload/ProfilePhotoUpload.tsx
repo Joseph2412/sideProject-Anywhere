@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Upload, Button, Avatar, message, Typography } from 'antd';
-import { UploadOutlined, UserOutlined } from '@ant-design/icons';
 import { useSetAtom } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
 import { messageToast } from '@repo/ui/store/LayoutStore';
@@ -8,6 +7,9 @@ import { useUserProfile } from '@repo/hooks';
 import { UploadChangeParam, UploadFile } from 'antd/es/upload';
 import styles from './ProfilePhotoUpload.module.css';
 import { RcFile } from 'antd/es/upload/interface';
+
+//Import ICONE CUSTOM
+import { UploadIcon, IconNoPic } from '../customIcons';
 
 const { Text } = Typography;
 
@@ -215,7 +217,7 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
         <Avatar
           size={size}
           src={imageUrl || undefined} // Passa undefined invece di null per evitare icona di errore
-          icon={!imageUrl && <UserOutlined />}
+          icon={!imageUrl && <IconNoPic />}
           className={styles.avatar}
         />
         <div className={styles.buttonsContainer}>
@@ -226,7 +228,7 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
             disabled={loading}
           >
             <Button
-              icon={<UploadOutlined />}
+              icon={<UploadIcon />}
               loading={loading}
               disabled={loading}
               className={styles.uploadButton}

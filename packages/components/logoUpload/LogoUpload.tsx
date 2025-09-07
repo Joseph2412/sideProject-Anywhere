@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Upload, Button, Avatar, message, Typography } from 'antd';
-import { UploadOutlined, ShopOutlined } from '@ant-design/icons';
+import { ShopOutlined } from '@ant-design/icons';
 import { useSetAtom } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
 import { messageToast } from '@repo/ui/store/LayoutStore';
@@ -8,6 +8,8 @@ import { useVenues } from '@repo/hooks';
 import { UploadChangeParam, UploadFile } from 'antd/es/upload';
 import { RcFile } from 'antd/es/upload/interface';
 import styles from './LogoUpload.module.css';
+
+import { UploadIcon } from '../customIcons';
 
 interface LogoUploadProps {
   size?: number;
@@ -199,7 +201,7 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
             disabled={loading}
           >
             <Button
-              icon={<UploadOutlined />}
+              icon={<UploadIcon />}
               loading={loading}
               disabled={loading}
               style={{ borderColor: '#D9D9D9', minWidth: 100 }}

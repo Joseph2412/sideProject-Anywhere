@@ -3,7 +3,7 @@
 //COMPONENTE SIDEBAR
 
 import { Menu, Layout, Modal, Select, Space, Button, Typography, Input, Form } from 'antd';
-import { CalendarOutlined, ShopOutlined, UserOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -16,6 +16,13 @@ import { packagesAtom, fetchPackagesAtom } from '@repo/ui/store/PackageFormStore
 
 import sidebarStyles from './Sidebar.module.css';
 import { useVenues } from '@repo/hooks';
+
+//import di Icone CUSTOM
+
+import { VenueIcon } from '../customIcons';
+import { CalendarIcon } from '../customIcons';
+import { BundleIcon } from '../customIcons';
+import { ProfileIcon } from '../customIcons';
 
 const { Sider } = Layout;
 
@@ -121,11 +128,11 @@ export default function Sidebar({ onLogout }: SidebarProps) {
           </div>
           <Menu.Divider style={{ margin: '8px 16px' }} />
           {/* Sezioni statiche */}
-          <Menu.Item key="calendar" icon={<CalendarOutlined />}>
+          <Menu.Item key="calendar" icon={<CalendarIcon />}>
             <Link href="/calendar">Calendario</Link>
           </Menu.Item>
           <Menu.Divider style={{ margin: '8px 16px' }} />
-          <Menu.SubMenu key="venue" icon={<ShopOutlined />} title="Locale">
+          <Menu.SubMenu key="venue" icon={<VenueIcon />} title="Locale">
             <Menu.Item key="venue-general" className={sidebarStyles['my-tab']}>
               <Link href="/venue">Generali</Link>
             </Menu.Item>
@@ -143,10 +150,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
             <>
               <Menu.SubMenu
                 key="packages"
-                icon={
-                  // Usa una icona a piacere, qui un esempio con ShopOutlined
-                  <ShopOutlined />
-                }
+                icon={<BundleIcon />}
                 title="Pacchetti"
                 style={{
                   marginLeft: 0,
@@ -217,7 +221,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
             </>
           )}
           <Menu.Divider style={{ margin: '8px 16px' }} />
-          <Menu.SubMenu key="account" icon={<UserOutlined />} title="Account">
+          <Menu.SubMenu key="account" icon={<ProfileIcon />} title="Account">
             <Menu.Item key="profile">
               <Link href="/profile">Profilo</Link>
             </Menu.Item>

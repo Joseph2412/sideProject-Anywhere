@@ -44,5 +44,4 @@ export * from './packageList/PackagesList';
 
 // Sidebar Components
 export * from './logoSidebar';
-export * from './profileSidebar';
 export * from './sidebarFooter';
