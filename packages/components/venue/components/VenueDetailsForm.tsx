@@ -3,6 +3,7 @@ import { useEffect } from 'react'; // React
 import { Form, Button, Space, Row, Card, Select, Tag, Input, Col } from 'antd';
 
 import { NibolInput } from '../../inputs/Input';
+import { AddressAutocomplete } from '../../inputs/AddressAutocomplete';
 import { LogoUpload } from '../../logoUpload';
 import styles from './VenueDetailsForm.module.css';
 import { useState } from 'react';
@@ -15,6 +16,7 @@ import { messageToast } from '@repo/ui/store/LayoutStore';
 import { PrimaryButton } from './../../buttons/PrimaryButton';
 
 import type { VenueDetails } from '@repo/ui/store/LayoutStore';
+import type { PlaceResult } from '../../utils/googlePlaces';
 
 export const VenueDetailsForm = () => {
   const [form] = Form.useForm();
@@ -25,6 +27,8 @@ export const VenueDetailsForm = () => {
 
   const [loading, setLoading] = useState(false); // Stato loading
   const [venueDetails, setVenueDetails] = useState<VenueDetails | null>(null);
+
+  const [coordinates, setCoordinates] = useState<{ latitude?: number; longitude?: number }>({});
 
   const { data, isLoading } = useVenues();
 
@@ -38,15 +42,32 @@ export const VenueDetailsForm = () => {
         address: data.venues.venue.address,
         description: data.venues.venue.description,
         services: data.venues.venue.services,
-
-        // avatarUrl: data.venues[0].avatarURL || '',
       });
       setVenueDetails(data.venues.venue);
+      setCoordinates({
+        latitude: data.venues.venue.latitude,
+        longitude: data.venues.venue.longitude,
+      });
     }
   }, [data, form]);
 
-  const onFinish = async (values: typeof venueDetails) => {
+  const handlePlaceSelect = (place: PlaceResult) => {
+    setCoordinates({
+      latitude: place.latitude,
+      longitude: place.longitude,
+    });
+
+    form.setFieldsValue({ address: place.address });
+  };
+
+  const onFinish = async (values: {
+    name: string;
+    address: string;
+    description?: string;
+    services?: string[];
+  }) => {
     setLoading(true);
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues`, {
         method: 'PUT',
@@ -54,8 +75,13 @@ export const VenueDetailsForm = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          ...values,
+          latitude: coordinates.latitude,
+          longitude: coordinates.longitude,
+        }),
       });
+
       if (res.ok) {
         const data = await res.json();
         setVenueDetails(data.venue);
@@ -65,22 +91,23 @@ export const VenueDetailsForm = () => {
 
         setMessage({
           type: 'success',
-          message: 'Dettagli aggiornati',
+          message: 'Dettagli aggiornati con successo',
           duration: 3,
           placement: 'bottomRight',
         });
       } else {
         setMessage({
           type: 'error',
-          message: 'Errore salvataggio',
+          message: 'Errore durante il salvataggio',
           duration: 3,
           placement: 'bottomRight',
         });
       }
-    } catch {
+    } catch (error) {
+      console.error('Errore:', error);
       setMessage({
         type: 'error',
-        message: 'Errore salvataggio',
+        message: 'Errore durante il salvataggio',
         duration: 3,
         placement: 'bottomRight',
       });
@@ -88,7 +115,6 @@ export const VenueDetailsForm = () => {
       setLoading(false);
     }
   };
-
   if (isLoading) {
     return <div>Caricamento dati venue...</div>;
   }
@@ -125,13 +151,17 @@ export const VenueDetailsForm = () => {
               name="address"
               rules={[{ required: true, message: "Inserisci L'indirizzo del Locale" }]}
             >
-              <NibolInput
-                validateTrigger="onSubmit"
+              <AddressAutocomplete
+                value={form.getFieldValue('address') || ''}
+                onChange={value => {
+                  form.setFieldValue('address', value);
+                }}
+                onPlaceSelect={handlePlaceSelect}
+                placeholder="Cerca indirizzo..."
+                style={{ width: '100%' }}
                 label="Indirizzo"
-                value="address"
-                hideAsterisk={true}
                 required={true}
-                style={{ height: '32px', width: '100%' }}
+                hideAsterisk={true}
               />
             </Form.Item>
           </Col>
@@ -186,6 +216,7 @@ export const VenueDetailsForm = () => {
             </Tag>
           ))}
         </div>
+
         <Form.Item style={{ marginTop: 20 }}>
           <Space>
             <Button
@@ -205,8 +236,8 @@ export const VenueDetailsForm = () => {
             >
               Annulla
             </Button>
-            <PrimaryButton type="primary" htmlType="submit" disabled={loading}>
-              Salva
+            <PrimaryButton type="primary" htmlType="submit" loading={loading} disabled={loading}>
+              {loading ? 'Salvando...' : 'Salva'}
             </PrimaryButton>
           </Space>
         </Form.Item>

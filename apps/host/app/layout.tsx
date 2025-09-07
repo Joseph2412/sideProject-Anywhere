@@ -3,6 +3,7 @@ import './global.css';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import LayoutClientWrapper from './LayoutClientWrapper';
 import '@ant-design/v5-patch-for-react-19';
+import Script from 'next/script';
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -20,9 +21,16 @@ export const metadata = {
  * Pattern: Separation of Concerns - server rendering + client interactivity separati
  * Setup: Font Google Jakarta, CSS reset Antd, lingua italiana
  */
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="it">
+      <head>
+        <Script
+          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&loading=async`}
+          strategy="beforeInteractive"
+        />
+      </head>
       <body className={jakarta.className}>
         <LayoutClientWrapper>{children}</LayoutClientWrapper>
       </body>
