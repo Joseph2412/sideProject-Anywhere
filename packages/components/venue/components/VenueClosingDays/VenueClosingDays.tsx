@@ -134,6 +134,8 @@ export const VenueClosingDays: React.FC = () => {
       initialIsRange
     );
 
+    const { ...safeRestField } = restField;
+
     return (
       <Form.Item
         key={name}
@@ -148,7 +150,7 @@ export const VenueClosingDays: React.FC = () => {
             <Space.Compact size="middle">
               {isRange ? (
                 <Form.Item
-                  {...restField}
+                  {...safeRestField}
                   name={[name, 'dates']}
                   style={{
                     marginBottom: 0,
@@ -170,7 +172,7 @@ export const VenueClosingDays: React.FC = () => {
                 </Form.Item>
               ) : (
                 <Form.Item
-                  {...restField}
+                  {...safeRestField}
                   name={[name, 'singleDate']}
                   style={{
                     marginBottom: 0,

@@ -4,7 +4,12 @@ import { PlansRate } from '@repo/database';
 
 export const getAllPackagesHandler = async (request: FastifyRequest, reply: FastifyReply) => {
   try {
+    const { venueId } = request.query as { venueId?: string };
+
+    const whereClause = venueId ? { venueId: parseInt(venueId) } : {};
+
     const packages = await prisma.package.findMany({
+      where: whereClause,
       include: { plans: true },
     });
     return reply.send(packages);

@@ -12,15 +12,16 @@ import { useState } from 'react';
 import { useSetAtom } from 'jotai';
 import { messageToast, Package } from '@repo/ui/store/LayoutStore';
 import { PrimaryButton } from '../../buttons/PrimaryButton';
-import { fetchPackagesAtom, packageFormAtom } from '@repo/ui/store/PackageFormStore';
+import { packageFormAtom } from '@repo/ui/store/PackageFormStore';
 import { useParams } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const PackageDetails = () => {
   const params = useParams();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const setMessage = useSetAtom(messageToast);
-  const fetchPackages = useSetAtom(fetchPackagesAtom);
+  const queryClient = useQueryClient();
   const [details, setDetails] = useState<Package | null>(null);
   const router = useRouter();
 
@@ -92,7 +93,8 @@ export const PackageDetails = () => {
         const data = await res.json();
         setDetails(data);
         setMessage({ type: 'success', message: successMsg });
-        await fetchPackages();
+        // Invalida la cache dei pacchetti per aggiornare la sidebar
+        queryClient.invalidateQueries({ queryKey: ['packages'] });
       } else {
         setMessage({ type: 'error', message: 'Errore durante la richiesta' });
       }
@@ -116,7 +118,8 @@ export const PackageDetails = () => {
       });
       if (res.ok) {
         setMessage({ type: 'success', message: 'Pacchetto eliminato!' });
-        await fetchPackages();
+        // Invalida la cache dei pacchetti per aggiornare la sidebar
+        queryClient.invalidateQueries({ queryKey: ['packages'] });
         setPackageForm(null); // Resetta lo stato globale
         router.replace('/packages'); // Ti ributto su un packages Form Vuoto
       } else {
@@ -150,7 +153,8 @@ export const PackageDetails = () => {
           type: 'success',
           message: newIsActive ? 'Pacchetto attivato!' : 'Pacchetto disattivato!',
         });
-        await fetchPackages();
+        // Invalida la cache dei pacchetti per aggiornare la sidebar
+        queryClient.invalidateQueries({ queryKey: ['packages'] });
       } else {
         setMessage({ type: 'error', message: 'Errore durante la richiesta' });
       }

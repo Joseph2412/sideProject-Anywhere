@@ -6,13 +6,14 @@ import { Menu, Layout, Modal, Select, Space, Button, Typography, Input, Form } f
 import { PlusOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { PrimaryButton, LogoSidebar, SidebarFooter } from '@repo/components';
 import { messageToast } from '@repo/ui/store/ToastStore';
 
-import { useSetAtom, useAtomValue } from 'jotai';
-import { packagesAtom, fetchPackagesAtom } from '@repo/ui/store/PackageFormStore';
+import { useSetAtom } from 'jotai';
+import { usePackages } from '@repo/hooks';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import sidebarStyles from './Sidebar.module.css';
 import { useVenues } from '@repo/hooks';
@@ -37,11 +38,45 @@ export default function Sidebar({ onLogout }: SidebarProps) {
   console.log(data?.venues); // DEBUG LOG
   console.log(data?.venues.venue.id); // DEBUG LOG. Testa su altri utenti
   const idVenue = data?.venues.venue.id; // usa il primo venue
-  const packages = useAtomValue(packagesAtom);
-  // Ordina prima per tipologia (DESK prima di SALA), poi per id crescente
 
-  const filteredPackages = packages.filter(pkg => pkg.venueId === idVenue);
-  const sortedPackages = [...filteredPackages].sort((a, b) => {
+  // Usa TanStack Query per i pacchetti
+  const { data: packages = [], isLoading, error } = usePackages(idVenue);
+  const queryClient = useQueryClient();
+
+  // Mutation per creare un nuovo pacchetto
+  const createPackageMutation = useMutation({
+    mutationFn: async (values: { name: string; type: string }) => {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages/add`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ name: values.name, type: values.type, venueId: idVenue }),
+      });
+      if (!res.ok) throw new Error('Errore creazione pacchetto');
+      return await res.json();
+    },
+    onSuccess: data => {
+      // Invalida la cache per aggiornare la lista
+      queryClient.invalidateQueries({ queryKey: ['packages'] });
+      // Redirect a /packages/:id
+      if (data.id) {
+        router.push(`/packages/${data.id}`);
+      }
+    },
+    onError: err => {
+      setToastMessage({
+        type: 'error',
+        message: 'Errore durante la creazione del pacchetto',
+        placement: 'bottomRight',
+      });
+      console.error("Errore durante l'aggiunta del pacchetto:", err);
+    },
+  });
+
+  // Ordina prima per tipologia (DESK prima di SALA), poi per id crescente
+  const sortedPackages = [...packages].sort((a, b) => {
     if (a.type === b.type) return a.id - b.id;
     if (a.type === 'SALA') return -1;
     if (b.type === 'DESK') return 1;
@@ -62,50 +97,24 @@ export default function Sidebar({ onLogout }: SidebarProps) {
     }
   };
 
-  const fetchPackages = useSetAtom(fetchPackagesAtom);
-
   const isEmpty = packages.length === 0; //Controlliamo se ci sono Pacchetti da Mostrare nella sidebar
 
   const [modalOpen, setModalOpen] = useState(false); //Gestiamo comparsa/scomparsa della Modale
 
   // Funzione per aggiungere un nuovo pacchetto
-  // Crea il pacchetto, aggiorna la sidebar e fa redirect a /packages/:id
+  // Crea il pacchetto e aggiorna automaticamente la sidebar
   const setToastMessage = useSetAtom(messageToast);
   const handleAddPackage = async () => {
     try {
       const values = await form.validateFields();
       setModalOpen(false);
       form.resetFields();
-      // Chiamata API per creare il pacchetto
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ name: values.name, type: values.type, venueId: idVenue }),
-      });
-      if (!res.ok) throw new Error('Errore creazione pacchetto');
-      const data = await res.json();
-      // Aggiorna la sidebar
-      await fetchPackages();
-      // Redirect a /packages/:id
-      if (data.id) {
-        router.push(`/packages/${data.id}`);
-      }
+      // Usa la mutation per creare il pacchetto
+      createPackageMutation.mutate(values);
     } catch (err) {
-      setToastMessage({
-        type: 'error',
-        message: 'Errore durante la creazione del pacchetto',
-        placement: 'bottomRight',
-      });
-      console.error("Errore durante l'aggiunta del pacchetto:", err);
+      console.error('Errore nella validazione del form:', err);
     }
   };
-
-  useEffect(() => {
-    fetchPackages();
-  }, [fetchPackages]);
 
   return (
     <Sider width={248} style={{ background: '#fff', height: '100vh' }}>
@@ -142,7 +151,15 @@ export default function Sidebar({ onLogout }: SidebarProps) {
           </Menu.SubMenu>
           <Menu.Divider style={{ margin: '8px 16px' }} />
           {/* Pacchetti dinamici */}
-          {isEmpty ? (
+          {isLoading ? (
+            <Menu.Item disabled>
+              <span style={{ color: '#999' }}>Caricamento pacchetti...</span>
+            </Menu.Item>
+          ) : error ? (
+            <Menu.Item disabled>
+              <span style={{ color: '#ff4d4f' }}>Errore caricamento pacchetti</span>
+            </Menu.Item>
+          ) : isEmpty ? (
             <Menu.Item key="addPackage" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
               Aggiungi Pacchetto
             </Menu.Item>

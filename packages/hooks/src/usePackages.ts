@@ -1,24 +1,23 @@
 import { useQuery } from '@tanstack/react-query';
 
-export function usePackages() {
+export function usePackages(venueId?: number) {
   return useQuery({
-    queryKey: ['packages'],
+    queryKey: ['packages', venueId],
     queryFn: async () => {
       const token = localStorage.getItem('token');
-      const [packagesRes, plansRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages/:id`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages/:id/plans`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
-      if (!packagesRes.ok) throw new Error('Errore nel recupero pacchetti');
-      if (!plansRes.ok) throw new Error('Errore nel recupero piani');
-      const packages = await packagesRes.json();
-      const plans = await plansRes.json();
-      return { packages, plans };
+      const url = venueId
+        ? `${process.env.NEXT_PUBLIC_API_HOST}/api/packages?venueId=${venueId}`
+        : `${process.env.NEXT_PUBLIC_API_HOST}/api/packages`;
+
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error('Errore nel recupero pacchetti');
+      const packages = await res.json();
+      return packages;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: !!venueId, // Solo se abbiamo un venueId
   });
 }
