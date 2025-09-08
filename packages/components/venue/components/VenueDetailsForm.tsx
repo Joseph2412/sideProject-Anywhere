@@ -37,11 +37,16 @@ export const VenueDetailsForm = () => {
   // useEffect per caricamento dati venue esistenti
   useEffect(() => {
     if (data && data.venues.venue) {
+      // Ensure services is a clean array to avoid circular references
+      const cleanServices = Array.isArray(data.venues.venue.services)
+        ? [...data.venues.venue.services].filter(Boolean)
+        : [];
+
       form.setFieldsValue({
         name: data.venues.venue.name,
         address: data.venues.venue.address,
         description: data.venues.venue.description,
-        services: data.venues.venue.services,
+        services: cleanServices,
       });
       setVenueDetails(data.venues.venue);
       setCoordinates({
@@ -124,7 +129,6 @@ export const VenueDetailsForm = () => {
       layout="vertical"
       style={{ width: '100%', borderRadius: 8, height: '100%' }}
       form={form}
-      initialValues={venueDetails || {}}
       onFinish={onFinish}
     >
       <Card>
@@ -194,10 +198,12 @@ export const VenueDetailsForm = () => {
               key={service}
               className={styles.clickableTag}
               onClick={() => {
-                console.log('Valore attuale di services:', form.getFieldValue('services'));
                 const current = form.getFieldValue('services') || [];
-                if (!current.includes(service)) {
-                  form.setFieldValue('services', [...current, service]);
+                // Ensure we're working with a clean array of strings to avoid circular references
+                const cleanCurrent = Array.isArray(current) ? [...current].filter(Boolean) : [];
+                if (!cleanCurrent.includes(service)) {
+                  const newServices = [...cleanCurrent, service];
+                  form.setFieldValue('services', newServices);
                 }
               }}
             >

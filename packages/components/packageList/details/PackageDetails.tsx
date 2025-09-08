@@ -16,6 +16,8 @@ import { packageFormAtom } from '@repo/ui/store/PackageFormStore';
 import { useParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 
+import packageDetailsStyles from './PackageDetails.module.css';
+
 export const PackageDetails = () => {
   const params = useParams();
   const [form] = Form.useForm();
@@ -347,7 +349,13 @@ export const PackageDetails = () => {
           okText="Si"
           cancelText="No"
         >
-          <Button type="primary" danger disabled={loading || !details?.id} style={{ height: 32 }}>
+          <Button
+            type="primary"
+            danger
+            disabled={loading || !details?.id}
+            style={{ height: 32 }}
+            className={packageDetailsStyles.deleteButton}
+          >
             Elimina Pacchetto
           </Button>
         </Popconfirm>
