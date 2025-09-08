@@ -88,6 +88,9 @@ body {
   color: #fff !important;
   border-radius: 10px !important;
 }
+.ant-menu-item svg {
+  color: inherit !important;
+}
 
 /* Icone coerenti */
 .ant-menu-item .anticon {

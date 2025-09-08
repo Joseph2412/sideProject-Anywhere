@@ -10,29 +10,29 @@ interface CalendarIconProps {
 
 export const CalendarIcon: React.FC<CalendarIconProps> = ({
   width = 14,
-  height = 15,
+  height = 14,
   className,
   fill = 'none',
-  stroke = '#00063E',
+  stroke = 'currentColor', // Changed from '#1f1f1f' to 'currentColor'
 }) => {
   return (
     <svg
       width={width}
       height={height}
-      viewBox="0 0 14 15"
+      viewBox="0 0 14 14"
       fill={fill}
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
       <path
-        d="M4.11108 2.44453V0.666748"
+        d="M4.22217 1V2.44444"
         stroke={stroke}
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M9.88892 2.44453V0.666748"
+        d="M9.77783 1V2.44444"
         stroke={stroke}
         strokeWidth="1.5"
         strokeLinecap="round"
