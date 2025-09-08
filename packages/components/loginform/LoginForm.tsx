@@ -389,7 +389,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
             type="text" // Stile link, non bottone pieno
             onClick={onGoToSignup} // Callback per navigazione
             disabled={loading} // Consistenza durante operazioni
-            className={`${styles.register} ${styles.registerWrapper}`} // Multi-class CSS modules
+            className={`${styles.registerWrapper}`} //
           >
             Non hai un account? Registrati
           </Button>
@@ -398,7 +398,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
             type="text"
             onClick={handleResetPassword} // Handler reset password
             disabled={loading}
-            className={`${styles.register} ${styles.registerWrapper}`}
+            className={`${styles.registerWrapper}`}
             style={{ marginTop: 4 }} // Piccolo spazio per separazione visuale
           >
             Reimposta password

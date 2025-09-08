@@ -313,7 +313,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
           type="text" // Stile link
           onClick={onGoToLogin} // Callback navigazione
           disabled={loading} // Consistenza durante operazioni
-          className={`${styles.register} ${styles.registerWrapper}`}
+          className={`${styles.registerWrapper}`}
         >
           Sei già Registrato? Accedi!
         </Button>

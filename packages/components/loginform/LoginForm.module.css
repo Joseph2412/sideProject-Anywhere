@@ -43,40 +43,11 @@
   text-align: center;
 }
 
-/* Divider principale */
-.divider {
-  margin-top: 16px;
-}
-
-/* Divider con testo “OR” */
+/* Divider con testo "OR" */
 .orDivider {
   font-weight: 500;
   color: #999999;
 }
-
-/* Form */
-.form {
-  width: 100%;
-}
-/* 
-.register {
-  background-color: #fff;
-  color: #1f1f1f;
-  font-size: 14px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  border-style:solid;
-  box-shadow: none;
-  font-weight: 500;
-  transition: all 0.2s ease-in-out;
-  align-items: center;
-}
-
-.register:hover {
-  background-color: #eaeaea;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-} */
 
 .registerWrapper {
   margin-top: 10px;
@@ -84,6 +55,11 @@
   justify-content: center;
   align-items: center;
   font-weight: 500;
+  border: none;
+}
+
+.registerWrapper:hover {
+  cursor: pointer;
 }
 
 .actionButtons {
@@ -94,7 +70,7 @@
 }
 
 .secondaryButton {
-  border: 1px solid;
+  border: none !important;
   border-color: #d6d7e6;
   font-weight: 500;
   color: #1f1f1f;
@@ -104,9 +80,8 @@
   transition: all 0.2s ease;
 }
 
-.secondaryButton:hover {
-  border: 1px solid !important;
-  background-color: white !important;
+.input {
+  border-color: #d9d9d9 !important;
 }
 
 .input:hover {
@@ -126,7 +101,6 @@
 .googleButton:focus {
   background-color: white !important;
   color: #1f1f1f !important;
-  border-color: #1f1f1f !important;
 }
 
 .primaryButton {

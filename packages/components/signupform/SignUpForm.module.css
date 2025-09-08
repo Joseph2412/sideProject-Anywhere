@@ -9,8 +9,6 @@
   flex-direction: column;
 }
 
-
-
 .card {
   width: 420px;
   border: 1px solid #ededed;
@@ -22,7 +20,7 @@
   align-items: center;
   gap: 0px;
   background-color: #fff;
-  animation: fadeIn 0.5s ease;;
+  animation: fadeIn 0.5s ease;
 }
 
 .ant-form-item,
@@ -48,36 +46,21 @@
 
 .title {
   flex: 1;
-width: 100%;
-position: relative;
-font-size: 30px;
-line-height: 38px;
-display: inline-block;
-color: #1f1f1f;
-text-align: center;
-margin-bottom: 10px;
-}
-
-.form {
   width: 100%;
-}
-
-.divider {
-  width: 100%;
-  margin: 16px 0 0;
+  position: relative;
+  font-size: 30px;
+  line-height: 38px;
+  display: inline-block;
+  color: #1f1f1f;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
 .orDivider {
   margin-bottom: 10px !important;
   margin-top: 0px !important;
   font-weight: 500;
-  color: #999;;
-}
-
-.register {
-  font-weight: 500;
-  text-align: center;
-  margin-top: 16px;
+  color: #999;
 }
 
 .doubleInput {
@@ -97,6 +80,11 @@ margin-bottom: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
+  border: none;
+}
+
+.registerWrapper:hover {
+  border: none;
 }
 
 .checkboxText {
@@ -109,14 +97,20 @@ margin-bottom: 10px;
   margin-top: 12px;
 }
 
-
 .link {
   text-decoration: underline;
-  color: inherit; 
+  color: inherit;
   font-weight: 500;
 }
 
 .input:hover {
   border: 1px solid;
+  border-color: #d9d9d9 !important;
 }
 
+.passwordNote {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  margin-bottom: 16px;
+}
