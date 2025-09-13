@@ -12,7 +12,9 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata = {
-  title: 'Nibol Login',
+  // title: 'Nibol Login', Sti stronzi di marketing hanno cambiato idea
+  title: 'Anywhere',
+  description: 'Piattaforma di gestione per lavoratori in mobilità',
 };
 
 /**
