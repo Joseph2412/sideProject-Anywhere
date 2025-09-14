@@ -1,17 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AutoComplete } from 'antd';
-import { GooglePlacesService, PlaceResult } from '../utils/googlePlaces';
-
-/* eslint-disable @typescript-eslint/naming-convention */
-interface GooglePrediction {
-  description: string;
-  place_id: string;
-  structured_formatting: {
-    main_text: string;
-    secondary_text: string;
-  };
-}
-/* eslint-enable @typescript-eslint/naming-convention */
+import { useGooglePlaces, GooglePrediction, PlaceResult } from '@repo/hooks';
 
 interface AddressAutocompleteProps {
   value?: string;
@@ -39,31 +28,18 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   const [options, setOptions] = useState<
     { value: string; label: React.ReactNode; placeId: string }[]
   >([]);
-  const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState(value || '');
   const [isFocused, setIsFocused] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<React.ElementRef<typeof AutoComplete>>(null);
   const shouldRestoreFocus = useRef(false);
 
-  const googlePlacesService = useRef(GooglePlacesService.getInstance());
+  const { searchPlaces, getPlaceDetails, loading } = useGooglePlaces();
 
   // Sincronizza il valore interno quando cambia il prop value
   useEffect(() => {
     setSearchValue(value || '');
   }, [value]);
-
-  const initializeService = useCallback(async () => {
-    try {
-      await googlePlacesService.current.initialize();
-    } catch (error) {
-      console.error("Errore nell'inizializzazione di Google Places:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    initializeService();
-  }, [initializeService]);
 
   // Ripristina il focus dopo che le opzioni sono state aggiornate
   useEffect(() => {
@@ -86,10 +62,9 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
     // Marca che dobbiamo ripristinare il focus
     shouldRestoreFocus.current = isFocused;
-    setLoading(true);
 
     try {
-      const predictions = await googlePlacesService.current.searchPlaces(searchText);
+      const predictions = await searchPlaces(searchText);
       const newOptions = predictions.map((prediction: GooglePrediction) => ({
         value: prediction.description,
         label: (
@@ -106,8 +81,6 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     } catch (error) {
       console.error('Errore nella ricerca degli indirizzi:', error);
       setOptions([]);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -131,7 +104,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
     if (onPlaceSelect && option.placeId) {
       try {
-        const placeDetails = await googlePlacesService.current.getPlaceDetails(option.placeId);
+        const placeDetails = await getPlaceDetails(option.placeId);
         if (placeDetails) {
           onPlaceSelect(placeDetails);
         }

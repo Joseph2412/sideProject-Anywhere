@@ -1,6 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { prisma } from './../../libs/prisma';
-
 import { generateS3Key } from './../../utils/generateS3Key';
 
 export const imagesHandler = {
@@ -50,8 +49,10 @@ export const imagesHandler = {
 
     const fileBuffer = await file.toBuffer();
 
+    const { S3_REPORTS_BUCKET } = process.env;
+
     const signedUrl = await request.s3.uploadFile(
-      'nibol-anywhere',
+      S3_REPORTS_BUCKET!,
       fileBuffer,
       s3Key,
       file.mimetype

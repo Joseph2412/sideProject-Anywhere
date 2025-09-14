@@ -21,6 +21,8 @@ import { packagesRoutes } from './routes/packages/packagesRoutes';
 import { imagesRoutes } from './routes/images/images';
 import fastifyMultipart from '@fastify/multipart';
 
+import { googlePlacesRoutes } from './proxy/googleGeoLocation';
+
 //Ricorda di importare prisma in ogni handler senza istanziarlo sempre
 
 const server: FastifyInstance = fastify();
@@ -82,6 +84,8 @@ server.register(packagesRoutes, { prefix: '/api' });
 
 //Metodi GET POST DELETE Consentiti e previsiti
 server.register(imagesRoutes, { prefix: '/media' });
+
+server.register(googlePlacesRoutes, { prefix: '/api/google' });
 
 //Rotta di Servizio per Avvio BACKEND
 server.listen({ port: 3001 }, (err, address) => {

@@ -16,7 +16,7 @@ import { messageToast } from '@repo/ui/store/LayoutStore';
 import { PrimaryButton } from './../../buttons/PrimaryButton';
 
 import type { VenueDetails } from '@repo/ui/store/LayoutStore';
-import type { PlaceResult } from '../../utils/googlePlaces';
+import type { PlaceResult } from '@repo/hooks';
 
 export const VenueDetailsForm = () => {
   const [form] = Form.useForm();
