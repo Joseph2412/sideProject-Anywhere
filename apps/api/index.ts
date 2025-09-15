@@ -19,12 +19,12 @@ import {
 } from './routes/venues/venues';
 import { packagesRoutes } from './routes/packages/packagesRoutes';
 import { imagesRoutes } from './routes/images/images';
+
+import { bookingsRoutes } from './routes/bookings/bookingsRoutes';
+
 import fastifyMultipart from '@fastify/multipart';
 
 import { googlePlacesRoutes } from './proxy/googleGeoLocation';
-
-import { publicVenueApi } from './routes/venues/venues';
-import { publicBookingsRoute } from './routes/venues/venues';
 
 const server: FastifyInstance = fastify();
 
@@ -75,17 +75,13 @@ server.register(venueOpeningDaysRoute, { prefix: '/api' });
 server.register(venueClosingPeriods, { prefix: '/api' });
 server.register(venuePayments, { prefix: '/api' });
 
-//Rotte Sezione Recensioni
-//server.register(reviewsRoutes, { prefix: '/api' });
-
-server.register(publicVenueApi, { prefix: '/api' });
-server.register(publicBookingsRoute, { prefix: '/api' });
-
 //Rotte Sezione Pacchetti
 server.register(packagesRoutes, { prefix: '/api' });
 
-//Rotta per GET/POST/DELETE Foto dell'intero Applicativo
+//Rotte per Prenotazioni/Booking
+server.register(bookingsRoutes, { prefix: '/api/bookings' });
 
+//Rotta per GET/POST/DELETE Foto dell'intero Applicativo
 //Metodi GET POST DELETE Consentiti e previsiti
 server.register(imagesRoutes, { prefix: '/media' });
 

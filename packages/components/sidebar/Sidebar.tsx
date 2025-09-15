@@ -148,6 +148,10 @@ export default function Sidebar({ onLogout }: SidebarProps) {
             <Menu.Item key="payments" className={sidebarStyles['my-tab']}>
               <Link href="/payments">Pagamenti</Link>
             </Menu.Item>
+
+            <Menu.Item key="bookings" className={sidebarStyles['my-tab']}>
+              <Link href="/bookings">Prenotazioni</Link>
+            </Menu.Item>
           </Menu.SubMenu>
           <Menu.Divider style={{ margin: '8px 16px' }} />
           {/* Pacchetti dinamici */}

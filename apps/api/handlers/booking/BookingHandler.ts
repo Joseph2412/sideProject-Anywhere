@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { prisma } from '../../libs/prisma';
+import { notifyBookingChange } from './BookingSSEHandler';
 
 interface ExternalBookingBody {
   venueId: number;
@@ -146,6 +147,9 @@ export const createNewBooking = async (request: FastifyRequest, reply: FastifyRe
       },
     });
 
+    // 🔥 Invia notifica SSE per aggiornamenti in tempo reale
+    notifyBookingChange(venueId, 'created', newBooking);
+
     return reply.code(201).send({
       message: 'Prenotazione creata con successo',
       bookingId: newBooking.id,
@@ -220,6 +224,9 @@ export const deleteBooking = async (request: FastifyRequest, reply: FastifyReply
       },
     });
 
+    // 🔥 Invia notifica SSE per aggiornamenti in tempo reale
+    notifyBookingChange(booking.venueId, 'deleted', cancelledBooking);
+
     return reply.code(200).send({
       message: 'Prenotazione cancellata con successo',
       booking: cancelledBooking,
@@ -272,6 +279,66 @@ export const getBookingDetails = async (request: FastifyRequest, reply: FastifyR
     console.error('Error in getBookingDetails:', error);
     return reply.code(500).send({
       error: 'Errore nel recupero della prenotazione',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+};
+
+export const getVenueBookings = async (request: FastifyRequest, reply: FastifyReply) => {
+  try {
+    const { venueId } = request.params as { venueId: string };
+    const {
+      status,
+      limit = 20,
+      offset = 0,
+    } = request.query as {
+      status?: string;
+      limit?: number;
+      offset?: number;
+    };
+
+    // Verifica che l'utente sia il proprietario della venue
+    const user = await prisma.user.findUnique({
+      where: { id: request.user.id },
+      select: { venueId: true },
+    });
+
+    if (!user?.venueId || user.venueId !== parseInt(venueId)) {
+      return reply.code(403).send({ error: 'Non autorizzato per questa venue' });
+    }
+
+    const whereClause: any = { venueId: parseInt(venueId) };
+    if (status) {
+      whereClause.status = status;
+    }
+
+    const bookings = await prisma.booking.findMany({
+      where: whereClause,
+      include: {
+        package: {
+          select: { id: true, name: true, type: true },
+        },
+        venue: {
+          select: { id: true, name: true },
+        },
+      },
+      orderBy: { start: 'desc' },
+      take: limit,
+      skip: offset,
+    });
+
+    const total = await prisma.booking.count({ where: whereClause });
+
+    return reply.code(200).send({
+      bookings,
+      total,
+      limit,
+      offset,
+    });
+  } catch (error) {
+    console.error('Error in getVenueBookings:', error);
+    return reply.code(500).send({
+      error: 'Errore nel recupero delle prenotazioni',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
   }

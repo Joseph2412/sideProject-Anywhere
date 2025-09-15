@@ -29,9 +29,6 @@ import {
   updateVenuePaymentsDetailsHandler,
 } from './../../handlers/venues/venuePaymentsDetails';
 import { updateVenuePaymentsDetailsSchema } from '../../schemas/venuePaymentsDetailsSchema';
-import { allPublicVenueSchema, idPublicVenueSchema } from 'schemas/publicVenueSchema';
-import { getPublicVenuesHandler } from 'handlers/booking/PublicVenueHandler';
-import { createExternalBookingHandler } from 'handlers/booking/BookingHandler';
 
 export async function venueDetailsRoute(fastify: FastifyInstance) {
   fastify.get('/venues', { preHandler: fastify.authenticate }, getVenueDetailsHandler);
@@ -89,22 +86,4 @@ export async function venuePayments(fastify: FastifyInstance) {
     },
     updateVenuePaymentsDetailsHandler
   );
-}
-
-export async function publicVenueApi(fastify: FastifyInstance) {
-  fastify.get(
-    '/public/venues',
-    { preHandler: fastify.authenticate, schema: allPublicVenueSchema },
-    getPublicVenuesHandler
-  );
-
-  fastify.get(
-    '/public/venues/:id',
-    { preHandler: fastify.authenticate, schema: idPublicVenueSchema },
-    getPublicVenuesHandler
-  );
-}
-
-export async function publicBookingsRoute(fastify: FastifyInstance) {
-  fastify.post('/bookings', { preHandler: fastify.authenticate }, createExternalBookingHandler);
 }

@@ -42,6 +42,9 @@ export * from './calendar';
 export * from './packageList/PackageForm';
 export * from './packageList/PackagesList';
 
+// Bookings Components
+export * from './bookings/BookingsForm';
+
 // Sidebar Components
 export * from './logoSidebar';
 export * from './sidebarFooter';
