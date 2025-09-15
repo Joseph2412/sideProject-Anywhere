@@ -1,15 +1,97 @@
-# 📚 Anywhere – Monorepo (WEBACK MANNNNNNN)
+# 📚 Anywhere – Monorepo
 
-> **🏗️ Architettura Monorepo**: Progetto organizzato con PNPM workspaces e Turborepo per massima scalabilità e manutenibilità.
+<div align="center">
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Fastify](https://img.shields.io/badge/Fastify-000000?style=for-the-badge&logo=fastify&logoColor=white)](https://www.fastify.io/)
+[![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org/)
+[![PNPM](https://img.shields.io/badge/PNPM-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
+
+</div>
+
+---
+
+> **🏗️ Architettura Monorepo Moderna**: Progetto di gestione workspace/coworking organizzato con **PNPM workspaces** e **Turborepo** per massima scalabilità, manutenibilità e performance di sviluppo.
+
+## ✨ **Features Principali**
+
+- 🏢 **Gestione Venue**: Creazione e amministrazione di spazi coworking
+- 📦 **Pacchetti Flessibili**: Sistema di piani tariffari (orario, giornaliero, mensile, etc.)
+- 📅 **Sistema Booking**: Prenotazioni con API pubbliche per clienti esterni
+- 🖼️ **Media Management**: Upload e gestione immagini tramite AWS S3
+- ⭐ **Sistema Recensioni**: Valutazioni e feedback sui venue
+- 🔐 **Autenticazione JWT**: Sistema sicuro di login/registrazione
+- 🌐 **API RESTful**: Backend completo con validazione JSON Schema
+- 📱 **UI Responsive**: Frontend moderno con Ant Design
+
+---
+
+## 🚀 **Quick Start - Script Principali**
+
+<div align="center">
+
+### 🎯 **Comandi Essenziali per Iniziare**
+
+</div>
+
+| 🎮 **Script**            | 💻 **Comando**  | 📝 **Descrizione**                        |
+| :----------------------- | :-------------- | :---------------------------------------- |
+| **🏃‍♂️ Sviluppo Completo** | `pnpm dev`      | Avvia **frontend + backend** in parallelo |
+| **🔧 Backend Only**      | `pnpm backend`  | Avvia solo l'**API Fastify** (porta 3001) |
+| **🎨 Frontend Only**     | `pnpm frontend` | Avvia solo **Next.js** (porta 3000)       |
+| **🏗️ Build Produzione**  | `pnpm build`    | Compila tutti i progetti per produzione   |
+
+<div align="center">
+
+### 🛠️ **Comandi Database & Utility**
+
+</div>
+
+| 🎮 **Script**          | 💻 **Comando**           | 📝 **Descrizione**                    |
+| :--------------------- | :----------------------- | :------------------------------------ |
+| **🗄️ Generate Client** | `pnpm database:generate` | Genera il **Prisma Client**           |
+| **📦 Migrations**      | `pnpm database:migrate`  | Esegue le **migrations DB**           |
+| **🎯 Prisma Studio**   | `pnpm studio`            | Apre l'**interfaccia visuale** del DB |
+| **🧹 Lint All**        | `pnpm lint`              | **Linting** su tutta la monorepo      |
+| **💎 Format Code**     | `pnpm format`            | **Prettier** su tutti i file          |
+| **🔍 Type Check**      | `pnpm check-types`       | Verifica **tipi TypeScript**          |
+| **📝 Smart Commit**    | `pnpm commit`            | **Lint + Format + Commit** guidato    |
+
+<div align="center">
+
+### ⚡ **Esempio Workflow Tipico**
+
+```bash
+# 1. Setup iniziale
+pnpm install && pnpm database:generate && pnpm database:migrate
+
+# 2. Sviluppo quotidiano
+pnpm dev                    # Avvia tutto
+# OPPURE
+pnpm backend & pnpm frontend   # Avvia separatamente
+
+# 3. Prima di committare
+pnpm commit                 # Lint + Format + Commit automatico
+```
+
+</div>
+
+---
 
 ## 📁 Struttura delle Cartelle
 
 ```txt
-anywhere/
+sideProject-Anywhere/
 ├── apps/
 │   ├── api/                           # Backend: Server Fastify con Prisma ORM
 │   │   ├── handlers/                  # Handler per logica di business
 │   │   │   ├── auth/                  # Gestione autenticazione utenti
+│   │   │   ├── booking/               # Gestione prenotazioni e API pubbliche venue
+│   │   │   ├── images/                # Gestione upload e galleria immagini S3
+│   │   │   ├── packages/              # Gestione pacchetti e piani tariffari
+│   │   │   ├── reviews/               # Gestione recensioni e valutazioni
 │   │   │   ├── user/                  # Gestione profili utente
 │   │   │   └── venues/                # Gestione locali/venue
 │   │   ├── routes/                    # Definizione delle route API
@@ -20,16 +102,80 @@ anywhere/
 │   │   │   │   ├── checkEmail.ts      # Verifica email
 │   │   │   │   ├── resetPassword.ts   # Reset password
 │   │   │   │   └── restorePassword.ts # Ripristino password
+│   │   │   ├── images/
+│   │   │   │   └── images.ts          # Gestione upload/download immagini S3
+│   │   │   ├── packages/
+│   │   │   │   └── packages.ts        # CRUD pacchetti e piani tariffari
+│   │   │   ├── reviews/
+│   │   │   │   └── reviews.ts         # Gestione recensioni venue
 │   │   │   ├── user/
 │   │   │   │   ├── index.ts           # Router principale utente
 │   │   │   │   ├── profile.ts         # Gestione profilo
 │   │   │   │   └── preferences.ts     # Preferenze notifiche
 │   │   │   └── venues/
 │   │   │       ├── index.ts           # Router principale venue
-│   │   │       └── venues.ts          # CRUD venue
+│   │   │       └── venues.ts          # CRUD venue, API pubbliche e prenotazioni
 │   │   ├── schemas/                   # Schemi validazione JSON Schema
 │   │   ├── plugins/                   # Plugin Fastify (auth, cors, etc.)
 │   │   ├── libs/                      # Connessioni database e utility
+│   │   ├── proxy/                     # Proxy per servizi esterni (Google Places)
+│   │   ├── utils/                     # Utility functions
+│   │   ├── index.ts                   # Entry point del server
+│   │   └── migrate.sh                 # Script per migrations Prisma
+│   │
+│   └── host/                          # Frontend: Applicazione Next.js
+│       ├── app/                       # App Router Next.js
+│       │   ├── (protected)/           # Route protette da autenticazione
+│       │   │   └── homepage/          # Dashboard principale
+│       │   ├── login/                 # Pagina di login
+│       │   ├── signup/                # Pagina di registrazione
+│       │   ├── layout.tsx             # Layout principale applicazione
+│       │   ├── page.tsx               # Homepage pubblica
+│       │   └── global.css             # Stili globali
+│       ├── components/
+│       │   └── providers/
+│       │       └── UserAuthProvider.tsx # Provider autenticazione utente
+│       ├── hooks/                     # Hook specifici dell'app host
+│       │   ├── useLogout.ts           # Hook per logout
+│       │   └── useUserProfile.ts      # Hook per profilo utente
+│       ├── theme/                     # Configurazione tema Ant Design
+│       │   └── theme.ts
+│       ├── middleware.ts              # Middleware Next.js
+│       └── next.config.js             # Configurazione Next.js
+│   │   ├── handlers/                  # Handler per logica di business
+│   │   │   ├── auth/                  # Gestione autenticazione utenti
+│   │   │   ├── booking/               # Gestione prenotazioni e API pubbliche venue
+│   │   │   ├── images/                # Gestione upload e galleria immagini S3
+│   │   │   ├── packages/              # Gestione pacchetti e piani tariffari
+│   │   │   ├── reviews/               # Gestione recensioni e valutazioni
+│   │   │   ├── user/                  # Gestione profili utente
+│   │   │   └── venues/                # Gestione locali/venue
+│   │   ├── routes/                    # Definizione delle route API
+│   │   │   ├── auth/
+│   │   │   │   ├── index.ts           # Router principale autenticazione
+│   │   │   │   ├── login.ts           # Endpoint login
+│   │   │   │   ├── signup.ts          # Endpoint registrazione
+│   │   │   │   ├── checkEmail.ts      # Verifica email
+│   │   │   │   ├── resetPassword.ts   # Reset password
+│   │   │   │   └── restorePassword.ts # Ripristino password
+│   │   │   ├── images/
+│   │   │   │   └── images.ts          # Gestione upload/download immagini S3
+│   │   │   ├── packages/
+│   │   │   │   └── packages.ts        # CRUD pacchetti e piani tariffari
+│   │   │   ├── reviews/
+│   │   │   │   └── reviews.ts         # Gestione recensioni venue
+│   │   │   ├── user/
+│   │   │   │   ├── index.ts           # Router principale utente
+│   │   │   │   ├── profile.ts         # Gestione profilo
+│   │   │   │   └── preferences.ts     # Preferenze notifiche
+│   │   │   └── venues/
+│   │   │       ├── index.ts           # Router principale venue
+│   │   │       └── venues.ts          # CRUD venue, API pubbliche e prenotazioni
+│   │   ├── schemas/                   # Schemi validazione JSON Schema
+│   │   ├── plugins/                   # Plugin Fastify (auth, cors, etc.)
+│   │   ├── libs/                      # Connessioni database e utility
+│   │   ├── proxy/                     # Proxy per servizi esterni (Google Places)
+│   │   ├── utils/                     # Utility functions
 │   │   ├── index.ts                   # Entry point del server
 │   │   └── migrate.sh                 # Script per migrations Prisma
 │   │
@@ -57,9 +203,11 @@ anywhere/
 │   ├── components/                    # Componenti UI riutilizzabili
 │   │   ├── account/                   # Componenti gestione account
 │   │   │   └── ProfileForm.tsx        # Form modifica profilo
-│   │   ├── bundle/                    # Componenti gestione pacchetti
-│   │   │   ├── AddBundleForm.tsx      # Form aggiunta pacchetto
-│   │   │   └── PackagesList.tsx       # Lista pacchetti
+│   │   ├── addressAutoComplete/       # Componenti per autocompletamento indirizzi
+│   │   ├── packageList/               # Componenti gestione pacchetti
+│   │   │   ├── PackageForm.tsx        # Form aggiunta/modifica pacchetto
+│   │   │   ├── PackagesList.tsx       # Lista pacchetti
+│   │   │   └── details/               # Dettagli pacchetti
 │   │   ├── buttons/                   # Pulsanti riutilizzabili
 │   │   │   ├── index.ts               # Barrel export pulsanti
 │   │   │   ├── PrimaryButton.tsx      # Pulsante primario
@@ -67,6 +215,7 @@ anywhere/
 │   │   ├── calendar/                  # Componenti calendario
 │   │   │   ├── calendar.tsx           # Calendario principale
 │   │   │   └── index.ts               # Barrel export calendario
+│   │   ├── customIcons/               # Icone personalizzate
 │   │   ├── header/                    # Componenti header layout
 │   │   │   ├── Header.tsx             # Header principale
 │   │   │   └── index.ts               # Barrel export header
@@ -79,6 +228,8 @@ anywhere/
 │   │   ├── sidebar/                   # Componenti sidebar navigazione
 │   │   │   ├── Sidebar.tsx            # Sidebar principale
 │   │   │   └── index.ts               # Barrel export sidebar
+│   │   ├── logoSidebar/               # Componenti logo nella sidebar
+│   │   ├── sidebarFooter/             # Componenti footer sidebar
 │   │   ├── venue/                     # Componenti gestione venue
 │   │   │   ├── venue.tsx              # Componente venue principale
 │   │   │   ├── index.ts               # Barrel export venue
@@ -104,12 +255,15 @@ anywhere/
 │   │   ├── imageUpload/               # Componenti upload immagini
 │   │   │   ├── imageUpload.tsx        # Upload immagini
 │   │   │   └── index.ts               # Barrel export upload
+│   │   ├── logoUpload/                # Componenti upload logo
+│   │   ├── profilePhotoUpload/        # Componenti upload foto profilo
 │   │   ├── tabs/                      # Componenti navigazione tab
 │   │   │   ├── tab.tsx                # Tab personalizzato
 │   │   │   └── index.ts               # Barrel export tabs
+│   │   ├── utils/                     # Utility per componenti
 │   │   ├── src/                       # Provider e configurazioni framework-specific
 │   │   │   ├── providers/
-│   │   │   │   ├── Message.provider.tsx # Provider toast messages
+│   │   │   │   ├── ToastMessageProvider.tsx # Provider toast messages
 │   │   │   │   └── index.ts           # Barrel export providers
 │   │   │   ├── global.d.ts            # Dichiarazioni TypeScript globali
 │   │   │   └── index.ts               # Barrel export src
@@ -124,7 +278,8 @@ anywhere/
 │   │   │   │   ├── AuthStore.ts       # Stato autenticazione utente
 │   │   │   │   ├── ToastStore.ts      # Stato notifiche toast
 │   │   │   │   ├── NavigationStore.ts # Stato navigazione
-│   │   │   │   └── VenueDetails.ts    # Stato dettagli venue
+│   │   │   │   ├── VenueDetails.ts    # Stato dettagli venue
+│   │   │   │   └── PackageFormStore.ts # Stato form pacchetti
 │   │   │   └── global.d.ts            # Dichiarazioni TypeScript
 │   │   └── package.json               # Configurazione package UI
 │   │
@@ -172,18 +327,25 @@ anywhere/
 └── README.md                          # Documentazione progetto
 ```
 
+---
+
 ## 🧰 Stack Tecnologico
 
-| Area           | Tecnologia                          |
-| -------------- | ----------------------------------- |
-| 🧠 Linguaggio  | **TypeScript**                      |
-| 🔙 Backend     | **Node.js** con **Fastify**         |
-| 📦 ORM         | **Prisma**                          |
-| 🗄️ Database    | **PostgreSQL**                      |
-| 🎨 Frontend    | **React** (Next.js App Router)      |
-| 🧩 UI Library  | **Ant Design**                      |
-| 📚 Monorepo    | **PNPM workspaces** + **Turborepo** |
-| ✅ Validazione | JSON Schema via Fastify             |
+| Area             | Tecnologia                          |
+| ---------------- | ----------------------------------- |
+| 🧠 Linguaggio    | **TypeScript**                      |
+| 🔙 Backend       | **Node.js** con **Fastify**         |
+| 📦 ORM           | **Prisma**                          |
+| 🗄️ Database      | **PostgreSQL**                      |
+| 🎨 Frontend      | **React** (Next.js App Router)      |
+| 🧩 UI Library    | **Ant Design**                      |
+| 📚 Monorepo      | **PNPM workspaces** + **Turborepo** |
+| ✅ Validazione   | JSON Schema via Fastify             |
+| 🌐 State Mgmt    | **Jotai** (Atomic State Management) |
+| 🔄 Data Fetching | **TanStack Query** (React Query)    |
+| ☁️ Cloud Storage | **AWS S3** (Immagini e file)        |
+| 🔐 Auth          | **JWT** + **bcrypt**                |
+| 📅 Date Handling | **Day.js**                          |
 
 ## 🏗️ **Architettura del Progetto**
 
@@ -263,10 +425,13 @@ anywhere/
 - **Separazione responsabilità**: Packages dedicati per UI, state, hooks e tipi
 - **Architettura scalabile**: Struttura modulare per crescita del progetto
 - **Zero file duplicati**: Struttura pulita senza ridondanze
-- **Store modulari**: State management organizzato per domain
+- **Store modulari**: State management organizzato per domain (Jotai)
 - **Hook riutilizzabili**: Logica condivisa framework-agnostic
 - **Tipizzazione completa**: TypeScript su tutta la codebase
 - **Build ottimizzato**: Turborepo per compilation parallelizzata
+- **API completa**: Gestione venue, pacchetti, recensioni, booking e immagini
+- **Cloud Storage**: Integrazione AWS S3 per upload file e immagini
+- **Data Fetching**: TanStack Query per cache e sincronizzazione dati
 
 ## �🛠️ Comandi Utili
 
@@ -283,7 +448,21 @@ anywhere/
 pnpm --filter host dev
 ```
 
-### 🔙 Backend (`apps/api`)
+### � Frontend (`apps/host`)
+
+| Script        | Comando                      | Descrizione                              |
+| ------------- | ---------------------------- | ---------------------------------------- |
+| `dev`         | `next dev --port 3000`       | Avvia Next.js in sviluppo (porta 3000)   |
+| `build`       | `next build`                 | Compila il frontend per la produzione    |
+| `start`       | `next start`                 | Avvia l'app in modalità production       |
+| `lint`        | `next lint --max-warnings 0` | Lint del progetto frontend (no warnings) |
+| `check-types` | `tsc --noEmit`               | Verifica tipi TypeScript senza output    |
+
+```bash
+pnpm --filter host dev
+```
+
+### �🔙 Backend (`apps/api`)
 
 | Script    | Comando                                           | Descrizione                             |
 | --------- | ------------------------------------------------- | --------------------------------------- |
@@ -308,22 +487,14 @@ pnpm --filter api dev
 pnpm --filter @repo/database studio
 ```
 
-## 🧼 Convenzioni e Pulizia del Codice
+## 🧼 **Strumenti di Sviluppo**
 
-| Script              | Comando                  | Descrizione                                                 |
-| ------------------- | ------------------------ | ----------------------------------------------------------- |
-| `format`            | `pnpm format`            | Applica Prettier a tutti i file `.ts`, `.tsx`, `.md`        |
-| `lint`              | `pnpm lint`              | Esegue linting su tutta la monorepo con le regole condivise |
-| `check-types`       | `pnpm check-types`       | Verifica i tipi TypeScript su tutti i pacchetti (via Turbo) |
-| `commit`            | `pnpm commit`            | Lint, format, git add e commit guidato con Commitizen       |
-| `database:generate` | `pnpm database:generate` | Entra in `packages/database` e genera il Prisma Client      |
+### 🧪 **Lint e Verifica**
 
-### 🧪 Verifica e Lint
-
-```bash
-pnpm lint         # Lint di tutti i pacchetti
-pnpm check-types  # Verifica tipi TypeScript
-```
+- **ESLint**: Configurazioni condivise per base, React e Next.js
+- **Prettier**: Formattazione automatica del codice
+- **TypeScript**: Verifica tipi su tutta la monorepo
+- **Turbo**: Build e cache ottimizzati per monorepo
 
 ## 🚀 Come Iniziare (Setup Completo)
 
@@ -331,7 +502,7 @@ pnpm check-types  # Verifica tipi TypeScript
 
 ```bash
 git clone <repo-url>
-cd anywhere
+cd sideProject-Anywhere
 ```
 
 2. **Installa le dipendenze**
@@ -340,7 +511,7 @@ cd anywhere
 pnpm install
 ```
 
-3. **Configura le variabili d’ambiente**
+3. **Configura le variabili d'ambiente**
 
 ```bash
 cp .env.example .env
@@ -349,17 +520,26 @@ cp .env.example .env
 4. **Genera il client Prisma**
 
 ```bash
-pnpm --filter @repo/database generate
+pnpm database:generate
 ```
 
 5. **Applica le migrations**
 
 ```bash
-pnpm --filter api migrate --name init
+pnpm database:migrate
 ```
 
 6. **Avvia in modalità sviluppo**
 
 ```bash
-pnpm dev
+pnpm dev          # Avvia tutto (frontend + backend)
+# OPPURE avvia singolarmente:
+pnpm backend      # Solo API
+pnpm frontend     # Solo Next.js
 ```
+
+7. **Accedi all'applicazione**
+
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:3001
+- **Prisma Studio**: http://localhost:5555 (con `pnpm studio`)

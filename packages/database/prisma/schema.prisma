@@ -187,7 +187,9 @@ model Booking {
   updatedAt DateTime @updatedAt
   
   people Int @default(1)
-  userId  Int
+  userId  Int  //Riferimento all'utente che ha fatto la prenotazione
+  costumerName String //Nome del cliente esterno che ha fatto la prenotazione
+  costumerEmail String? //Email del cliente esterno che ha fatto la prenotazione
 
   status String 
   // Reserved, Confirmed, Canceled, Completed, in Review, Reviewed

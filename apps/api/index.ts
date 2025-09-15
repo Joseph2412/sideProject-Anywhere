@@ -23,7 +23,8 @@ import fastifyMultipart from '@fastify/multipart';
 
 import { googlePlacesRoutes } from './proxy/googleGeoLocation';
 
-//Ricorda di importare prisma in ogni handler senza istanziarlo sempre
+import { publicVenueApi } from './routes/venues/venues';
+import { publicBookingsRoute } from './routes/venues/venues';
 
 const server: FastifyInstance = fastify();
 
@@ -77,6 +78,9 @@ server.register(venuePayments, { prefix: '/api' });
 //Rotte Sezione Recensioni
 //server.register(reviewsRoutes, { prefix: '/api' });
 
+server.register(publicVenueApi, { prefix: '/api' });
+server.register(publicBookingsRoute, { prefix: '/api' });
+
 //Rotte Sezione Pacchetti
 server.register(packagesRoutes, { prefix: '/api' });
 
@@ -95,3 +99,6 @@ server.listen({ port: 3001 }, (err, address) => {
   }
   console.log(`Server listening at ${address}`);
 });
+
+//Continua con il Backend
+//Imposta un componente per visualizzare le prenotazioni presenti e passate.
