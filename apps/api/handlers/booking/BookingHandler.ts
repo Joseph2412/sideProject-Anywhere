@@ -20,28 +20,100 @@ interface ExternalBookingBody {
 // Handler unificato per prenotazioni esterne (da altra app)
 export const createNewBooking = async (request: FastifyRequest, reply: FastifyReply) => {
   try {
-    const { venueId, packageId, start, end, people, userId, customerInfo } =
-      request.body as ExternalBookingBody;
+    const body = request.body as ExternalBookingBody;
+    const venueId = Number(body.venueId);
+    const packageId = Number(body.packageId);
+    const people = Number(body.people);
+    const userId = Number(body.userId);
+    const { start, end, customerInfo } = body;
+
+    // 🔍 DEBUG: Aggiungi questi log
+    console.log('========== DEBUG BOOKING ==========');
+    console.log('📋 Body ricevuto:', JSON.stringify(body, null, 2));
+    console.log('🔢 Parametri convertiti:');
+    console.log('  venueId:', venueId, 'type:', typeof venueId);
+    console.log('  packageId:', packageId, 'type:', typeof packageId);
+    console.log('  userId:', userId, 'type:', typeof userId);
+    console.log('===================================');
+
+    if (isNaN(venueId) || isNaN(packageId) || isNaN(people) || isNaN(userId)) {
+      console.log('❌ Errore: Parametri numerici non validi');
+      return reply.code(400).send({ error: 'Parametri numerici non validi' });
+    }
 
     // Validazione input
     if (!venueId || !packageId || !start || !end || !people || !userId || !customerInfo) {
+      console.log('❌ Errore: Campi obbligatori mancanti');
       return reply.code(400).send({ error: 'Tutti i campi sono obbligatori' });
     }
 
     if (!customerInfo.firstName || !customerInfo.lastName || !customerInfo.email) {
+      console.log('❌ Errore: Informazioni cliente incomplete');
       return reply.code(400).send({ error: 'Informazioni cliente incomplete' });
     }
 
     // Verifica che l'utente esista (userId dall'altra app)
+    console.log('🔍 Cerco utente con ID:', userId);
     const existingUser = await prisma.user.findUnique({
       where: { id: userId },
     });
 
+    console.log('👤 Utente trovato:', !!existingUser);
+    if (existingUser) {
+      console.log('👤 Dettagli utente:', { id: existingUser.id, email: existingUser.email });
+    }
+
     if (!existingUser) {
+      console.log('❌ Utente non trovato nel database');
       return reply.code(404).send({ error: 'Utente non trovato' });
     }
 
+    // 🔍 DEBUG: Controlla venue e package separatamente
+    console.log('🏢 Cerco venue con ID:', venueId);
+    const venueCheck = await prisma.venue.findUnique({ where: { id: venueId } });
+
+    console.log('📦 Cerco package con ID:', packageId);
+    const packageCheck = await prisma.package.findUnique({ where: { id: packageId } });
+
+    console.log('🏢 Venue esiste:', !!venueCheck);
+    console.log('📦 Package esiste:', !!packageCheck);
+
+    if (venueCheck) {
+      console.log('🏢 Venue details:', { id: venueCheck.id, name: venueCheck.name });
+    }
+
+    if (packageCheck) {
+      console.log('📦 Package details:', {
+        id: packageCheck.id,
+        name: packageCheck.name,
+        isActive: packageCheck.isActive,
+        venueId: packageCheck.venueId,
+      });
+    }
+
+    // 🔍 DEBUG: Controlla i plans del package
+    console.log('🎯 Cerco plans per package ID:', packageId);
+    const plansCheck = await prisma.packagePlan.findMany({
+      where: { packageId: packageId },
+    });
+
+    console.log('🎯 Plans totali trovati:', plansCheck.length);
+
+    if (plansCheck.length > 0) {
+      plansCheck.forEach((plan, index) => {
+        console.log(`🎯 Plan ${index + 1}:`, {
+          id: plan.id,
+          name: plan.name,
+          isEnabled: plan.isEnabled,
+          packageId: plan.packageId,
+        });
+      });
+    } else {
+      console.log('❌ NESSUN PLAN TROVATO per questo package!');
+    }
+
     // Verifica esistenza venue e package
+    console.log('🔗 Cerco venue con package collegato...');
     const venue = await prisma.venue.findFirst({
       where: {
         id: venueId,
