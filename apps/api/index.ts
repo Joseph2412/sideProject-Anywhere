@@ -26,6 +26,8 @@ import fastifyMultipart from '@fastify/multipart';
 
 import { googlePlacesRoutes } from './proxy/googleGeoLocation';
 
+import { publicVenuesRoutes } from './routes/venues/publicVenuesRoutes';
+
 const server: FastifyInstance = fastify();
 
 server.register(cors, {
@@ -98,3 +100,7 @@ server.listen({ port: 3001 }, (err, address) => {
 
 //Continua con il Backend
 //Imposta un componente per visualizzare le prenotazioni presenti e passate.
+
+//Rotte esterne per Applicazione Cliente
+
+server.register(publicVenuesRoutes, { prefix: '/api' });
