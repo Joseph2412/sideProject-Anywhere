@@ -27,6 +27,7 @@ import fastifyMultipart from '@fastify/multipart';
 import { googlePlacesRoutes } from './proxy/googleGeoLocation';
 
 import { publicVenuesRoutes } from './routes/venues/publicVenuesRoutes';
+import { secureMediaRoutes } from './routes/media/secureMediaRoutes';
 
 const server: FastifyInstance = fastify();
 
@@ -86,6 +87,9 @@ server.register(bookingsRoutes, { prefix: '/api/bookings' });
 //Rotta per GET/POST/DELETE Foto dell'intero Applicativo
 //Metodi GET POST DELETE Consentiti e previsiti
 server.register(imagesRoutes, { prefix: '/media' });
+
+// Rotte proxy sicure per servire media S3 senza esporre credenziali
+server.register(secureMediaRoutes, { prefix: '/secure-media' });
 
 server.register(googlePlacesRoutes, { prefix: '/api/google' });
 

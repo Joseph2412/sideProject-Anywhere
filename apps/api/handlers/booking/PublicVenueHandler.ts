@@ -1,5 +1,10 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { prisma } from '../../libs/prisma';
+import {
+  generateSecureVenueLogoUrl,
+  generateSecureVenuePhotoUrl,
+  generateSecurePackagePhotoUrl,
+} from '../../utils/secureMediaUtils';
 
 interface PublicVenuesQuery {
   city?: string;
@@ -139,44 +144,54 @@ export const getPublicVenuesHandler = async (
       },
     });
 
-    // Genera URL signed per logos e photos
-    const venuesWithUrls = await Promise.all(
-      venues.map(async venue => {
-        const { S3_REPORTS_BUCKET } = process.env;
-
-        // Genera URL signed per il logo
-        let logoURL = null;
-        if (venue.logoURL) {
-          logoURL = await request.s3.getSignedUrl(S3_REPORTS_BUCKET!, venue.logoURL);
+    // Genera URL proxy sicuri per logos e photos
+    const venuesWithUrls = venues.map(venue => {
+      // Genera URL proxy sicuro per il logo
+      let logoURL = null;
+      if (venue.logoURL) {
+        try {
+          logoURL = generateSecureVenueLogoUrl(venue.logoURL);
+        } catch (error) {
+          console.warn(`Could not generate logo URL for venue ${venue.id}:`, error);
+          logoURL = null;
         }
+      }
 
-        // Genera URL signed per le photos
-        const photos = await Promise.all(
-          venue.photos.map(async photo => {
-            return await request.s3.getSignedUrl(S3_REPORTS_BUCKET!, photo);
+      // Genera URL proxy sicuri per le photos
+      const photos = venue.photos
+        .map(photo => {
+          try {
+            return generateSecureVenuePhotoUrl(photo);
+          } catch (error) {
+            console.warn(`Could not generate photo URL for venue ${venue.id}:`, error);
+            return null;
+          }
+        })
+        .filter(Boolean); // Rimuovi URL null
+
+      // Genera URL proxy sicuri per le photos dei packages
+      const packages = venue.packages.map(pkg => {
+        const packagePhotos = pkg.photos
+          .map(photo => {
+            try {
+              return generateSecurePackagePhotoUrl(photo);
+            } catch (error) {
+              console.warn(`Could not generate package photo URL for package ${pkg.id}:`, error);
+              return null;
+            }
           })
-        );
+          .filter(Boolean); // Rimuovi URL null
 
-        // Genera URL signed per le photos dei packages
-        const packages = await Promise.all(
-          venue.packages.map(async pkg => {
-            const packagePhotos = await Promise.all(
-              pkg.photos.map(async photo => {
-                return await request.s3.getSignedUrl(S3_REPORTS_BUCKET!, photo);
-              })
-            );
-            return { ...pkg, photos: packagePhotos };
-          })
-        );
+        return { ...pkg, photos: packagePhotos };
+      });
 
-        return {
-          ...venue,
-          logoURL,
-          photos,
-          packages,
-        };
-      })
-    );
+      return {
+        ...venue,
+        logoURL,
+        photos,
+        packages,
+      };
+    });
 
     return reply.code(200).send({
       venues: venuesWithUrls,
@@ -280,30 +295,42 @@ export const getPublicVenueDetailsHandler = async (
       return reply.code(404).send({ error: 'Locale non trovato' });
     }
 
-    // Genera URL signed
-    const { S3_REPORTS_BUCKET } = process.env;
-
+    // Genera URL proxy sicuri
     let logoURL = null;
     if (venue.logoURL) {
-      logoURL = await request.s3.getSignedUrl(S3_REPORTS_BUCKET!, venue.logoURL);
+      try {
+        logoURL = generateSecureVenueLogoUrl(venue.logoURL);
+      } catch (error) {
+        console.warn(`Could not generate logo URL for venue ${venue.id}:`, error);
+        logoURL = null;
+      }
     }
 
-    const photos = await Promise.all(
-      venue.photos.map(async photo => {
-        return await request.s3.getSignedUrl(S3_REPORTS_BUCKET!, photo);
+    const photos = venue.photos
+      .map(photo => {
+        try {
+          return generateSecureVenuePhotoUrl(photo);
+        } catch (error) {
+          console.warn(`Could not generate photo URL for venue ${venue.id}:`, error);
+          return null;
+        }
       })
-    );
+      .filter(Boolean); // Rimuovi URL null
 
-    const packages = await Promise.all(
-      venue.packages.map(async pkg => {
-        const packagePhotos = await Promise.all(
-          pkg.photos.map(async photo => {
-            return await request.s3.getSignedUrl(S3_REPORTS_BUCKET!, photo);
-          })
-        );
-        return { ...pkg, photos: packagePhotos };
-      })
-    );
+    const packages = venue.packages.map(pkg => {
+      const packagePhotos = pkg.photos
+        .map(photo => {
+          try {
+            return generateSecurePackagePhotoUrl(photo);
+          } catch (error) {
+            console.warn(`Could not generate package photo URL for package ${pkg.id}:`, error);
+            return null;
+          }
+        })
+        .filter(Boolean); // Rimuovi URL null
+
+      return { ...pkg, photos: packagePhotos };
+    });
 
     return reply.code(200).send({
       venue: {

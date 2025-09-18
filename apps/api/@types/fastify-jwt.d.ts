@@ -30,6 +30,7 @@ declare module 'fastify' {
       uploadFile: (bucket: string, file: any, key: string, mimetype: string) => Promise<string>;
       deleteFile: (bucket: string, key: string) => Promise<void>;
       getSignedUrl: (bucket: string, key: string) => Promise<string>;
+      getObject: (bucket: string, key: string) => Promise<any>;
     };
   }
   interface FastifyRequest {

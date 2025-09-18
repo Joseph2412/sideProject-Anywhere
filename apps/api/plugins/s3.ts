@@ -66,6 +66,11 @@ export class S3Service {
     const command = new DeleteObjectCommand({ Bucket: bucket, Key: key });
     await this.client.send(command);
   }
+
+  public async getObject(bucket: string, key: string) {
+    const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+    return await this.client.send(command);
+  }
 }
 
 const plugin: FastifyPluginAsync = async (
