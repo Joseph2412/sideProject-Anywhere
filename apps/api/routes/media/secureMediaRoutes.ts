@@ -4,6 +4,7 @@ interface MediaParams {
   venueId: string;
   filename: string;
   packageId?: string;
+  userId?: string;
 }
 
 export async function secureMediaRoutes(fastify: FastifyInstance) {
@@ -127,6 +128,48 @@ export async function secureMediaRoutes(fastify: FastifyInstance) {
 
         return reply.code(500).send({
           error: 'Errore nel servire la foto del pacchetto',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+  );
+
+  // Proxy per avatar utenti
+  fastify.get(
+    '/user/:userId/avatar/:filename',
+    async (request: FastifyRequest<{ Params: MediaParams }>, reply: FastifyReply) => {
+      const { userId, filename } = request.params;
+
+      try {
+        console.log(`👤 Serving user ${userId} avatar: ${filename}`);
+
+        // Costruisci la S3 key per gli avatar utenti
+        const s3Key = `host/${userId}/profile/avatar/${filename}`;
+
+        // Ottieni l'oggetto da S3
+        const s3Response = await request.s3.getObject(process.env.S3_REPORTS_BUCKET!, s3Key);
+
+        // Determina il content type dall'estensione
+        const contentType = getContentType(filename);
+
+        // Stream dell'immagine direttamente al client
+        return reply
+          .type(contentType)
+          .header('Cache-Control', 'public, max-age=3600') // Cache 1 ora
+          .header('ETag', s3Response.ETag || '')
+          .send(s3Response.Body);
+      } catch (error) {
+        console.error(`❌ Error serving user ${userId} avatar ${filename}:`, error);
+
+        if ((error as any).Code === 'NoSuchKey') {
+          return reply.code(404).send({
+            error: 'Avatar non trovato',
+            resource: `user/${userId}/avatar/${filename}`,
+          });
+        }
+
+        return reply.code(500).send({
+          error: "Errore nel servire l'avatar",
           message: error instanceof Error ? error.message : 'Unknown error',
         });
       }

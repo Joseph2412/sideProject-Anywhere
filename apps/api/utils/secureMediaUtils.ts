@@ -26,6 +26,15 @@ function extractPackageIdFromS3Key(s3Key: string): string {
   return '';
 }
 
+// Helper per estrarre user ID da S3 key (format: host/123/profile/avatar/file.jpg)
+function extractUserIdFromS3Key(s3Key: string): string {
+  const parts = s3Key.split('/');
+  if (parts[0] === 'host' && parts.length >= 2) {
+    return parts[1];
+  }
+  return '';
+}
+
 /**
  * Genera URL proxy sicuro per logo venue
  */
@@ -72,11 +81,26 @@ export function generateSecurePackagePhotoUrl(s3Key: string, baseUrl?: string): 
 }
 
 /**
+ * Genera URL proxy sicuro per avatar utente
+ */
+export function generateSecureUserAvatarUrl(s3Key: string, baseUrl?: string): string {
+  const filename = extractFilenameFromS3Key(s3Key);
+  const userId = extractUserIdFromS3Key(s3Key);
+
+  if (!filename || !userId) {
+    throw new Error(`Invalid S3 key for user avatar: ${s3Key}`);
+  }
+
+  const base = baseUrl || process.env.API_HOST || 'http://localhost:3001';
+  return `${base}/secure-media/user/${userId}/avatar/${filename}`;
+}
+
+/**
  * Helper per determinare il tipo di media da S3 key
  */
 export function getMediaTypeFromS3Key(
   s3Key: string
-): 'venue-logo' | 'venue-photo' | 'package-photo' | 'unknown' {
+): 'venue-logo' | 'venue-photo' | 'package-photo' | 'user-avatar' | 'unknown' {
   const parts = s3Key.split('/');
 
   if (parts[0] === 'venues' && parts[2] === 'logo') {
@@ -89,6 +113,10 @@ export function getMediaTypeFromS3Key(
 
   if (parts[0] === 'packages' && parts[2] === 'photos') {
     return 'package-photo';
+  }
+
+  if (parts[0] === 'host' && parts[2] === 'profile' && parts[3] === 'avatar') {
+    return 'user-avatar';
   }
 
   return 'unknown';
@@ -107,6 +135,8 @@ export function generateSecureMediaUrl(s3Key: string, baseUrl?: string): string 
       return generateSecureVenuePhotoUrl(s3Key, baseUrl);
     case 'package-photo':
       return generateSecurePackagePhotoUrl(s3Key, baseUrl);
+    case 'user-avatar':
+      return generateSecureUserAvatarUrl(s3Key, baseUrl);
     default:
       throw new Error(`Unsupported S3 key format: ${s3Key}`);
   }

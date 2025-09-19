@@ -46,15 +46,8 @@ export class S3Service {
       const putCommand = new PutObjectCommand(params);
       await this.client.send(putCommand);
 
-      const getCommand = new GetObjectCommand({
-        Bucket: bucket,
-        Key: fileName,
-      });
-      //return signed url
-      return await getSignedUrl(this.client, getCommand, {
-        signableHeaders: new Set(['content-type']),
-        expiresIn: this.expirationSignedUrl,
-      });
+      // ✅ SICURO: Restituisce solo la chiave S3, non la signed URL
+      return fileName;
     } catch (err) {
       console.error('S3 upload error:', err); // LOG ERRORE ORIGINALE
       this.instance.log.error(err);

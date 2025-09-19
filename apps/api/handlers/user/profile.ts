@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { prisma } from '../../libs/prisma';
 import { Prisma } from '@repo/database';
+import { generateSecureMediaUrl } from './../../utils/secureMediaUtils';
 
 export const profileHandler = async (request: FastifyRequest, reply: FastifyReply) => {
   const auth = request.user as {
@@ -23,11 +24,15 @@ export const profileHandler = async (request: FastifyRequest, reply: FastifyRepl
     return reply.code(404).send({ message: 'Profilo non trovato' });
   }
 
-  // Genera URL signed per l'avatar se esiste
+  // Genera URL proxy sicuro per l'avatar se esiste
   let avatarUrl = null;
   if (user.avatarUrl) {
-    const { S3_REPORTS_BUCKET } = process.env;
-    avatarUrl = await request.s3.getSignedUrl(S3_REPORTS_BUCKET!, user.avatarUrl);
+    try {
+      avatarUrl = generateSecureMediaUrl(user.avatarUrl);
+    } catch (error) {
+      console.warn(`Could not generate secure avatar URL for user ${user.id}:`, error);
+      avatarUrl = null;
+    }
   }
 
   return reply.send({

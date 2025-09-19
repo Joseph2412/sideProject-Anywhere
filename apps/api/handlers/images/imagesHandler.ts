@@ -1,6 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { prisma } from './../../libs/prisma';
 import { generateS3Key } from './../../utils/generateS3Key';
+import { generateSecureMediaUrl } from './../../utils/secureMediaUtils';
 
 export const imagesHandler = {
   getGallery: async (request: FastifyRequest, reply: FastifyReply) => {
@@ -20,9 +21,16 @@ export const imagesHandler = {
       return reply.status(400).send({ error: 'Invalid entity' });
     }
     const photos = record.photos || [];
-    const urls = await Promise.all(
-      photos.map((key: string) => request.s3.getSignedUrl(S3_REPORTS_BUCKET!, key))
-    );
+    const urls = photos
+      .map((s3Key: string) => {
+        try {
+          return generateSecureMediaUrl(s3Key);
+        } catch (error) {
+          console.warn(`Could not generate secure URL for ${s3Key}:`, error);
+          return null;
+        }
+      })
+      .filter(Boolean);
     return reply.send({ urls });
   },
 
@@ -51,12 +59,8 @@ export const imagesHandler = {
 
     const { S3_REPORTS_BUCKET } = process.env;
 
-    const signedUrl = await request.s3.uploadFile(
-      S3_REPORTS_BUCKET!,
-      fileBuffer,
-      s3Key,
-      file.mimetype
-    );
+    // ✅ SICURO: uploadFile ora restituisce solo la chiave S3
+    await request.s3.uploadFile(S3_REPORTS_BUCKET!, fileBuffer, s3Key, file.mimetype);
 
     // Gestione salvataggio nel DB basato sul tipo
     if (typeValue === 'gallery') {
@@ -97,7 +101,19 @@ export const imagesHandler = {
       });
     }
 
-    return reply.send({ url: signedUrl });
+    // ✅ SICURO: Genera URL proxy invece di esporre signed URL
+    try {
+      const secureUrl = generateSecureMediaUrl(s3Key);
+      return reply.send({ url: secureUrl });
+    } catch (error) {
+      console.warn(`Could not generate secure URL for ${s3Key}:`, error);
+      // Fallback: restituisci solo un messaggio di successo senza URL
+      return reply.send({
+        success: true,
+        message: 'File caricato con successo',
+        s3Key: s3Key,
+      });
+    }
   },
 
   delete: async (request: FastifyRequest, reply: FastifyReply) => {
@@ -189,8 +205,19 @@ export const imagesHandler = {
       return reply.status(400).send({ error: 'Missing key' });
     }
     console.log('S3 GET key:', key);
-    const { S3_REPORTS_BUCKET } = process.env;
-    const url = await request.s3.getSignedUrl(S3_REPORTS_BUCKET!, key);
-    return { url };
+
+    try {
+      // ✅ SICURO: Usa URL proxy invece di signed URL AWS
+      const secureUrl = generateSecureMediaUrl(key);
+      return reply.send({ url: secureUrl });
+    } catch (error) {
+      console.warn(`Could not generate secure URL for ${key}:`, error);
+      // ✅ SICURO: Non esporre mai signed URL, anche in caso di errore
+      return reply.status(400).send({
+        error: 'Impossibile generare URL sicuro per questo file',
+        s3Key: key,
+        message: 'Formato chiave S3 non supportato',
+      });
+    }
   },
 };

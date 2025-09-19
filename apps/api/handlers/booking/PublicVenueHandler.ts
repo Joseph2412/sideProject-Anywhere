@@ -66,11 +66,15 @@ export const getPublicVenuesHandler = async (
         return reply.code(404).send({ message: 'Venue non trovato' });
       }
 
-      // Genera URL signed per le foto se necessario
+      // Genera URL proxy sicuro per il logo se esiste
       let logoURL = null;
       if (venue.logoURL) {
-        const { S3_REPORTS_BUCKET } = process.env;
-        logoURL = await request.s3.getSignedUrl(S3_REPORTS_BUCKET!, venue.logoURL);
+        try {
+          logoURL = generateSecureVenueLogoUrl(venue.logoURL);
+        } catch (error) {
+          console.warn(`Could not generate secure logo URL for venue ${venue.id}:`, error);
+          logoURL = null;
+        }
       }
 
       return reply.code(200).send({

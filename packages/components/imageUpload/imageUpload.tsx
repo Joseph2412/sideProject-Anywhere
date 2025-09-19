@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import { messageToast } from '@repo/ui/store/ToastStore';
 import { usePathname } from 'next/navigation';
 import { useVenues } from '@repo/hooks';
+import { extractS3KeyFromUrl } from '../utils/mediaUtils';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -92,12 +93,6 @@ export const ImageUpload: React.FC = () => {
       console.error('Upload error:', info.file.error);
     }
   };
-
-  //Serve per fare il match corretto con il filename e l'url di amazon
-  function extractS3KeyFromUrl(url: string) {
-    const match = url.match(/\.amazonaws\.com\/(.+?)(\?|$)/);
-    return match ? match[1] : null;
-  }
 
   const handleRemove = async (file: UploadFile<string>) => {
     if (!file.url) {

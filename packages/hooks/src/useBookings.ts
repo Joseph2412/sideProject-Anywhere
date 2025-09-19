@@ -4,10 +4,11 @@ export interface BookingData {
   id: number;
   venueId: number;
   packageId: number;
+  price?: number;
   start: string;
   end: string;
   people: number;
-  status: 'PENDING' | 'CONFIRMED' | 'Cancelled';
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
   costumerName: string;
   costumerEmail: string;
   createdAt: string;
@@ -54,6 +55,8 @@ export function useVenueBookings(
     status?: string;
     page?: number;
     pageSize?: number;
+    startDate?: string;
+    endDate?: string;
   }
 ) {
   return useQuery({
