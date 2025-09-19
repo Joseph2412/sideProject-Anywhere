@@ -84,7 +84,10 @@ export function useBookingsSSE(
 
               // Invalida e ricarica i dati delle prenotazioni
               queryClient.invalidateQueries({
-                queryKey: ['venue-bookings', venueId],
+                queryKey: ['my-venue-bookings'], // Nuovo key
+              });
+              queryClient.invalidateQueries({
+                queryKey: ['venue-bookings'], // Vecchio key per compatibilità
               });
 
               // Callback personalizzato
@@ -96,7 +99,10 @@ export function useBookingsSSE(
 
               // Invalida e ricarica i dati delle prenotazioni
               queryClient.invalidateQueries({
-                queryKey: ['venue-bookings', venueId],
+                queryKey: ['my-venue-bookings'], // Nuovo key
+              });
+              queryClient.invalidateQueries({
+                queryKey: ['venue-bookings'], // Vecchio key per compatibilità
               });
 
               // Rimuovi anche i dettagli dalla cache se presenti

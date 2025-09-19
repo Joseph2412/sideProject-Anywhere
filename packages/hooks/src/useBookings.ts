@@ -60,7 +60,7 @@ export function useVenueBookings(
   }
 ) {
   return useQuery({
-    queryKey: ['venue-bookings', venueId, options],
+    queryKey: ['my-venue-bookings', options], // Cambiato da venue-bookings specifico a my-venue-bookings
     queryFn: async (): Promise<BookingsResponse> => {
       if (!venueId) {
         throw new Error('Venue ID richiesto');
@@ -74,7 +74,15 @@ export function useVenueBookings(
       if (options?.pageSize) params.append('pageSize', options.pageSize.toString());
 
       const queryString = params.toString();
-      const url = `${process.env.NEXT_PUBLIC_API_HOST}/api/bookings/venues/bookings/${venueId}${queryString ? `?${queryString}` : ''}`;
+      // Usa il nuovo endpoint che non richiede venueId
+      const url = `${process.env.NEXT_PUBLIC_API_HOST}/api/bookings/venues/bookings${queryString ? `?${queryString}` : ''}`;
+
+      //Debug
+      console.log('🔍 Debug useVenueBookings (NEW ENDPOINT):');
+      console.log('Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+      console.log('URL:', url);
+      console.log('VenueId (unused):', venueId);
+      console.log('Options:', options);
 
       const response = await fetch(url, {
         headers: {
@@ -83,11 +91,21 @@ export function useVenueBookings(
         },
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (!response.ok) {
-        throw new Error(`Errore nel recupero prenotazioni: ${response.statusText}`);
+        // Aggiungiamo più dettagli sull'errore
+        const errorText = await response.text();
+        console.log('Error response:', errorText);
+        throw new Error(
+          `Errore nel recupero prenotazioni: ${response.status} ${response.statusText}`
+        );
       }
 
-      return response.json();
+      const data = await response.json();
+      console.log('Response data:', data);
+      return data;
     },
     enabled: !!venueId, // Query abilitata solo se venueId è presente
     staleTime: 2 * 60 * 1000, // 2 minuti - dati più freschi per le prenotazioni
@@ -160,10 +178,10 @@ export function useCreateBooking() {
     onSuccess: data => {
       // Invalida le query delle prenotazioni per ricaricarne i dati
       queryClient.invalidateQueries({
-        queryKey: ['venue-bookings', data.venueId],
+        queryKey: ['my-venue-bookings'], // Usa il nuovo query key
       });
       queryClient.invalidateQueries({
-        queryKey: ['venue-bookings'],
+        queryKey: ['venue-bookings'], // Mantieni anche il vecchio per compatibilità
       });
     },
   });
@@ -199,7 +217,10 @@ export function useDeleteBooking() {
     onSuccess: (_, bookingId) => {
       // Invalida tutte le query delle prenotazioni
       queryClient.invalidateQueries({
-        queryKey: ['venue-bookings'],
+        queryKey: ['my-venue-bookings'], // Nuovo key
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['venue-bookings'], // Vecchio key per compatibilità
       });
       queryClient.invalidateQueries({
         queryKey: ['booking-details', bookingId],
@@ -244,7 +265,10 @@ export function useUpdateBookingStatus() {
     onSuccess: data => {
       // Invalida le query correlate
       queryClient.invalidateQueries({
-        queryKey: ['venue-bookings', data.venueId],
+        queryKey: ['my-venue-bookings'], // Nuovo key
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['venue-bookings'], // Vecchio key per compatibilità
       });
       queryClient.invalidateQueries({
         queryKey: ['booking-details', data.id],

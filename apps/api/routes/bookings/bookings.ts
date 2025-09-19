@@ -7,6 +7,7 @@ import {
   deleteBooking,
   getBookingDetails,
   getVenueBookings,
+  getMyVenueBookings,
 } from '../../handlers/booking/BookingHandler';
 import { addSSEClient } from '../../handlers/booking/BookingSSEHandler';
 import { createBookingSchema, deleteBookingSchema } from '../../schemas/bookingSchema';
@@ -28,7 +29,11 @@ export async function bookingsRoute(fastify: FastifyInstance) {
 }
 
 export async function venueBookingsDetailsRoute(fastify: FastifyInstance) {
+  // Endpoint originale con venueId (manteniamo per compatibilità)
   fastify.get('/venues/bookings/:id', { preHandler: fastify.authenticate }, getVenueBookings);
+
+  // Nuovo endpoint senza venueId - usa automaticamente il venue dell'utente
+  fastify.get('/venues/bookings', { preHandler: fastify.authenticate }, getMyVenueBookings);
 
   // Rotta SSE per aggiornamenti in tempo reale delle prenotazioni
   fastify.get('/venue/:venueId/events', async (request, reply) => {

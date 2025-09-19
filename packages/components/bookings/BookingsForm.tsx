@@ -42,9 +42,24 @@ export const BookingsForm: React.FC<VenueBookingsHistoryProps> = ({ venueId: pro
 
   // Ottieni venue ID dal contesto se non fornito
   const { data: venueData } = useVenues();
+
+  // Debug per capire la struttura dei dati venue
+  console.log('🏢 VenueData structure:', venueData);
+  console.log('🏢 VenueData venues:', venueData?.venues);
+  console.log('🏢 VenueData venue from venues:', venueData?.venues?.venue);
+
+  // Fix: Assicurati di estrarre l'ID numerico dall'oggetto venue
   const currentVenueId = propVenueId || venueData?.venues?.venue?.id;
 
+  console.log('🏢 Final currentVenueId (should be number):', currentVenueId);
+
   // Hook per le prenotazioni con filtri
+  console.log('BookingsForm - Before hook call:');
+  console.log('currentVenueId:', currentVenueId);
+  console.log('statusFilter:', statusFilter);
+  console.log('currentPage:', currentPage);
+  console.log('pageSize:', pageSize);
+  console.log('dateRange:', dateRange);
   const {
     data: bookingsData,
     isLoading,

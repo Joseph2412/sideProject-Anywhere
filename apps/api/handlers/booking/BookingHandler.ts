@@ -372,12 +372,36 @@ export const getVenueBookings = async (request: FastifyRequest, reply: FastifyRe
     // Verifica che l'utente sia il proprietario della venue
     const user = await prisma.user.findUnique({
       where: { id: request.user.id },
-      select: { venueId: true },
+      select: {
+        id: true,
+        email: true,
+        venue: {
+          select: { id: true, name: true },
+        },
+      },
     });
 
-    if (!user?.venueId || user.venueId !== parseInt(venueId)) {
+    // Debug logs per diagnosticare il problema
+    console.log('🔍 Authorization Debug:');
+    console.log('Requested venueId:', venueId, 'type:', typeof venueId);
+    console.log('Parsed venueId:', parseInt(venueId), 'type:', typeof parseInt(venueId));
+    console.log('User from JWT:', { id: request.user.id, email: request.user.email });
+    console.log('User from DB:', user ? { id: user.id, email: user.email } : 'NULL');
+    console.log(
+      'User venue from DB:',
+      user?.venue ? { id: user.venue.id, name: user.venue.name } : 'NO VENUE'
+    );
+    console.log('Match check:', user?.venue?.id === parseInt(venueId));
+
+    if (!user?.venue?.id || user.venue.id !== parseInt(venueId)) {
+      console.log('❌ Authorization failed - user not owner of venue');
+      console.log('❌ Possible issues:');
+      console.log('  - User has no venue assigned:', !user?.venue?.id);
+      console.log('  - User venue ID mismatch:', user?.venue?.id !== parseInt(venueId));
       return reply.code(403).send({ error: 'Non autorizzato per questa venue' });
     }
+
+    console.log('✅ Authorization passed - user owns venue');
 
     const whereClause: any = { venueId: parseInt(venueId) };
     if (status) {
@@ -409,6 +433,83 @@ export const getVenueBookings = async (request: FastifyRequest, reply: FastifyRe
     });
   } catch (error) {
     console.error('Error in getVenueBookings:', error);
+    return reply.code(500).send({
+      error: 'Errore nel recupero delle prenotazioni',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+};
+
+// Nuovo handler che usa automaticamente il venue dell'utente autenticato
+export const getMyVenueBookings = async (request: FastifyRequest, reply: FastifyReply) => {
+  try {
+    const {
+      status,
+      limit = 20,
+      offset = 0,
+    } = request.query as {
+      status?: string;
+      limit?: number;
+      offset?: number;
+    };
+
+    // Trova il venue dell'utente autenticato
+    const user = await prisma.user.findUnique({
+      where: { id: request.user.id },
+      select: {
+        id: true,
+        email: true,
+        venue: {
+          select: { id: true, name: true },
+        },
+      },
+    });
+
+    console.log('🔍 My Venue Bookings Debug:');
+    console.log('User from JWT:', { id: request.user.id, email: request.user.email });
+    console.log('User from DB:', user ? { id: user.id, email: user.email } : 'NULL');
+    console.log(
+      'User venue from DB:',
+      user?.venue ? { id: user.venue.id, name: user.venue.name } : 'NO VENUE'
+    );
+
+    if (!user?.venue?.id) {
+      console.log('❌ User has no venue assigned');
+      return reply.code(404).send({ error: 'Utente non ha un venue associato' });
+    }
+
+    console.log('✅ User owns venue:', user.venue.id);
+
+    const whereClause: any = { venueId: user.venue.id };
+    if (status) {
+      whereClause.status = status;
+    }
+
+    const bookings = await prisma.booking.findMany({
+      where: whereClause,
+      include: {
+        package: {
+          select: { id: true, name: true, type: true },
+        },
+        venue: {
+          select: { id: true, name: true },
+        },
+      },
+      orderBy: { start: 'desc' },
+      take: limit,
+      skip: offset,
+    });
+
+    const total = await prisma.booking.count({ where: whereClause });
+
+    return reply.code(200).send({
+      bookings,
+      total,
+      limit,
+      offset,
+    });
+  } catch (error) {
+    console.error('Error in getMyVenueBookings:', error);
     return reply.code(500).send({
       error: 'Errore nel recupero delle prenotazioni',
       message: error instanceof Error ? error.message : 'Unknown error',
