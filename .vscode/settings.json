@@ -7,5 +7,11 @@
     "*.prisma": "prisma"
   },
   "CodeGPT.apiKey": "OpenAI",
-  "postman.settings.dotenv-detection-notification-visibility": false
+  "postman.settings.dotenv-detection-notification-visibility": false,
+  "workbench.colorCustomizations": {
+    "terminal.background": "#00000000",
+    "activityBar.background": "#1F330D",
+    "titleBar.activeBackground": "#2C4713",
+    "titleBar.activeForeground": "#F6FBF1"
+  }
 }
