@@ -1,11 +1,11 @@
-import { Form, Checkbox, Row, Col, Card, Typography, Divider } from 'antd';
-import { useEffect, useState } from 'react';
-import { useSetAtom } from 'jotai';
-import { messageToast } from '@repo/ui/store/LayoutStore';
-import { NotificationChannel, NotificationType } from './NotificationType';
-import { NotificationGroups } from './NotificationGroups';
-import { NotificationItems } from './NotificationItems';
-import { usePreferences } from '@repo/hooks';
+import { Form, Checkbox, Row, Col, Card, Typography, Divider } from "antd";
+import { useEffect, useState } from "react";
+import { useSetAtom } from "jotai";
+import { messageToast } from "@repo/ui/store/LayoutStore";
+import { NotificationChannel, NotificationType } from "./NotificationType";
+import { NotificationGroups } from "./NotificationGroups";
+import { NotificationItems } from "./NotificationItems";
+import { usePreferences } from "@repo/hooks";
 
 type NotificationPreference = {
   [key in NotificationType]: {
@@ -17,11 +17,11 @@ export const PreferencesForm = () => {
   const [form] = Form.useForm();
   const setMessage = useSetAtom(messageToast);
 
-  const token = localStorage.getItem('token') || '';
+  const token = localStorage.getItem("token") || "";
   const { data, isLoading, error } = usePreferences(token);
 
   const [formValues, setFormValues] = useState<NotificationPreference>(
-    {} as NotificationPreference
+    {} as NotificationPreference,
   );
 
   // Aggiorna lo stato quando arrivano i dati
@@ -42,12 +42,16 @@ export const PreferencesForm = () => {
   const handleGroupToggle = (
     groupItems: NotificationType[],
     channel: NotificationChannel,
-    checked: boolean
+    checked: boolean,
   ) => {
     const updated = { ...formValues };
 
-    groupItems.forEach(key => {
-      if (channel === 'push' && key === 'booking_cancelled_due_to_low_participation') return;
+    groupItems.forEach((key) => {
+      if (
+        channel === "push" &&
+        key === "booking_cancelled_due_to_low_participation"
+      )
+        return;
       updated[key] = {
         ...updated[key],
         [channel]: checked,
@@ -57,18 +61,18 @@ export const PreferencesForm = () => {
     setFormValues(updated);
 
     fetch(urlFetch, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(updated),
     }).catch(() => {
       setMessage({
-        type: 'error',
-        message: 'Salvataggio fallito',
-        description: 'Preferenze Non Salvate',
-        placement: 'bottomRight',
+        type: "error",
+        message: "Salvataggio fallito",
+        description: "Preferenze Non Salvate",
+        placement: "bottomRight",
       });
     });
   };
@@ -78,7 +82,7 @@ export const PreferencesForm = () => {
   const handleCheckboxChange = async (
     type: NotificationType,
     channel: NotificationChannel,
-    checked: boolean
+    checked: boolean,
   ) => {
     const updated = {
       ...formValues,
@@ -93,35 +97,35 @@ export const PreferencesForm = () => {
     // autosave subito dopo la modifica
     try {
       const res = await fetch(urlFetch, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(updated),
       });
-      if (!res.ok) throw new Error('Salvataggio Fallito');
+      if (!res.ok) throw new Error("Salvataggio Fallito");
     } catch (error) {
-      console.error('Errore Nel Salvataggio delle preferenze', error);
+      console.error("Errore Nel Salvataggio delle preferenze", error);
       setMessage({
-        type: 'error',
-        message: 'Salvataggio fallito',
-        description: 'Preferenze Non Salvate',
-        placement: 'bottomRight',
+        type: "error",
+        message: "Salvataggio fallito",
+        description: "Preferenze Non Salvate",
+        placement: "bottomRight",
       });
     }
   };
 
   const isDisabled = (key: NotificationType, channel: NotificationChannel) =>
-    key === 'booking_cancelled_due_to_low_participation' && channel === 'push';
+    key === "booking_cancelled_due_to_low_participation" && channel === "push";
 
   if (isLoading) return null;
   if (error) {
     setMessage({
-      type: 'error',
-      message: 'Errore nel caricamento preferenze',
-      description: 'Impossibile caricare le preferenze',
-      placement: 'bottomRight',
+      type: "error",
+      message: "Errore nel caricamento preferenze",
+      description: "Impossibile caricare le preferenze",
+      placement: "bottomRight",
     });
     return null;
   }
@@ -131,57 +135,73 @@ export const PreferencesForm = () => {
       <Card style={{ borderRadius: 8 }} styles={{ body: { padding: 20 } }}>
         {NotificationGroups.map((group, index) => (
           <div key={group.title}>
-            <Row justify="space-between" align="middle" style={{ marginBottom: 8 }}>
+            <Row
+              justify="space-between"
+              align="middle"
+              style={{ marginBottom: 8 }}
+            >
               <Col>
                 <Typography.Text strong>{group.title}</Typography.Text>
                 <br />
                 <Typography.Text>{group.description}</Typography.Text>
               </Col>
-              <Col style={{ display: 'flex', gap: 12 }}>
+              <Col style={{ display: "flex", gap: 12 }}>
                 <Checkbox
                   checked={group.items
-                    .filter(key => !isDisabled(key, 'push'))
-                    .every(key => formValues?.[key]?.push === true)}
-                  onChange={e => handleGroupToggle(group.items, 'push', e.target.checked)}
+                    .filter((key) => !isDisabled(key, "push"))
+                    .every((key) => formValues?.[key]?.push === true)}
+                  onChange={(e) =>
+                    handleGroupToggle(group.items, "push", e.target.checked)
+                  }
                 >
                   Push
                 </Checkbox>
 
                 <Checkbox
                   checked={group.items
-                    .filter(key => !isDisabled(key, 'email'))
+                    .filter((key) => !isDisabled(key, "email"))
                     //Al momento non serve ma se un domani aggiungessimo un campo su email che è disabled, logica già pronta
-                    .every(key => formValues?.[key]?.email === true)}
-                  onChange={e => handleGroupToggle(group.items, 'email', e.target.checked)}
+                    .every((key) => formValues?.[key]?.email === true)}
+                  onChange={(e) =>
+                    handleGroupToggle(group.items, "email", e.target.checked)
+                  }
                 >
                   E-mail
                 </Checkbox>
               </Col>
             </Row>
 
-            {group.items.map(key => {
-              const label = NotificationItems.find(item => item.key === key)?.label || key;
+            {group.items.map((key) => {
+              const label =
+                NotificationItems.find((item) => item.key === key)?.label ||
+                key;
               return (
-                <Row key={key} style={{ marginTop: 12, alignItems: 'center' }}>
+                <Row key={key} style={{ marginTop: 12, alignItems: "center" }}>
                   <Col span={12}>{label}</Col>
                   <Col
                     span={12}
                     style={{
-                      display: 'flex',
-                      justifyContent: 'flex-end',
+                      display: "flex",
+                      justifyContent: "flex-end",
                       gap: 12,
                     }}
                   >
                     <Checkbox
                       checked={formValues[key]?.push}
-                      onChange={e => handleCheckboxChange(key, 'push', e.target.checked)}
-                      disabled={key === 'booking_cancelled_due_to_low_participation'}
+                      onChange={(e) =>
+                        handleCheckboxChange(key, "push", e.target.checked)
+                      }
+                      disabled={
+                        key === "booking_cancelled_due_to_low_participation"
+                      }
                     >
                       Push
                     </Checkbox>
                     <Checkbox
                       checked={formValues[key]?.email}
-                      onChange={e => handleCheckboxChange(key, 'email', e.target.checked)}
+                      onChange={(e) =>
+                        handleCheckboxChange(key, "email", e.target.checked)
+                      }
                     >
                       E-mail
                     </Checkbox>

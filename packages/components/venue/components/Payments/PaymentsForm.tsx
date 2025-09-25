@@ -1,11 +1,11 @@
-import { Form, Button, Space, Row, Col, Card, Select } from 'antd';
-import { NibolInput } from '../../../inputs/Input';
-import styles from './Payments.module.css';
-import { useEffect, useState } from 'react';
-import { useVenues } from '@repo/hooks';
+import { Form, Button, Space, Row, Col, Card, Select } from "antd";
+import { NibolInput } from "../../../inputs/Input";
+import styles from "./Payments.module.css";
+import { useEffect, useState } from "react";
+import { useVenues } from "@repo/hooks";
 
-import { useSetAtom } from 'jotai';
-import { messageToast } from '@repo/ui';
+import { useSetAtom } from "jotai";
+import { messageToast } from "@repo/ui";
 
 interface PaymentsFormValues {
   companyName: string;
@@ -18,19 +18,21 @@ interface PaymentsFormValues {
 
 export const PaymentsForm = () => {
   // Codici paese supportati per i pagamenti (ISO 3166-1)
-  const countryCode = ['IT', 'FR', 'DE', 'ES', 'GBR', 'CHE', 'NLD', 'AT'];
+  const countryCode = ["IT", "FR", "DE", "ES", "GBR", "CHE", "NLD", "AT"];
 
   // Codici valuta corrispondenti alle nazioni europee
-  const currencyCode = ['EUR', 'GBP', 'CHF'];
+  const currencyCode = ["EUR", "GBP", "CHF"];
 
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [initialValues, setInitialValues] = useState<Partial<PaymentsFormValues>>({}); // Nuovo state per salvare i valori iniziali
+  const [initialValues, setInitialValues] = useState<
+    Partial<PaymentsFormValues>
+  >({}); // Nuovo state per salvare i valori iniziali
   const setMessage = useSetAtom(messageToast);
 
   // useEffect per caricare e popolare i dati di pagamento dal backend
   const { data, isLoading } = useVenues();
-  console.log('Dati venues:', data);
+  console.log("Dati venues:", data);
   useEffect(() => {
     if (data && data.payments) {
       form.setFieldsValue(data.payments);
@@ -42,45 +44,48 @@ export const PaymentsForm = () => {
     setLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues/payments`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/api/venues/payments`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            companyName: values.companyName,
+            address: values.address,
+            iban: values.iban,
+            bicSwift: values.bicSwift,
+            countryCode: values.countryCode,
+            currencyCode: values.currencyCode,
+          }),
         },
-        body: JSON.stringify({
-          companyName: values.companyName,
-          address: values.address,
-          iban: values.iban,
-          bicSwift: values.bicSwift,
-          countryCode: values.countryCode,
-          currencyCode: values.currencyCode,
-        }),
-      });
+      );
       if (res.ok) {
         const data = await res.json();
         form.setFieldsValue(data);
         setMessage({
-          type: 'success',
-          message: 'Pagamenti aggiornati con successo',
+          type: "success",
+          message: "Pagamenti aggiornati con successo",
           duration: 3,
-          placement: 'bottomRight',
+          placement: "bottomRight",
         });
       } else {
         setMessage({
-          type: 'error',
+          type: "error",
           message: "Errore durante l'aggiornamento dei pagamenti",
           duration: 3,
-          placement: 'bottomRight',
+          placement: "bottomRight",
         });
       }
     } catch (error) {
-      console.error('Error updating payments:', error);
+      console.error("Error updating payments:", error);
       setMessage({
-        type: 'error',
+        type: "error",
         message: "Errore durante l'aggiornamento dei pagamenti",
         duration: 3,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     } finally {
       setLoading(false);
@@ -96,7 +101,7 @@ export const PaymentsForm = () => {
       form={form}
       layout="vertical"
       requiredMark={false} // Nasconde gli asterischi globalmente
-      style={{ width: '100%', borderRadius: 8, paddingRight: 16 }}
+      style={{ width: "100%", borderRadius: 8, paddingRight: 16 }}
       onFinish={onFinish}
     >
       <Card
@@ -109,26 +114,30 @@ export const PaymentsForm = () => {
       >
         <Row gutter={[16, 0]}>
           <Col span={12}>
-            <Form.Item rules={[{ required: true, message: 'Ragione Sociale Richiesta' }]}>
+            <Form.Item
+              rules={[{ required: true, message: "Ragione Sociale Richiesta" }]}
+            >
               <NibolInput
                 validateTrigger="onSubmit"
                 label="Ragione Sociale"
                 name="companyName"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: 32, width: '100%' }}
+                style={{ height: 32, width: "100%" }}
               />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item rules={[{ required: true, message: `Inserisci L'indirizzo` }]}>
+            <Form.Item
+              rules={[{ required: true, message: `Inserisci L'indirizzo` }]}
+            >
               <NibolInput
                 validateTrigger="onSubmit"
                 label="Indirizzo"
                 name="address"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: 32, width: '100%' }}
+                style={{ height: 32, width: "100%" }}
               />
             </Form.Item>
           </Col>
@@ -140,11 +149,12 @@ export const PaymentsForm = () => {
                 { required: true, message: `Inserisci L'iban` },
                 {
                   pattern: /^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$/,
-                  message: 'Formato IBAN non valido (es: IT00X0000000000000000000000)',
+                  message:
+                    "Formato IBAN non valido (es: IT00X0000000000000000000000)",
                 },
                 {
                   max: 34,
-                  message: 'IBAN troppo lungo (massimo 34 caratteri)',
+                  message: "IBAN troppo lungo (massimo 34 caratteri)",
                 },
               ]}
             >
@@ -154,17 +164,17 @@ export const PaymentsForm = () => {
                 name="iban"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: 32, width: '100%' }}
+                style={{ height: 32, width: "100%" }}
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
               rules={[
-                { required: true, message: 'Inserisci il Codice BIC/SWIFT' },
+                { required: true, message: "Inserisci il Codice BIC/SWIFT" },
                 {
                   pattern: /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/,
-                  message: 'Formato BIC/SWIFT non valido (8 o 11 caratteri)',
+                  message: "Formato BIC/SWIFT non valido (8 o 11 caratteri)",
                 },
               ]}
             >
@@ -174,7 +184,7 @@ export const PaymentsForm = () => {
                 name="bicSwift"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: 32, width: '100%' }}
+                style={{ height: 32, width: "100%" }}
               />
             </Form.Item>
           </Col>
@@ -185,11 +195,11 @@ export const PaymentsForm = () => {
               validateTrigger="onSubmit"
               name="countryCode"
               label="Paese"
-              rules={[{ required: true, message: 'Seleziona una Nazione' }]}
+              rules={[{ required: true, message: "Seleziona una Nazione" }]}
             >
               <Select
-                style={{ height: 32, width: '100%' }}
-                options={countryCode.map(code => ({
+                style={{ height: 32, width: "100%" }}
+                options={countryCode.map((code) => ({
                   label: code,
                   value: code,
                 }))}
@@ -201,11 +211,11 @@ export const PaymentsForm = () => {
               validateTrigger="onSubmit"
               name="currencyCode"
               label="Valuta"
-              rules={[{ required: true, message: 'Seleziona Una Valuta' }]}
+              rules={[{ required: true, message: "Seleziona Una Valuta" }]}
             >
               <Select
-                style={{ height: 32, width: '100%' }}
-                options={currencyCode.map(code => ({
+                style={{ height: 32, width: "100%" }}
+                options={currencyCode.map((code) => ({
                   label: code,
                   value: code,
                 }))}
@@ -222,7 +232,12 @@ export const PaymentsForm = () => {
             >
               Annulla
             </Button>
-            <Button type="primary" htmlType="submit" className={styles.save} loading={loading}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className={styles.save}
+              loading={loading}
+            >
               Salva
             </Button>
           </Space>
@@ -234,14 +249,16 @@ export const PaymentsForm = () => {
           body: { paddingTop: 10, paddingBottom: 10, paddingLeft: 15 },
         }}
       >
-        <div style={{ color: '#8c8c8c', fontSize: 12, marginBottom: 8 }}>
+        <div style={{ color: "#8c8c8c", fontSize: 12, marginBottom: 8 }}>
           Informazioni Per emissione Fattura
         </div>
 
         <div>
           <p style={{ fontSize: 12, margin: 0 }}>Nibol S.R.L</p>
           <p style={{ fontSize: 12, margin: 0 }}>P.IVA: IT10683870967</p>
-          <p style={{ fontSize: 12, margin: 0 }}>Via Alfredo Campanini 4. 20121, Milano(MI)</p>
+          <p style={{ fontSize: 12, margin: 0 }}>
+            Via Alfredo Campanini 4. 20121, Milano(MI)
+          </p>
           <p style={{ fontSize: 12, margin: 0 }}>SDIT9K4ZHO</p>
           <p style={{ fontSize: 12, margin: 0 }}>billing@nibol.com</p>
           <p style={{ fontSize: 12, margin: 0 }}>PEC: nibol@pec.it</p>

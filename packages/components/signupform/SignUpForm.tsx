@@ -1,17 +1,17 @@
 // 'use client' - componente client Next.js
-'use client';
+"use client";
 
 // Librerie esterne
-import { Form, Checkbox, Divider, App, Button } from 'antd';
+import { Form, Checkbox, Divider, App, Button } from "antd";
 // React hooks
-import { useState } from 'react';
-import React from 'react';
+import { useState } from "react";
+import React from "react";
 
 // Import interni e stili
-import { NibolInput } from '../inputs/Input';
-import { PrimaryButton } from '../buttons/PrimaryButton';
-import { GoogleLoginButton } from '../buttons/GoogleLoginButton';
-import styles from './SignUpForm.module.css';
+import { NibolInput } from "../inputs/Input";
+import { PrimaryButton } from "../buttons/PrimaryButton";
+import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
+import styles from "./SignUpForm.module.css";
 
 // Tipi TypeScript
 type SignupPayload = {
@@ -19,7 +19,7 @@ type SignupPayload = {
   lastName: string;
   email: string;
   password: string;
-  role: 'HOST';
+  role: "HOST";
 };
 
 // Risposta backend dopo registrazione
@@ -29,7 +29,7 @@ type SignupResponse = {
     id: number;
     name: string;
     email: string;
-    role: 'HOST';
+    role: "HOST";
   };
 };
 
@@ -37,11 +37,11 @@ type SignupResponse = {
 const userSignup = async (payload: SignupPayload): Promise<SignupResponse> => {
   // Chiamata HTTP POST al backend
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/auth/signup`, {
-    method: 'POST', // POST per inviare dati sensibili
+    method: "POST", // POST per inviare dati sensibili
     headers: {
-      'Content-Type': 'application/json', // Specifica formato dati JSON
+      "Content-Type": "application/json", // Specifica formato dati JSON
     },
-    credentials: 'include', // Include cookie per sessioni future
+    credentials: "include", // Include cookie per sessioni future
     body: JSON.stringify(payload), // Serializza oggetto JavaScript in JSON
   });
 
@@ -52,7 +52,7 @@ const userSignup = async (payload: SignupPayload): Promise<SignupResponse> => {
   if (!res.ok) {
     // Lancia errore con messaggio specifico dal backend
     // Ordine di priorità: error → message → fallback generico
-    throw new Error(data.error || data.message || 'Errore nella registrazione');
+    throw new Error(data.error || data.message || "Errore nella registrazione");
   }
 
   // Ritorna dati di successo al componente
@@ -159,7 +159,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
         lastName: values.lastName,
         email: values.email,
         password: values.password,
-        role: 'HOST', // HARDCODED - Tutti i nuovi utenti sono gestori locali
+        role: "HOST", // HARDCODED - Tutti i nuovi utenti sono gestori locali
       };
 
       // CHIAMATA API per registrazione
@@ -170,7 +170,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
       form.resetFields();
 
       // FEEDBACK SUCCESSO all'utente
-      message.success('Registrazione completata con successo!');
+      message.success("Registrazione completata con successo!");
 
       // REDIRECT automatico al login
       // L'utente deve ora fare login con le credenziali appena create
@@ -179,7 +179,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
       // GESTIONE ERRORI specifici
       if (err instanceof Error) {
         // Mostra messaggio di errore con dettagli dal backend
-        message.error(err.message || 'Errore nella registrazione');
+        message.error(err.message || "Errore nella registrazione");
       }
     } finally {
       // CLEANUP: Disattiva loading in ogni caso
@@ -205,7 +205,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
         <Form
           form={form}
           layout="vertical"
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           onFinish={handleSubmit} // Chiamato solo se validazione passa
         >
           <div className={styles.doubleInput}>
@@ -214,7 +214,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
               name="firstName" // Nome campo nel form object
               className={styles.input}
               style={{ height: 32 }}
-              rules={[{ required: true, message: 'Inserisci il nome' }]}
+              rules={[{ required: true, message: "Inserisci il nome" }]}
               hideAsterisk={true} // Design pulito senza asterisco rosso
             />
 
@@ -223,7 +223,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
               name="lastName"
               className={styles.input}
               style={{ height: 32 }}
-              rules={[{ required: true, message: 'Inserisci il cognome' }]}
+              rules={[{ required: true, message: "Inserisci il cognome" }]}
               hideAsterisk={true}
             />
           </div>
@@ -234,8 +234,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
             style={{ height: 32 }}
             className={styles.input}
             rules={[
-              { required: true, message: 'Inserisci la tua email' },
-              { type: 'email', message: 'Email non valida' }, // Regex automatica Ant Design
+              { required: true, message: "Inserisci la tua email" },
+              { type: "email", message: "Email non valida" }, // Regex automatica Ant Design
             ]}
             hideAsterisk={true}
           />
@@ -248,7 +248,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
             password // Mostra/nascondi password
             hideAsterisk={true}
             rules={[
-              { required: true, message: 'Inserisci una password' },
+              { required: true, message: "Inserisci una password" },
               {
                 // REGEX COMPLESSA per password sicura
                 // (?=.*[A-Z]) = almeno una maiuscola
@@ -258,7 +258,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
                 // .{8,} = minimo 8 caratteri
                 pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^\w\s]).{8,}$/,
                 message:
-                  'Password non valida, almeno 8 caratteri, 1 maiuscola, 1 simbolo e 1 numero.',
+                  "Password non valida, almeno 8 caratteri, 1 maiuscola, 1 simbolo e 1 numero.",
               },
             ]}
           />
@@ -273,16 +273,16 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
             rules={[
               {
                 required: true,
-                message: 'Devi accettare i termini per continuare.',
+                message: "Devi accettare i termini per continuare.",
               },
             ]}
           >
             <Checkbox className={styles.checkboxText}>
-              Creando un account, accetto le{' '}
+              Creando un account, accetto le{" "}
               <a href="#" className={styles.link}>
                 Condizioni di Servizio – Locale
-              </a>{' '}
-              e la{' '}
+              </a>{" "}
+              e la{" "}
               <a href="#" className={styles.link}>
                 Privacy Policy
               </a>
@@ -296,7 +296,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
               htmlType="submit" // Tipo HTML per trigger form submit
               loading={loading} // Spinner durante API call
               disabled={loading} // Previene doppi click
-              style={{ height: 32, marginTop: 10, width: '100%' }}
+              style={{ height: 32, marginTop: 10, width: "100%" }}
             />
           </Form.Item>
         </Form>
@@ -308,7 +308,9 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onGoToLogin }) => {
         <GoogleLoginButton style={{ height: 32, width: 380 }} />
       </div>
 
-      <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+      <div
+        style={{ marginTop: "16px", display: "flex", justifyContent: "center" }}
+      >
         <Button
           type="text" // Stile link
           onClick={onGoToLogin} // Callback navigazione

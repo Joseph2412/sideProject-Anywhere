@@ -1,24 +1,25 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
-import { prisma } from './../../libs/prisma';
-import { generateS3Key } from './../../utils/generateS3Key';
-import { generateSecureMediaUrl } from './../../utils/secureMediaUtils';
+import { FastifyReply, FastifyRequest } from "fastify";
+import { prisma } from "./../../libs/prisma";
+import { generateS3Key } from "./../../utils/generateS3Key";
+import { generateSecureMediaUrl } from "./../../utils/secureMediaUtils";
 
 export const imagesHandler = {
   getGallery: async (request: FastifyRequest, reply: FastifyReply) => {
     const { entity, id } = request.params as { entity: string; id: string };
     const { S3_REPORTS_BUCKET } = process.env;
     if (!entity || !id) {
-      return reply.status(400).send({ error: 'Missing entity or id' });
+      return reply.status(400).send({ error: "Missing entity or id" });
     }
     let record: any = null;
-    if (entity === 'venues') {
+    if (entity === "venues") {
       record = await prisma.venue.findUnique({ where: { id: Number(id) } });
-      if (!record) return reply.status(404).send({ error: 'Venue not found' });
-    } else if (entity === 'packages') {
+      if (!record) return reply.status(404).send({ error: "Venue not found" });
+    } else if (entity === "packages") {
       record = await prisma.package.findUnique({ where: { id: Number(id) } });
-      if (!record) return reply.status(404).send({ error: 'Package not found' });
+      if (!record)
+        return reply.status(404).send({ error: "Package not found" });
     } else {
-      return reply.status(400).send({ error: 'Invalid entity' });
+      return reply.status(400).send({ error: "Invalid entity" });
     }
     const photos = record.photos || [];
     const urls = photos
@@ -35,11 +36,16 @@ export const imagesHandler = {
   },
 
   upload: async (request: FastifyRequest, reply: FastifyReply) => {
-    console.log('BODY: ', request.body);
-    const { type, id, filename, file, entity } = request.body as Record<string, any>;
+    console.log("BODY: ", request.body);
+    const { type, id, filename, file, entity } = request.body as Record<
+      string,
+      any
+    >;
 
     if (!type || !id || !filename || !file || !entity) {
-      return reply.status(400).send({ error: 'Missing type, id, filename, entity or file' });
+      return reply
+        .status(400)
+        .send({ error: "Missing type, id, filename, entity or file" });
     }
 
     // Estrai i valori reali dai campi multipart
@@ -52,7 +58,7 @@ export const imagesHandler = {
       type: typeValue,
       id: idValue,
       filename: filenameValue,
-      entity: entityValue === 'packages' ? 'package' : 'venue',
+      entity: entityValue === "packages" ? "package" : "venue",
     });
 
     const fileBuffer = await file.toBuffer();
@@ -60,11 +66,16 @@ export const imagesHandler = {
     const { S3_REPORTS_BUCKET } = process.env;
 
     // ✅ SICURO: uploadFile ora restituisce solo la chiave S3
-    await request.s3.uploadFile(S3_REPORTS_BUCKET!, fileBuffer, s3Key, file.mimetype);
+    await request.s3.uploadFile(
+      S3_REPORTS_BUCKET!,
+      fileBuffer,
+      s3Key,
+      file.mimetype,
+    );
 
     // Gestione salvataggio nel DB basato sul tipo
-    if (typeValue === 'gallery') {
-      if (entityValue === 'venues') {
+    if (typeValue === "gallery") {
+      if (entityValue === "venues") {
         await prisma.venue.update({
           where: { id: Number(idValue) },
           data: {
@@ -73,7 +84,7 @@ export const imagesHandler = {
             },
           },
         });
-      } else if (entityValue === 'packages') {
+      } else if (entityValue === "packages") {
         await prisma.package.update({
           where: { id: Number(idValue) },
           data: {
@@ -83,7 +94,7 @@ export const imagesHandler = {
           },
         });
       }
-    } else if (typeValue === 'avatar') {
+    } else if (typeValue === "avatar") {
       // Salva la CHIAVE S3 dell'avatar nel campo avatarUrl dell'utente
       await prisma.user.update({
         where: { id: Number(idValue) },
@@ -91,7 +102,7 @@ export const imagesHandler = {
           avatarUrl: s3Key, // Salviamo la chiave S3, non l'URL signed
         },
       });
-    } else if (typeValue === 'logo') {
+    } else if (typeValue === "logo") {
       // Salva la CHIAVE S3 del logo nel campo logoURL della venue
       await prisma.venue.update({
         where: { id: Number(idValue) },
@@ -110,7 +121,7 @@ export const imagesHandler = {
       // Fallback: restituisci solo un messaggio di successo senza URL
       return reply.send({
         success: true,
-        message: 'File caricato con successo',
+        message: "File caricato con successo",
         s3Key: s3Key,
       });
     }
@@ -125,14 +136,14 @@ export const imagesHandler = {
     const typeValue = type?.value ?? type;
 
     if (!idValue || !filenameValue) {
-      return reply.status(400).send({ error: 'Missing id or filename' });
+      return reply.status(400).send({ error: "Missing id or filename" });
     }
 
     const { S3_REPORTS_BUCKET } = process.env;
     let key: string;
 
     // Gestisci i diversi tipi di delete
-    if (typeValue === 'avatar') {
+    if (typeValue === "avatar") {
       // Per avatar: host/{id}/profile/avatar/{timestamp}_{filename}
       key = filenameValue; // Il filename è già la chiave S3 completa
 
@@ -145,7 +156,7 @@ export const imagesHandler = {
           avatarUrl: null,
         },
       });
-    } else if (typeValue === 'logo') {
+    } else if (typeValue === "logo") {
       // Per logo: venues/{id}/logo/{timestamp}_{filename}
       key = filenameValue; // Il filename è già la chiave S3 completa
 
@@ -158,33 +169,40 @@ export const imagesHandler = {
           logoURL: null,
         },
       });
-    } else if (entityValue && (entityValue === 'venues' || entityValue === 'packages')) {
+    } else if (
+      entityValue &&
+      (entityValue === "venues" || entityValue === "packages")
+    ) {
       // Per gallery: venues/{id}/photos/{filename} o packages/{id}/photos/{filename}
       key = `${entityValue}/${idValue}/photos/${filenameValue}`;
 
       await request.s3.deleteFile(S3_REPORTS_BUCKET!, key);
 
       // Rimuovi la chiave dal campo photos della venue o package
-      if (entityValue === 'venues') {
+      if (entityValue === "venues") {
         await prisma.venue.update({
           where: { id: Number(idValue) },
           data: {
             photos: {
               set:
-                (await prisma.venue.findUnique({ where: { id: Number(idValue) } }))?.photos?.filter(
-                  (k: string) => k !== key
-                ) || [],
+                (
+                  await prisma.venue.findUnique({
+                    where: { id: Number(idValue) },
+                  })
+                )?.photos?.filter((k: string) => k !== key) || [],
             },
           },
         });
-      } else if (entityValue === 'packages') {
+      } else if (entityValue === "packages") {
         await prisma.package.update({
           where: { id: Number(idValue) },
           data: {
             photos: {
               set:
                 (
-                  await prisma.package.findUnique({ where: { id: Number(idValue) } })
+                  await prisma.package.findUnique({
+                    where: { id: Number(idValue) },
+                  })
                 )?.photos?.filter((k: string) => k !== key) || [],
             },
           },
@@ -193,7 +211,9 @@ export const imagesHandler = {
     } else {
       return reply
         .status(400)
-        .send({ error: 'Invalid delete parameters. Must specify type or entity.' });
+        .send({
+          error: "Invalid delete parameters. Must specify type or entity.",
+        });
     }
 
     return reply.send({ success: true });
@@ -202,9 +222,9 @@ export const imagesHandler = {
   get: async (request: FastifyRequest, reply: FastifyReply) => {
     const { key } = request.query as any;
     if (!key) {
-      return reply.status(400).send({ error: 'Missing key' });
+      return reply.status(400).send({ error: "Missing key" });
     }
-    console.log('S3 GET key:', key);
+    console.log("S3 GET key:", key);
 
     try {
       // ✅ SICURO: Usa URL proxy invece di signed URL AWS
@@ -214,9 +234,9 @@ export const imagesHandler = {
       console.warn(`Could not generate secure URL for ${key}:`, error);
       // ✅ SICURO: Non esporre mai signed URL, anche in caso di errore
       return reply.status(400).send({
-        error: 'Impossibile generare URL sicuro per questo file',
+        error: "Impossibile generare URL sicuro per questo file",
         s3Key: key,
-        message: 'Formato chiave S3 non supportato',
+        message: "Formato chiave S3 non supportato",
       });
     }
   },

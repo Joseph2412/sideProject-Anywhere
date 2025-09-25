@@ -1,10 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 
 export function usePackages(venueId?: number) {
   return useQuery({
-    queryKey: ['packages', venueId],
+    queryKey: ["packages", venueId],
     queryFn: async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const url = venueId
         ? `${process.env.NEXT_PUBLIC_API_HOST}/api/packages?venueId=${venueId}`
         : `${process.env.NEXT_PUBLIC_API_HOST}/api/packages`;
@@ -13,7 +13,7 @@ export function usePackages(venueId?: number) {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!res.ok) throw new Error('Errore nel recupero pacchetti');
+      if (!res.ok) throw new Error("Errore nel recupero pacchetti");
       const packages = await res.json();
       return packages;
     },

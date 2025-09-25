@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { Card, Upload } from 'antd';
-import type { GetProp, UploadProps, UploadFile } from 'antd';
-import styles from './imageUpload.module.css';
-import { useSetAtom } from 'jotai';
-import { useParams } from 'next/navigation';
-import { messageToast } from '@repo/ui/store/ToastStore';
-import { usePathname } from 'next/navigation';
-import { useVenues } from '@repo/hooks';
-import { extractS3KeyFromUrl } from '../utils/mediaUtils';
+import React, { useEffect, useState } from "react";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { Card, Upload } from "antd";
+import type { GetProp, UploadProps, UploadFile } from "antd";
+import styles from "./imageUpload.module.css";
+import { useSetAtom } from "jotai";
+import { useParams } from "next/navigation";
+import { messageToast } from "@repo/ui/store/ToastStore";
+import { usePathname } from "next/navigation";
+import { useVenues } from "@repo/hooks";
+import { extractS3KeyFromUrl } from "../utils/mediaUtils";
 
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
+type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 const beforeUpload = (file: FileType) => {
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
   if (!isJpgOrPng) {
-    console.log('Formato non valido:', file.type);
+    console.log("Formato non valido:", file.type);
   }
   const isLt1GB = file.size / 1024 / 1024 < 1024;
   if (!isLt1GB) {
-    console.log('File troppo grande:', file.size);
+    console.log("File troppo grande:", file.size);
   }
   return isJpgOrPng && isLt1GB;
 };
@@ -40,129 +40,133 @@ export const ImageUpload: React.FC = () => {
 
   // Dichiara id ed entity PRIMA di qualsiasi useEffect
   let id: number | undefined;
-  let entity: 'venues' | 'packages' | undefined;
+  let entity: "venues" | "packages" | undefined;
 
-  console.log('DEBUG params:', params);
-  if (pathname.startsWith('/packages/')) {
+  console.log("DEBUG params:", params);
+  if (pathname.startsWith("/packages/")) {
     // Gestione robusta: usa params.id se presente (route /packages/[id])
     id = params.id ? Number(params.id) : undefined;
-    entity = 'packages';
-  } else if (pathname.startsWith('/venue')) {
+    entity = "packages";
+  } else if (pathname.startsWith("/venue")) {
     id = venueId;
-    entity = 'venues';
+    entity = "venues";
   }
 
   // Console Log Per DEBUG
-  console.log('venueDetails:', data?.venues);
-  console.log('ID inviato per upload:', id);
-  console.log('pathname:', pathname);
-  console.log('params:', params);
+  console.log("venueDetails:", data?.venues);
+  console.log("ID inviato per upload:", id);
+  console.log("pathname:", pathname);
+  console.log("params:", params);
 
-  const handleChange: UploadProps['onChange'] = info => {
-    setLoading(info.file.status === 'uploading');
+  const handleChange: UploadProps["onChange"] = (info) => {
+    setLoading(info.file.status === "uploading");
     setFileList(
       info.fileList
-        .map(file => {
-          if (file.status === 'done' && file.response?.url) {
-            return { ...file, url: file.response.url, thumbUrl: file.response.url };
+        .map((file) => {
+          if (file.status === "done" && file.response?.url) {
+            return {
+              ...file,
+              url: file.response.url,
+              thumbUrl: file.response.url,
+            };
           }
           return file;
         })
-        .slice(-12)
+        .slice(-12),
     );
 
-    if (info.file.status === 'done') {
+    if (info.file.status === "done") {
       setLoading(false);
       setToast({
-        type: 'success',
-        message: 'Upload completato!',
+        type: "success",
+        message: "Upload completato!",
         description: `L'immagine "${info.file.name}" è stata caricata con successo su S3.`,
         duration: 4,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
-      console.log('Upload success:', info.file.response);
-    } else if (info.file.status === 'error') {
+      console.log("Upload success:", info.file.response);
+    } else if (info.file.status === "error") {
       setLoading(false);
       setToast({
-        type: 'error',
-        message: 'Errore upload',
+        type: "error",
+        message: "Errore upload",
         description: `Errore durante l'upload di "${info.file.name}".`,
         duration: 4,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
-      console.error('Upload error:', info.file.error);
+      console.error("Upload error:", info.file.error);
     }
   };
 
   const handleRemove = async (file: UploadFile<string>) => {
     if (!file.url) {
-      setFileList(prev => prev.filter(f => f.uid !== file.uid));
+      setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
       return true;
     }
-    const key = extractS3KeyFromUrl(file.url || '');
+    const key = extractS3KeyFromUrl(file.url || "");
     if (!key) {
       setToast({
-        type: 'error',
-        message: 'Errore rimozione',
+        type: "error",
+        message: "Errore rimozione",
         description: "Impossibile estrarre la chiave S3 dall'URL.",
         duration: 4,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
       return false;
     }
-    const parts = key.split('/');
+    const parts = key.split("/");
     if (parts.length < 4) {
       setToast({
-        type: 'error',
-        message: 'Errore rimozione',
-        description: 'Chiave S3 non valida.',
+        type: "error",
+        message: "Errore rimozione",
+        description: "Chiave S3 non valida.",
         duration: 4,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
       return false;
     }
     const id = parts[1];
-    const filename = parts.slice(3).join('/');
+    const filename = parts.slice(3).join("/");
 
-    let url = '';
-    if (pathname.startsWith('/venue')) {
+    let url = "";
+    if (pathname.startsWith("/venue")) {
       // Per venue: aggiungi entity=venues
       url = `${process.env.NEXT_PUBLIC_API_HOST}/media/delete?entity=venues&id=${id}&filename=${encodeURIComponent(filename)}`;
-    } else if (pathname.startsWith('/packages/')) {
+    } else if (pathname.startsWith("/packages/")) {
       url = `${process.env.NEXT_PUBLIC_API_HOST}/media/delete?entity=packages&id=${id}&filename=${encodeURIComponent(filename)}`;
     } else {
       setToast({
-        type: 'error',
-        message: 'Errore rimozione',
-        description: 'Path non supportato.',
+        type: "error",
+        message: "Errore rimozione",
+        description: "Path non supportato.",
         duration: 4,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
       return false;
     }
 
     try {
       const res = await fetch(url, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      if (!res.ok) throw new Error('Errore durante la cancellazione');
+      if (!res.ok) throw new Error("Errore durante la cancellazione");
       setToast({
-        type: 'success',
-        message: 'Immagine eliminata!',
+        type: "success",
+        message: "Immagine eliminata!",
         duration: 3,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
       return true;
     } catch (err) {
       setToast({
-        type: 'error',
-        message: 'Errore rimozione',
+        type: "error",
+        message: "Errore rimozione",
         description: (err as Error).message,
         duration: 4,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
       return false;
     }
@@ -172,14 +176,17 @@ export const ImageUpload: React.FC = () => {
     // id ed entity sono già nello scope del componente
     async function fetchGallery() {
       if (!id || !entity) return;
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/media/gallery/${entity}/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/media/gallery/${entity}/${id}`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        },
+      );
       const { urls } = await res.json();
       const files = (urls || []).map((url: string, idx: number) => ({
         uid: url,
         name: `Immagine ${idx + 1}`,
-        status: 'done',
+        status: "done",
         url,
         key: extractS3KeyFromUrl(url),
       }));
@@ -194,17 +201,17 @@ export const ImageUpload: React.FC = () => {
         border: 20,
         borderRadius: 8,
         borderWidth: 2,
-        borderStyle: 'dashed',
-        borderColor: '#d9d9d9',
-        minWidth: '350px',
-        minHeight: '260px',
-        width: '350px',
-        height: '260px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
+        borderStyle: "dashed",
+        borderColor: "#d9d9d9",
+        minWidth: "350px",
+        minHeight: "260px",
+        width: "350px",
+        height: "260px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
       }}
       type="button"
     >
@@ -216,10 +223,10 @@ export const ImageUpload: React.FC = () => {
   return (
     <Card
       style={{
-        paddingRight: '0px !important',
-        height: '100%',
-        minWidth: '100%',
-        width: 'fit-content',
+        paddingRight: "0px !important",
+        height: "100%",
+        minWidth: "100%",
+        width: "fit-content",
       }}
     >
       <div className={styles.centeredUpload}>
@@ -230,12 +237,12 @@ export const ImageUpload: React.FC = () => {
           listType="picture-card"
           showUploadList
           action={UPLOAD_ENDPOINT}
-          headers={{ Authorization: `Bearer ${localStorage.getItem('token')}` }}
+          headers={{ Authorization: `Bearer ${localStorage.getItem("token")}` }}
           beforeUpload={beforeUpload}
           onChange={handleChange}
           onRemove={handleRemove}
-          data={file => ({
-            type: 'gallery',
+          data={(file) => ({
+            type: "gallery",
             entity,
             id,
             filename: file.name,

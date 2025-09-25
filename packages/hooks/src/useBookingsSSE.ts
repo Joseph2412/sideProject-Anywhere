@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export interface BookingSSEEvent {
-  type: 'created' | 'deleted' | 'heartbeat';
+  type: "created" | "deleted" | "heartbeat";
   booking?: any;
   timestamp: string;
   venueId: number;
@@ -22,7 +22,7 @@ export function useBookingsSSE(
     onError?: (error: Error) => void;
     onConnect?: () => void;
     onDisconnect?: () => void;
-  }
+  },
 ) {
   const queryClient = useQueryClient();
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -50,10 +50,10 @@ export function useBookingsSSE(
 
     cleanup(); // Chiudi eventuali connessioni esistenti
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      console.warn('⚠️ Token non trovato - SSE non disponibile');
-      options?.onError?.(new Error('Token di autenticazione non trovato'));
+      console.warn("⚠️ Token non trovato - SSE non disponibile");
+      options?.onError?.(new Error("Token di autenticazione non trovato"));
       return;
     }
 
@@ -62,7 +62,9 @@ export function useBookingsSSE(
 
       // Nota: EventSource non supporta headers personalizzati
       // Il token deve essere inviato come query parameter o tramite cookie
-      const eventSource = new EventSource(`${url}?token=${encodeURIComponent(token)}`);
+      const eventSource = new EventSource(
+        `${url}?token=${encodeURIComponent(token)}`,
+      );
 
       eventSourceRef.current = eventSource;
 
@@ -72,43 +74,43 @@ export function useBookingsSSE(
         options?.onConnect?.();
       };
 
-      eventSource.onmessage = event => {
+      eventSource.onmessage = (event) => {
         try {
           const data: BookingSSEEvent = JSON.parse(event.data);
 
           console.log(`📨 SSE messaggio ricevuto:`, data);
 
           switch (data.type) {
-            case 'created':
+            case "created":
               console.log(`✅ Nuova prenotazione creata:`, data.booking);
 
               // Invalida e ricarica i dati delle prenotazioni
               queryClient.invalidateQueries({
-                queryKey: ['my-venue-bookings'], // Nuovo key
+                queryKey: ["my-venue-bookings"], // Nuovo key
               });
               queryClient.invalidateQueries({
-                queryKey: ['venue-bookings'], // Vecchio key per compatibilità
+                queryKey: ["venue-bookings"], // Vecchio key per compatibilità
               });
 
               // Callback personalizzato
               options?.onBookingCreated?.(data.booking);
               break;
 
-            case 'deleted':
+            case "deleted":
               console.log(`❌ Prenotazione cancellata:`, data.booking);
 
               // Invalida e ricarica i dati delle prenotazioni
               queryClient.invalidateQueries({
-                queryKey: ['my-venue-bookings'], // Nuovo key
+                queryKey: ["my-venue-bookings"], // Nuovo key
               });
               queryClient.invalidateQueries({
-                queryKey: ['venue-bookings'], // Vecchio key per compatibilità
+                queryKey: ["venue-bookings"], // Vecchio key per compatibilità
               });
 
               // Rimuovi anche i dettagli dalla cache se presenti
               if (data.booking?.id) {
                 queryClient.removeQueries({
-                  queryKey: ['booking-details', data.booking.id],
+                  queryKey: ["booking-details", data.booking.id],
                 });
               }
 
@@ -116,7 +118,7 @@ export function useBookingsSSE(
               options?.onBookingDeleted?.(data.booking);
               break;
 
-            case 'heartbeat':
+            case "heartbeat":
               // Heartbeat silenzioso - mantiene la connessione attiva
               break;
 
@@ -124,23 +126,24 @@ export function useBookingsSSE(
               console.warn(`⚠️ Tipo messaggio SSE sconosciuto: ${data.type}`);
           }
         } catch (error) {
-          console.error('❌ Errore parsing messaggio SSE:', error);
+          console.error("❌ Errore parsing messaggio SSE:", error);
           options?.onError?.(error as Error);
         }
       };
 
-      eventSource.onerror = event => {
+      eventSource.onerror = (event) => {
         const error = new Error(`Errore connessione SSE per venue ${venueId}`);
-        console.error('❌ Errore SSE:', event);
+        console.error("❌ Errore SSE:", event);
 
         options?.onError?.(error);
 
         // Gestione riconnessione automatica
         if (reconnectAttemptsRef.current < maxReconnectAttempts) {
-          const delay = baseReconnectDelay * Math.pow(2, reconnectAttemptsRef.current); // Exponential backoff
+          const delay =
+            baseReconnectDelay * Math.pow(2, reconnectAttemptsRef.current); // Exponential backoff
 
           console.log(
-            `🔄 Tentativo riconnessione SSE ${reconnectAttemptsRef.current + 1}/${maxReconnectAttempts} tra ${delay}ms`
+            `🔄 Tentativo riconnessione SSE ${reconnectAttemptsRef.current + 1}/${maxReconnectAttempts} tra ${delay}ms`,
           );
 
           reconnectTimeoutRef.current = setTimeout(() => {
@@ -148,12 +151,14 @@ export function useBookingsSSE(
             connect();
           }, delay);
         } else {
-          console.error(`💀 Riconnessione SSE fallita dopo ${maxReconnectAttempts} tentativi`);
+          console.error(
+            `💀 Riconnessione SSE fallita dopo ${maxReconnectAttempts} tentativi`,
+          );
           options?.onDisconnect?.();
         }
       };
     } catch (error) {
-      console.error('❌ Errore creazione EventSource:', error);
+      console.error("❌ Errore creazione EventSource:", error);
       options?.onError?.(error as Error);
     }
   };
@@ -189,14 +194,14 @@ export function useBookingsSSE(
 export function useBookingsRealtime(venueId: number | undefined) {
   return useBookingsSSE(venueId, {
     enabled: true,
-    onBookingCreated: booking => {
-      console.log('🎉 Nuova prenotazione in tempo reale!', booking);
+    onBookingCreated: (booking) => {
+      console.log("🎉 Nuova prenotazione in tempo reale!", booking);
     },
-    onBookingDeleted: booking => {
-      console.log('🗑️ Prenotazione cancellata in tempo reale!', booking);
+    onBookingDeleted: (booking) => {
+      console.log("🗑️ Prenotazione cancellata in tempo reale!", booking);
     },
-    onError: error => {
-      console.error('❌ Errore SSE:', error);
+    onError: (error) => {
+      console.error("❌ Errore SSE:", error);
     },
   });
 }

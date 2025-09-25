@@ -1,12 +1,12 @@
-import { Form, Button, Space, message, Row, Card, Col } from 'antd';
-import { NibolInput } from '../inputs/Input';
-import { useState, useEffect } from 'react';
-import { useSetAtom } from 'jotai';
-import { messageToast } from '@repo/ui/store/LayoutStore';
-import { useUserProfile } from '@repo/hooks';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ProfilePhotoUpload } from '../profilePhotoUpload';
-import styles from './profile.module.css';
+import { Form, Button, Space, message, Row, Card, Col } from "antd";
+import { NibolInput } from "../inputs/Input";
+import { useState, useEffect } from "react";
+import { useSetAtom } from "jotai";
+import { messageToast } from "@repo/ui/store/LayoutStore";
+import { useUserProfile } from "@repo/hooks";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ProfilePhotoUpload } from "../profilePhotoUpload";
+import styles from "./profile.module.css";
 
 export const ProfileForm = () => {
   const [form] = Form.useForm();
@@ -15,31 +15,34 @@ export const ProfileForm = () => {
   const { data, isLoading } = useUserProfile();
 
   const setMessage = useSetAtom(messageToast);
-  console.log('Dati profilo:', data);
+  console.log("Dati profilo:", data);
 
   const queryClient = useQueryClient();
 
   const updateProfile = useMutation({
     mutationFn: async (values: { firstName: string; lastName: string }) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/user/profile`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/user/profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(values),
         },
-        body: JSON.stringify(values),
-      });
+      );
       if (!res.ok) throw new Error();
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
       setMessage({
-        type: 'success',
-        message: 'Profilo Aggiornato con successo!',
-        description: 'Profilo Aggiornato',
+        type: "success",
+        message: "Profilo Aggiornato con successo!",
+        description: "Profilo Aggiornato",
         duration: 3,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     },
     onError: () => {
@@ -81,7 +84,7 @@ export const ProfileForm = () => {
     <Form
       form={form}
       layout="vertical"
-      style={{ width: '100%', borderRadius: 8 }}
+      style={{ width: "100%", borderRadius: 8 }}
       onFinish={onFinish}
     >
       <Card style={{ marginRight: 16 }}>
@@ -91,7 +94,7 @@ export const ProfileForm = () => {
           <Col span={12}>
             <Form.Item
               name="firstName"
-              rules={[{ required: true, message: 'Inserisci il nome' }]}
+              rules={[{ required: true, message: "Inserisci il nome" }]}
               style={{ marginBottom: 16 }}
             >
               <NibolInput
@@ -100,14 +103,14 @@ export const ProfileForm = () => {
                 label="Nome"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: 32, width: '100%' }}
+                style={{ height: 32, width: "100%" }}
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
               name="lastName"
-              rules={[{ required: true, message: 'Inserisci il cognome' }]}
+              rules={[{ required: true, message: "Inserisci il cognome" }]}
               style={{ marginBottom: 16 }}
             >
               <NibolInput
@@ -115,7 +118,7 @@ export const ProfileForm = () => {
                 label="Cognome"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: 32, width: '100%' }}
+                style={{ height: 32, width: "100%" }}
               />
             </Form.Item>
           </Col>
@@ -125,11 +128,18 @@ export const ProfileForm = () => {
           <NibolInput
             label="Email"
             disabled
-            style={{ height: 32, width: '100%' }}
+            style={{ height: 32, width: "100%" }}
             hideAsterisk={true}
           />
         </Form.Item>
-        <div style={{ color: '#8c8c8c', fontSize: 12, marginTop: -8, marginBottom: 16 }}>
+        <div
+          style={{
+            color: "#8c8c8c",
+            fontSize: 12,
+            marginTop: -8,
+            marginBottom: 16,
+          }}
+        >
           Per modificare la mail, scrivi a support@nibol.com.
         </div>
         <Form.Item style={{ marginBottom: 0 }}>
@@ -148,7 +158,12 @@ export const ProfileForm = () => {
             >
               Annulla
             </Button>
-            <Button type="primary" htmlType="submit" loading={loading} className={styles.save}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              className={styles.save}
+            >
               Salva
             </Button>
           </Space>

@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest } from 'fastify';
+import { FastifyInstance, FastifyRequest } from "fastify";
 
 interface GooglePlacesQuery {
   input: string;
@@ -11,20 +11,23 @@ interface GooglePlaceDetailsQuery {
 export async function googlePlacesRoutes(fastify: FastifyInstance) {
   // Endpoint per autocomplete
   fastify.get<{ Querystring: GooglePlacesQuery }>(
-    '/places/autocomplete',
+    "/places/autocomplete",
     {
       preHandler: [fastify.authenticate], // Usa il plugin auth esistente
       schema: {
         querystring: {
-          type: 'object',
-          required: ['input'],
+          type: "object",
+          required: ["input"],
           properties: {
-            input: { type: 'string', minLength: 3 },
+            input: { type: "string", minLength: 3 },
           },
         },
       },
     },
-    async (request: FastifyRequest<{ Querystring: GooglePlacesQuery }>, reply) => {
+    async (
+      request: FastifyRequest<{ Querystring: GooglePlacesQuery }>,
+      reply,
+    ) => {
       const { input } = request.query;
 
       try {
@@ -36,42 +39,47 @@ export async function googlePlacesRoutes(fastify: FastifyInstance) {
           `&key=${process.env.GOOGLE_MAPS_API_KEY}`;
 
         console.log(
-          'Calling Google Places API:',
-          googleUrl.replace(process.env.GOOGLE_MAPS_API_KEY || '', '[API_KEY]')
+          "Calling Google Places API:",
+          googleUrl.replace(process.env.GOOGLE_MAPS_API_KEY || "", "[API_KEY]"),
         );
 
         const response = await fetch(googleUrl);
         const data = await response.json();
 
-        console.log('Google API response status:', data.status);
+        console.log("Google API response status:", data.status);
         if (data.error_message) {
-          console.error('Google API error:', data.error_message);
+          console.error("Google API error:", data.error_message);
         }
 
         return reply.send(data);
       } catch (error) {
-        console.error('Error calling Google Places API:', error);
-        return reply.code(500).send({ error: 'Errore nel servizio Google Places' });
+        console.error("Error calling Google Places API:", error);
+        return reply
+          .code(500)
+          .send({ error: "Errore nel servizio Google Places" });
       }
-    }
+    },
   );
 
   // Endpoint per dettagli del luogo
   fastify.get<{ Querystring: GooglePlaceDetailsQuery }>(
-    '/places/details',
+    "/places/details",
     {
       preHandler: [fastify.authenticate],
       schema: {
         querystring: {
-          type: 'object',
-          required: ['placeId'],
+          type: "object",
+          required: ["placeId"],
           properties: {
-            placeId: { type: 'string' },
+            placeId: { type: "string" },
           },
         },
       },
     },
-    async (request: FastifyRequest<{ Querystring: GooglePlaceDetailsQuery }>, reply) => {
+    async (
+      request: FastifyRequest<{ Querystring: GooglePlaceDetailsQuery }>,
+      reply,
+    ) => {
       const { placeId } = request.query;
 
       try {
@@ -79,14 +87,16 @@ export async function googlePlacesRoutes(fastify: FastifyInstance) {
           `https://maps.googleapis.com/maps/api/place/details/json?` +
             `place_id=${placeId}` +
             `&fields=geometry,formatted_address,name` +
-            `&key=${process.env.GOOGLE_MAPS_API_KEY}`
+            `&key=${process.env.GOOGLE_MAPS_API_KEY}`,
         );
 
         const data = await response.json();
         return reply.send(data);
       } catch (error) {
-        return reply.code(500).send({ error: 'Errore nel recupero dettagli luogo' });
+        return reply
+          .code(500)
+          .send({ error: "Errore nel recupero dettagli luogo" });
       }
-    }
+    },
   );
 }

@@ -1,8 +1,11 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../../libs/prisma';
-import { generateSecureVenueLogoUrl } from './../../utils/secureMediaUtils';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { prisma } from "../../libs/prisma";
+import { generateSecureVenueLogoUrl } from "./../../utils/secureMediaUtils";
 
-export const getVenueDetailsHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+export const getVenueDetailsHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   // Recupera l'utente e la venue in un'unica query
   const user = await prisma.user.findUnique({
     where: { id: request.user.id },
@@ -19,7 +22,7 @@ export const getVenueDetailsHandler = async (request: FastifyRequest, reply: Fas
           latitude: true,
           longitude: true,
           openingDays: {
-            orderBy: [{ day: 'asc' }],
+            orderBy: [{ day: "asc" }],
             select: {
               id: true,
               day: true,
@@ -41,7 +44,10 @@ export const getVenueDetailsHandler = async (request: FastifyRequest, reply: Fas
     try {
       logoURL = generateSecureVenueLogoUrl(venue.logoURL);
     } catch (error) {
-      console.warn(`Could not generate secure logo URL for venue ${venue.id}:`, error);
+      console.warn(
+        `Could not generate secure logo URL for venue ${venue.id}:`,
+        error,
+      );
       logoURL = null;
     }
   }
@@ -54,21 +60,32 @@ export const getVenueDetailsHandler = async (request: FastifyRequest, reply: Fas
   });
 };
 
-export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: FastifyReply) => {
-  const { name, address, description, services, logoURL, photos, latitude, longitude } =
-    request.body as {
-      name: string;
-      address: string;
-      description?: string | null;
-      services?: string[];
-      logoURL?: string | null;
-      photos?: string[];
-      latitude?: number | null;
-      longitude?: number | null;
-    };
+export const updateVenueDetailsHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const {
+    name,
+    address,
+    description,
+    services,
+    logoURL,
+    photos,
+    latitude,
+    longitude,
+  } = request.body as {
+    name: string;
+    address: string;
+    description?: string | null;
+    services?: string[];
+    logoURL?: string | null;
+    photos?: string[];
+    latitude?: number | null;
+    longitude?: number | null;
+  };
 
   if (!name || !address) {
-    return reply.code(400).send({ message: 'name and address are required' });
+    return reply.code(400).send({ message: "name and address are required" });
   }
 
   // Recupera venueId dell'utente in una sola query
@@ -106,10 +123,15 @@ export const updateVenueDetailsHandler = async (request: FastifyRequest, reply: 
       services: services ?? [],
       photos: photos ?? [],
       // Preserva il logoURL esistente se non viene fornito un nuovo valore
-      logoURL: logoURL !== undefined ? logoURL : (existingVenue?.logoURL ?? null),
+      logoURL:
+        logoURL !== undefined ? logoURL : (existingVenue?.logoURL ?? null),
       // Aggiorna le coordinate se fornite, altrimenti mantieni quelle esistenti
-      latitude: latitude !== undefined ? latitude : (existingVenue?.latitude ?? null),
-      longitude: longitude !== undefined ? longitude : (existingVenue?.longitude ?? null),
+      latitude:
+        latitude !== undefined ? latitude : (existingVenue?.latitude ?? null),
+      longitude:
+        longitude !== undefined
+          ? longitude
+          : (existingVenue?.longitude ?? null),
     },
     select: {
       id: true,

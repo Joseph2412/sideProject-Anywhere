@@ -1,7 +1,10 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../../libs/prisma';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { prisma } from "../../libs/prisma";
 
-export const getPreferencesHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+export const getPreferencesHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   const userId = request.user.id;
 
   const user = await prisma.user.findUnique({
@@ -12,7 +15,10 @@ export const getPreferencesHandler = async (request: FastifyRequest, reply: Fast
   reply.send({ preferences: user?.preferences ?? null });
 };
 
-export const updatePreferencesHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+export const updatePreferencesHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   const userId = request.user.id;
   const preferences = request.body as Record<string, any>;
 

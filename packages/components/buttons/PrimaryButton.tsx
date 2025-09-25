@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button, ButtonProps } from 'antd';
-import styles from './PrimaryButton.module.css';
+import React from "react";
+import { Button, ButtonProps } from "antd";
+import styles from "./PrimaryButton.module.css";
 
 // Estendiamo i props di AntD + un opzionale text
 type Props = ButtonProps & {
@@ -8,7 +8,16 @@ type Props = ButtonProps & {
 };
 
 export const PrimaryButton = React.forwardRef<HTMLElement, Props>(
-  ({ text, loading, disabled, style, className, onClick, children, ...rest }) => {
+  ({
+    text,
+    loading,
+    disabled,
+    style,
+    className,
+    onClick,
+    children,
+    ...rest
+  }) => {
     return (
       <Button
         {...rest}
@@ -17,13 +26,13 @@ export const PrimaryButton = React.forwardRef<HTMLElement, Props>(
         loading={loading}
         disabled={disabled}
         style={style}
-        className={`${styles.primary} ${className || ''}`}
+        className={`${styles.primary} ${className || ""}`}
         onClick={onClick}
       >
         {text || children}
       </Button>
     );
-  }
+  },
 );
 
-PrimaryButton.displayName = 'PrimaryButton';
+PrimaryButton.displayName = "PrimaryButton";

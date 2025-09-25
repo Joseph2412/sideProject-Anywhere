@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
-import { Upload, Button, Avatar, message, Typography } from 'antd';
-import { useSetAtom } from 'jotai';
-import { useQueryClient } from '@tanstack/react-query';
-import { messageToast } from '@repo/ui/store/LayoutStore';
-import { useUserProfile } from '@repo/hooks';
-import { UploadChangeParam, UploadFile } from 'antd/es/upload';
-import styles from './ProfilePhotoUpload.module.css';
-import { RcFile } from 'antd/es/upload/interface';
+import { useState, useEffect } from "react";
+import { Upload, Button, Avatar, message, Typography } from "antd";
+import { useSetAtom } from "jotai";
+import { useQueryClient } from "@tanstack/react-query";
+import { messageToast } from "@repo/ui/store/LayoutStore";
+import { useUserProfile } from "@repo/hooks";
+import { UploadChangeParam, UploadFile } from "antd/es/upload";
+import styles from "./ProfilePhotoUpload.module.css";
+import { RcFile } from "antd/es/upload/interface";
 
 //Import ICONE CUSTOM
-import { UploadIcon, IconNoPic } from '../customIcons';
+import { UploadIcon, IconNoPic } from "../customIcons";
 
 const { Text } = Typography;
 
@@ -26,8 +26,8 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
   size = 100,
   showTitle = true,
   showRemove = true,
-  title = 'Foto Profilo',
-  description = '',
+  title = "Foto Profilo",
+  description = "",
   className,
 }) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -46,10 +46,10 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
 
   // Validazione file
   const beforeUpload = (file: File) => {
-    console.log('Validazione file:', file);
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    console.log("Validazione file:", file);
+    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
     if (!isJpgOrPng) {
-      message.error('Puoi caricare solo file JPG/PNG!');
+      message.error("Puoi caricare solo file JPG/PNG!");
       return false;
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
@@ -62,19 +62,19 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
 
   // Handler upload
   const handleUpload = async (info: UploadChangeParam<UploadFile>) => {
-    console.log('Evento onChange attivato:', info);
+    console.log("Evento onChange attivato:", info);
 
     // Verifica se il file è disponibile
     const file = info.file.originFileObj || (info.file as RcFile); // Usa RcFile come fallback
     if (!file) {
-      console.error('Nessun file selezionato.');
+      console.error("Nessun file selezionato.");
       return;
     }
 
-    console.log('File selezionato:', file);
+    console.log("File selezionato:", file);
 
     if (!profileData?.user.id) {
-      console.error('ID utente non disponibile.');
+      console.error("ID utente non disponibile.");
       return;
     }
 
@@ -82,33 +82,36 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
 
     try {
       const formData = new FormData();
-      formData.append('file', file); // File originale
-      formData.append('type', 'avatar'); // Tipo di upload
-      formData.append('id', profileData.user.id.toString()); // ID utente
-      formData.append('filename', file.name); // Nome del file
-      formData.append('entity', 'users'); // Entità (es. 'users' per foto profilo)
+      formData.append("file", file); // File originale
+      formData.append("type", "avatar"); // Tipo di upload
+      formData.append("id", profileData.user.id.toString()); // ID utente
+      formData.append("filename", file.name); // Nome del file
+      formData.append("entity", "users"); // Entità (es. 'users' per foto profilo)
 
-      console.log('Dati inviati al backend:', {
+      console.log("Dati inviati al backend:", {
         file: file.name,
-        type: 'avatar',
+        type: "avatar",
         id: profileData.user.id.toString(),
         filename: file.name,
-        entity: 'users',
+        entity: "users",
       });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/media/upload`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/media/upload`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: formData,
         },
-        body: formData,
-      });
+      );
 
-      console.log('Risposta backend:', response);
+      console.log("Risposta backend:", response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null); // Prova a leggere il messaggio di errore
-        console.error('Errore dal backend:', errorData || response.statusText);
+        console.error("Errore dal backend:", errorData || response.statusText);
         throw new Error("Errore durante l'upload");
       }
 
@@ -116,23 +119,24 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
       setImageUrl(data.url);
 
       // Invalida la cache per aggiornare i dati del profilo
-      await queryClient.invalidateQueries({ queryKey: ['profile'] });
+      await queryClient.invalidateQueries({ queryKey: ["profile"] });
 
       setToast({
-        type: 'success',
-        message: 'Upload completato!',
-        description: 'Foto profilo caricata con successo.',
+        type: "success",
+        message: "Upload completato!",
+        description: "Foto profilo caricata con successo.",
         duration: 3,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     } catch (error) {
-      console.error('Errore upload:', error);
+      console.error("Errore upload:", error);
       setToast({
-        type: 'error',
-        message: 'Errore upload',
-        description: error instanceof Error ? error.message : 'Errore sconosciuto',
+        type: "error",
+        message: "Errore upload",
+        description:
+          error instanceof Error ? error.message : "Errore sconosciuto",
         duration: 4,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     } finally {
       setLoading(false);
@@ -149,43 +153,44 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
       // Estrai la chiave S3 dall'URL
       const key = extractS3KeyFromUrl(imageUrl);
       if (!key) {
-        throw new Error('Impossibile estrarre la chiave S3');
+        throw new Error("Impossibile estrarre la chiave S3");
       }
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_HOST}/media/delete?type=avatar&id=${profileData.user.id}&filename=${encodeURIComponent(key)}`,
         {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
-        throw new Error('Errore durante la rimozione');
+        throw new Error("Errore durante la rimozione");
       }
 
       setImageUrl(null);
 
       // Invalida la cache per aggiornare i dati del profilo
-      await queryClient.invalidateQueries({ queryKey: ['profile'] });
+      await queryClient.invalidateQueries({ queryKey: ["profile"] });
 
       setToast({
-        type: 'success',
-        message: 'Immagine rimossa!',
-        description: 'Foto profilo rimossa con successo.',
+        type: "success",
+        message: "Immagine rimossa!",
+        description: "Foto profilo rimossa con successo.",
         duration: 3,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     } catch (error) {
-      console.error('Errore rimozione:', error);
+      console.error("Errore rimozione:", error);
       setToast({
-        type: 'error',
-        message: 'Errore rimozione',
-        description: error instanceof Error ? error.message : 'Errore sconosciuto',
+        type: "error",
+        message: "Errore rimozione",
+        description:
+          error instanceof Error ? error.message : "Errore sconosciuto",
         duration: 4,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     } finally {
       setLoading(false);
@@ -199,7 +204,7 @@ export const ProfilePhotoUpload: React.FC<ProfilePhotoUploadProps> = ({
   };
 
   return (
-    <div className={`${styles.container} ${className || ''}`}>
+    <div className={`${styles.container} ${className || ""}`}>
       {showTitle && (
         <div className={styles.header}>
           <Text strong className={styles.title}>

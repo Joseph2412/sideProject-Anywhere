@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import { AutoComplete, Input } from 'antd';
-import { useGooglePlaces, GooglePrediction, PlaceResult } from '@repo/hooks';
+import React, { useState, useEffect, useRef } from "react";
+import { AutoComplete, Input } from "antd";
+import { useGooglePlaces, GooglePrediction, PlaceResult } from "@repo/hooks";
 
 interface AddressOption {
   value: string;
@@ -20,11 +20,11 @@ interface AddressAutocompleteProps {
 export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   value,
   onChange,
-  placeholder = 'Cerca un indirizzo...',
+  placeholder = "Cerca un indirizzo...",
   disabled = false,
 }) => {
   const [options, setOptions] = useState<AddressOption[]>([]);
-  const [searchValue, setSearchValue] = useState(value || '');
+  const [searchValue, setSearchValue] = useState(value || "");
   const { searchPlaces, getPlaceDetails, loading } = useGooglePlaces();
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
 
@@ -45,9 +45,11 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         const newOptions = predictions.map((prediction: GooglePrediction) => ({
           value: prediction.description,
           label: (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontWeight: 500 }}>{prediction.structured_formatting.main_text}</span>
-              <span style={{ fontSize: '12px', color: '#666' }}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ fontWeight: 500 }}>
+                {prediction.structured_formatting.main_text}
+              </span>
+              <span style={{ fontSize: "12px", color: "#666" }}>
                 {prediction.structured_formatting.secondary_text}
               </span>
             </div>
@@ -56,7 +58,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         }));
         setOptions(newOptions);
       } catch (err) {
-        console.error('Errore nella ricerca degli indirizzi:', err);
+        console.error("Errore nella ricerca degli indirizzi:", err);
         setOptions([]);
       }
     }, 300);
@@ -69,7 +71,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       const placeDetails = await getPlaceDetails(option.placeId);
       onChange?.(selectedValue, placeDetails);
     } catch (err) {
-      console.error('Errore nel recupero dettagli:', err);
+      console.error("Errore nel recupero dettagli:", err);
       onChange?.(selectedValue);
     }
 
@@ -97,11 +99,15 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       onSelect={handleSelect}
       placeholder={placeholder}
       disabled={disabled}
-      style={{ width: '100%' }}
-      notFoundContent={loading ? 'Ricerca in corso...' : 'Nessun risultato'}
+      style={{ width: "100%" }}
+      notFoundContent={loading ? "Ricerca in corso..." : "Nessun risultato"}
       filterOption={false}
     >
-      <Input.Search loading={loading} placeholder={placeholder} disabled={disabled} />
+      <Input.Search
+        loading={loading}
+        placeholder={placeholder}
+        disabled={disabled}
+      />
     </AutoComplete>
   );
 };

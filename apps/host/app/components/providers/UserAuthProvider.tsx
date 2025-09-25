@@ -1,10 +1,10 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { useSetAtom, useAtomValue } from 'jotai';
-import { useRouter } from 'next/navigation';
-import { authUserAtom } from '@repo/ui/store/LayoutStore';
-import { useUserProfile } from '@repo/hooks';
-import { useLogout } from '../../hooks/useLogout';
+"use client";
+import { useEffect, useState } from "react";
+import { useSetAtom, useAtomValue } from "jotai";
+import { useRouter } from "next/navigation";
+import { authUserAtom } from "@repo/ui/store/LayoutStore";
+import { useUserProfile } from "@repo/hooks";
+import { useLogout } from "../../hooks/useLogout";
 
 type Props = {
   children: React.ReactNode;
@@ -27,7 +27,7 @@ export const UserProvider = ({ children }: Props) => {
    * Dependencies: router, setUser, logout, authUser, reloadProfile
    */
   useEffect(() => {
-    const token = localStorage.getItem('token'); //FIX ToDo: Token non in localStorage ma in Cookie
+    const token = localStorage.getItem("token"); //FIX ToDo: Token non in localStorage ma in Cookie
 
     if (!token) {
       setLoading(false);

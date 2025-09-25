@@ -1,16 +1,19 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 
 export function usePreferences(token: string) {
   return useQuery({
-    queryKey: ['preferences', token],
+    queryKey: ["preferences", token],
     queryFn: async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/user/preferences`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/user/preferences`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
-      if (!res.ok) throw new Error('Non Autorizzato');
+      );
+      if (!res.ok) throw new Error("Non Autorizzato");
       return res.json();
     },
     enabled: !!token,

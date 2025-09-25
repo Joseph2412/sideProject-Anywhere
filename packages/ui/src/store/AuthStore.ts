@@ -1,6 +1,6 @@
 // Store autenticazione utente: stato globale e dati profilo
 
-import { atom } from 'jotai';
+import { atom } from "jotai";
 
 // AuthUser: dati essenziali utente autenticato
 export type AuthUser = {
@@ -8,7 +8,7 @@ export type AuthUser = {
   firstName: string; // Nome
   lastName: string; // Cognome
   email: string; // Email (univoca)
-  role: 'USER' | 'HOST'; // Ruolo
+  role: "USER" | "HOST"; // Ruolo
   avatarUrl: string; // Path immagine profilo
   preferences?: Record<string, unknown>; // Impostazioni opzionali
 };

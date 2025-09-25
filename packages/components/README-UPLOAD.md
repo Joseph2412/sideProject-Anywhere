@@ -77,8 +77,9 @@
 
 ```tsx
 // LogoUpload e LogoSidebar
-const uploadType = pathname.includes('/profile') ? 'avatar' : 'logo';
-const isVenueContext = pathname.includes('/venue') || pathname.includes('/packages');
+const uploadType = pathname.includes("/profile") ? "avatar" : "logo";
+const isVenueContext =
+  pathname.includes("/venue") || pathname.includes("/packages");
 ```
 
 ### Struttura S3 (Utilizzata)

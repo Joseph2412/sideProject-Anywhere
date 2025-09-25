@@ -14,7 +14,7 @@ export type UserProfile = {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'USER' | 'HOST';
+  role: "USER" | "HOST";
   avatarUrl: string;
   preferences?: Record<string, unknown> | null;
   venue?: Venue | null;

@@ -1,6 +1,6 @@
-import fastify, { FastifyInstance } from 'fastify';
+import fastify, { FastifyInstance } from "fastify";
 
-import 'fastify';
+import "fastify";
 
 import {
   createNewBooking,
@@ -8,41 +8,56 @@ import {
   getBookingDetails,
   getVenueBookings,
   getMyVenueBookings,
-} from '../../handlers/booking/BookingHandler';
-import { addSSEClient } from '../../handlers/booking/BookingSSEHandler';
-import { createBookingSchema, deleteBookingSchema } from '../../schemas/bookingSchema';
+} from "../../handlers/booking/BookingHandler";
+import { addSSEClient } from "../../handlers/booking/BookingSSEHandler";
+import {
+  createBookingSchema,
+  deleteBookingSchema,
+} from "../../schemas/bookingSchema";
 
 export async function bookingsRoute(fastify: FastifyInstance) {
   fastify.delete(
-    '/booking/:id',
+    "/booking/:id",
     { preValidation: fastify.authenticate, schema: deleteBookingSchema },
-    deleteBooking
+    deleteBooking,
   );
 
   fastify.post(
-    '/booking/:id',
+    "/booking/:id",
     { preValidation: fastify.authenticate, schema: createBookingSchema },
-    createNewBooking
+    createNewBooking,
   );
 
-  fastify.get('/booking/:id', { preHandler: fastify.authenticate }, getBookingDetails);
+  fastify.get(
+    "/booking/:id",
+    { preHandler: fastify.authenticate },
+    getBookingDetails,
+  );
 }
 
 export async function venueBookingsDetailsRoute(fastify: FastifyInstance) {
   // Endpoint originale con venueId (manteniamo per compatibilità)
-  fastify.get('/venues/bookings/:id', { preHandler: fastify.authenticate }, getVenueBookings);
+  fastify.get(
+    "/venues/bookings/:id",
+    { preHandler: fastify.authenticate },
+    getVenueBookings,
+  );
 
   // Nuovo endpoint senza venueId - usa automaticamente il venue dell'utente
-  fastify.get('/venues/bookings', { preHandler: fastify.authenticate }, getMyVenueBookings);
+  fastify.get(
+    "/venues/bookings",
+    { preHandler: fastify.authenticate },
+    getMyVenueBookings,
+  );
 
   // Rotta SSE per aggiornamenti in tempo reale delle prenotazioni
-  fastify.get('/venue/:venueId/events', async (request, reply) => {
+  fastify.get("/venue/:venueId/events", async (request, reply) => {
     const { venueId } = request.params as { venueId: string };
     const { token } = request.query as { token?: string };
     const venueIdNum = parseInt(venueId);
 
     if (isNaN(venueIdNum)) {
-      return reply.code(400).send({ error: 'ID venue non valido' });
+      return reply.code(400).send({ error: "ID venue non valido" });
     }
 
     // Verifica il token (dall'header o dalla query)
@@ -54,7 +69,7 @@ export async function venueBookingsDetailsRoute(fastify: FastifyInstance) {
 
       await request.jwtVerify();
     } catch (err) {
-      return reply.code(401).send({ message: 'Token non valido o scaduto' });
+      return reply.code(401).send({ message: "Token non valido o scaduto" });
     }
 
     // Configura la connessione SSE

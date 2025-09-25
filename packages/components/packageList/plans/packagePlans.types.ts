@@ -7,9 +7,9 @@ export interface PlanRateData {
 }
 
 export const PlansRate = [
-  { value: 'HOURLY', name: 'Orario', label: 'ora' },
-  { value: 'DAILY', name: 'Giornaliero', label: 'giorno' },
-  { value: 'WEEKLY', name: 'Settimanale', label: 'settimana' },
-  { value: 'MONTHLY', name: 'Mensile', label: 'mese' },
-  { value: 'YEARLY', name: 'Annuale', label: 'anno' },
+  { value: "HOURLY", name: "Orario", label: "ora" },
+  { value: "DAILY", name: "Giornaliero", label: "giorno" },
+  { value: "WEEKLY", name: "Settimanale", label: "settimana" },
+  { value: "MONTHLY", name: "Mensile", label: "mese" },
+  { value: "YEARLY", name: "Annuale", label: "anno" },
 ];

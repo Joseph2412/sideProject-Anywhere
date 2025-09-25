@@ -1,22 +1,33 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 //Componete FORM DETTAGLI PACCHETTO
 
-import { Form, Button, Space, Row, Col, Card, Select, Input, Switch, Popconfirm } from 'antd';
+import {
+  Form,
+  Button,
+  Space,
+  Row,
+  Col,
+  Card,
+  Select,
+  Input,
+  Switch,
+  Popconfirm,
+} from "antd";
 
-import { NibolInput } from '../../inputs/Input';
-import { useState } from 'react';
+import { NibolInput } from "../../inputs/Input";
+import { useState } from "react";
 
 // Jotai e store
-import { useSetAtom } from 'jotai';
-import { messageToast, Package } from '@repo/ui/store/LayoutStore';
-import { PrimaryButton } from '../../buttons/PrimaryButton';
-import { packageFormAtom } from '@repo/ui/store/PackageFormStore';
-import { useParams } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
+import { useSetAtom } from "jotai";
+import { messageToast, Package } from "@repo/ui/store/LayoutStore";
+import { PrimaryButton } from "../../buttons/PrimaryButton";
+import { packageFormAtom } from "@repo/ui/store/PackageFormStore";
+import { useParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
-import packageDetailsStyles from './PackageDetails.module.css';
+import packageDetailsStyles from "./PackageDetails.module.css";
 
 export const PackageDetails = () => {
   const params = useParams();
@@ -37,11 +48,11 @@ export const PackageDetails = () => {
       setLoading(true);
       fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages/${id}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           setDetails(data);
           setPackageForm({
             name: data.name,
@@ -49,7 +60,12 @@ export const PackageDetails = () => {
           });
           form.setFieldsValue({
             name: data.name,
-            type: data.type === 'Sala' ? 'SALA' : data.type === 'Desk' ? 'DESK' : data.type,
+            type:
+              data.type === "Sala"
+                ? "SALA"
+                : data.type === "Desk"
+                  ? "DESK"
+                  : data.type,
             description: data.description,
             services: data.services,
             capacity: data.capacity,
@@ -62,7 +78,9 @@ export const PackageDetails = () => {
   }, [params, form, setPackageForm]);
 
   // Calcola direttamente il tipo selezionato dall'atomo
-  const selectedType = details?.type ? (details.type.toLowerCase() as 'sala' | 'desk') : undefined;
+  const selectedType = details?.type
+    ? (details.type.toLowerCase() as "sala" | "desk")
+    : undefined;
 
   // Gestione submit del form per aggiornare i dati
   const handleFinish = async (values: Package) => {
@@ -70,39 +88,39 @@ export const PackageDetails = () => {
     const id = params?.id;
     const payload = { ...values, isActive: details?.isActive };
     try {
-      let url = '';
-      let method: 'POST' | 'PUT' = 'POST';
-      let successMsg = '';
+      let url = "";
+      let method: "POST" | "PUT" = "POST";
+      let successMsg = "";
       if (id) {
         url = `${process.env.NEXT_PUBLIC_API_HOST}/api/packages/${id}`;
-        method = 'PUT';
-        successMsg = 'Pacchetto aggiornato!';
+        method = "PUT";
+        successMsg = "Pacchetto aggiornato!";
       } else {
         url = `${process.env.NEXT_PUBLIC_API_HOST}/api/packages/add`;
-        method = 'POST';
-        successMsg = 'Pacchetto aggiunto!';
+        method = "POST";
+        successMsg = "Pacchetto aggiunto!";
       }
       // Forza POST se non c'è id (aggiunta)
       const res = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(payload),
       });
       if (res.ok) {
         const data = await res.json();
         setDetails(data);
-        setMessage({ type: 'success', message: successMsg });
+        setMessage({ type: "success", message: successMsg });
         // Invalida la cache dei pacchetti per aggiornare la sidebar
-        queryClient.invalidateQueries({ queryKey: ['packages'] });
+        queryClient.invalidateQueries({ queryKey: ["packages"] });
       } else {
-        setMessage({ type: 'error', message: 'Errore durante la richiesta' });
+        setMessage({ type: "error", message: "Errore durante la richiesta" });
       }
     } catch (error) {
-      console.error('Errore durante la richiesta:', error);
-      setMessage({ type: 'error', message: 'Errore durante la richiesta' });
+      console.error("Errore durante la richiesta:", error);
+      setMessage({ type: "error", message: "Errore durante la richiesta" });
     } finally {
       setLoading(false);
     }
@@ -112,24 +130,27 @@ export const PackageDetails = () => {
     if (!details?.id) return;
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages/${details.id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/api/packages/${details.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         },
-      });
+      );
       if (res.ok) {
-        setMessage({ type: 'success', message: 'Pacchetto eliminato!' });
+        setMessage({ type: "success", message: "Pacchetto eliminato!" });
         // Invalida la cache dei pacchetti per aggiornare la sidebar
-        queryClient.invalidateQueries({ queryKey: ['packages'] });
+        queryClient.invalidateQueries({ queryKey: ["packages"] });
         setPackageForm(null); // Resetta lo stato globale
-        router.replace('/packages'); // Ti ributto su un packages Form Vuoto
+        router.replace("/packages"); // Ti ributto su un packages Form Vuoto
       } else {
-        setMessage({ type: 'error', message: 'Errore durante la richiesta' });
+        setMessage({ type: "error", message: "Errore durante la richiesta" });
       }
     } catch (error) {
-      console.error('Errore durante la richiesta:', error);
-      setMessage({ type: 'error', message: 'Errore durante la richiesta' });
+      console.error("Errore durante la richiesta:", error);
+      setMessage({ type: "error", message: "Errore durante la richiesta" });
     } finally {
       setLoading(false);
     }
@@ -140,29 +161,34 @@ export const PackageDetails = () => {
     setLoading(true);
     try {
       const payload = { ...details, isActive: newIsActive };
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages/${details.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/api/packages/${details.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      });
+      );
       if (res.ok) {
         const data = await res.json();
         setDetails(data);
         setMessage({
-          type: 'success',
-          message: newIsActive ? 'Pacchetto attivato!' : 'Pacchetto disattivato!',
+          type: "success",
+          message: newIsActive
+            ? "Pacchetto attivato!"
+            : "Pacchetto disattivato!",
         });
         // Invalida la cache dei pacchetti per aggiornare la sidebar
-        queryClient.invalidateQueries({ queryKey: ['packages'] });
+        queryClient.invalidateQueries({ queryKey: ["packages"] });
       } else {
-        setMessage({ type: 'error', message: 'Errore durante la richiesta' });
+        setMessage({ type: "error", message: "Errore durante la richiesta" });
       }
     } catch (error) {
-      console.error('Errore durante la richiesta:', error);
-      setMessage({ type: 'error', message: 'Errore durante la richiesta' });
+      console.error("Errore durante la richiesta:", error);
+      setMessage({ type: "error", message: "Errore durante la richiesta" });
     } finally {
       setLoading(false);
     }
@@ -174,7 +200,12 @@ export const PackageDetails = () => {
     if (details) {
       form.setFieldsValue({
         name: details.name,
-        type: details.type === 'Sala' ? 'SALA' : details.type === 'Desk' ? 'DESK' : details.type,
+        type:
+          details.type === "Sala"
+            ? "SALA"
+            : details.type === "Desk"
+              ? "DESK"
+              : details.type,
       });
     }
   }, [details, form]);
@@ -182,12 +213,13 @@ export const PackageDetails = () => {
   const isDisabled = details?.isActive === false;
 
   // Helper DRY per le rules required
-  const requiredRule = (message: string) => (isDisabled ? [] : [{ required: true, message }]);
+  const requiredRule = (message: string) =>
+    isDisabled ? [] : [{ required: true, message }];
 
   return (
     <Form
       layout="vertical"
-      style={{ width: '100%', borderRadius: 8 }}
+      style={{ width: "100%", borderRadius: 8 }}
       form={form}
       requiredMark={false}
       validateTrigger="onSubmit"
@@ -196,7 +228,9 @@ export const PackageDetails = () => {
         setDetails({
           ...details,
           ...allValues,
-          type: allValues.type ? (allValues.type as 'Sala' | 'Desk') : details.type,
+          type: allValues.type
+            ? (allValues.type as "Sala" | "Desk")
+            : details.type,
         });
       }}
       onFinish={handleFinish}
@@ -220,7 +254,7 @@ export const PackageDetails = () => {
           >
             <Switch
               checked={details?.isActive}
-              onClick={checked => {
+              onClick={(checked) => {
                 if (!details) return;
                 if (checked) {
                   setDetails({ ...details, isActive: true });
@@ -234,31 +268,41 @@ export const PackageDetails = () => {
         </Form.Item>
         <Row gutter={[16, 0]}>
           <Col span={12}>
-            <Form.Item name="name" rules={requiredRule('Inserisci il Nome del Piano')}>
+            <Form.Item
+              name="name"
+              rules={requiredRule("Inserisci il Nome del Piano")}
+            >
               <NibolInput
                 validateTrigger="onSubmit"
                 label="Nome del Piano"
                 name="name"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: 32, width: '100%' }}
+                style={{ height: 32, width: "100%" }}
                 disabled={isDisabled}
               />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="type" rules={requiredRule('Specifica la Tipologia')} label="Tipologia">
+            <Form.Item
+              name="type"
+              rules={requiredRule("Specifica la Tipologia")}
+              label="Tipologia"
+            >
               <Select
-                style={{ width: '100%', height: 32 }}
+                style={{ width: "100%", height: 32 }}
                 options={[
-                  { value: 'SALA', label: 'Sala' },
-                  { value: 'DESK', label: 'Desk' },
+                  { value: "SALA", label: "Sala" },
+                  { value: "DESK", label: "Desk" },
                 ]}
-                onChange={value => {
-                  if (value === 'desk') {
+                onChange={(value) => {
+                  if (value === "desk") {
                     form.setFieldsValue({ seats: undefined });
                   } else {
-                    form.setFieldsValue({ capacity: undefined, squareMetres: undefined });
+                    form.setFieldsValue({
+                      capacity: undefined,
+                      squareMetres: undefined,
+                    });
                   }
                 }}
                 disabled={isDisabled}
@@ -269,47 +313,66 @@ export const PackageDetails = () => {
         <Form.Item
           name="description"
           label="Descrizione"
-          rules={requiredRule('Inserisci una descrizione')}
+          rules={requiredRule("Inserisci una descrizione")}
         >
           <Input.TextArea
-            style={{ height: 32, width: '100%', minHeight: 100 }}
+            style={{ height: 32, width: "100%", minHeight: 100 }}
             disabled={isDisabled}
           />
         </Form.Item>
         <Form.Item name="services" label="Servizi">
-          <Select mode="tags" style={{ height: 28, width: '100%' }} disabled={isDisabled} />
+          <Select
+            mode="tags"
+            style={{ height: 28, width: "100%" }}
+            disabled={isDisabled}
+          />
         </Form.Item>
 
-        {selectedType === 'sala' && (
+        {selectedType === "sala" && (
           <Row gutter={[16, 0]}>
             <Col span={12}>
               <Form.Item
                 name="capacity"
                 label="Capienza"
-                rules={requiredRule('Inserisci la capienza')}
+                rules={requiredRule("Inserisci la capienza")}
               >
-                <Input type="number" min={1} style={{ width: 100 }} disabled={isDisabled} />
+                <Input
+                  type="number"
+                  min={1}
+                  style={{ width: 100 }}
+                  disabled={isDisabled}
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
                 name="squareMetres"
                 label="Metri Quadrati (m²)"
-                rules={requiredRule('Inserisci i metri quadrati')}
+                rules={requiredRule("Inserisci i metri quadrati")}
               >
-                <Input type="number" min={1} style={{ width: 100 }} disabled={isDisabled} />
+                <Input
+                  type="number"
+                  min={1}
+                  style={{ width: 100 }}
+                  disabled={isDisabled}
+                />
               </Form.Item>
             </Col>
           </Row>
         )}
 
-        {selectedType === 'desk' && (
+        {selectedType === "desk" && (
           <Form.Item
             name="seats"
             label="Posti Disponibili"
-            rules={requiredRule('Inserisci i posti disponibili')}
+            rules={requiredRule("Inserisci i posti disponibili")}
           >
-            <Input type="number" min={1} style={{ width: 100 }} disabled={isDisabled} />
+            <Input
+              type="number"
+              min={1}
+              style={{ width: 100 }}
+              disabled={isDisabled}
+            />
           </Form.Item>
         )}
         <Form.Item style={{ marginTop: 20 }}>
@@ -324,7 +387,12 @@ export const PackageDetails = () => {
             >
               Annulla
             </Button>
-            <PrimaryButton type="primary" htmlType="submit" disabled={loading} loading={loading}>
+            <PrimaryButton
+              type="primary"
+              htmlType="submit"
+              disabled={loading}
+              loading={loading}
+            >
               Salva
             </PrimaryButton>
           </Space>
@@ -336,9 +404,9 @@ export const PackageDetails = () => {
           marginRight: 16,
           padding: 0,
           height: 64,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'left',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "left",
         }}
       >
         <Popconfirm

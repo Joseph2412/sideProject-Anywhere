@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 
 interface MediaParams {
   venueId: string;
@@ -10,8 +10,11 @@ interface MediaParams {
 export async function secureMediaRoutes(fastify: FastifyInstance) {
   // Proxy per logo venue
   fastify.get(
-    '/venue/:venueId/logo/:filename',
-    async (request: FastifyRequest<{ Params: MediaParams }>, reply: FastifyReply) => {
+    "/venue/:venueId/logo/:filename",
+    async (
+      request: FastifyRequest<{ Params: MediaParams }>,
+      reply: FastifyReply,
+    ) => {
       const { venueId, filename } = request.params;
 
       try {
@@ -21,7 +24,10 @@ export async function secureMediaRoutes(fastify: FastifyInstance) {
         const s3Key = `venues/${venueId}/logo/${filename}`;
 
         // Ottieni l'oggetto da S3
-        const s3Response = await request.s3.getObject(process.env.S3_REPORTS_BUCKET!, s3Key);
+        const s3Response = await request.s3.getObject(
+          process.env.S3_REPORTS_BUCKET!,
+          s3Key,
+        );
 
         // Determina il content type dall'estensione
         const contentType = getContentType(filename);
@@ -29,31 +35,37 @@ export async function secureMediaRoutes(fastify: FastifyInstance) {
         // Stream dell'immagine direttamente al client
         return reply
           .type(contentType)
-          .header('Cache-Control', 'public, max-age=3600') // Cache 1 ora
-          .header('ETag', s3Response.ETag || '')
+          .header("Cache-Control", "public, max-age=3600") // Cache 1 ora
+          .header("ETag", s3Response.ETag || "")
           .send(s3Response.Body);
       } catch (error) {
-        console.error(`❌ Error serving venue ${venueId} logo ${filename}:`, error);
+        console.error(
+          `❌ Error serving venue ${venueId} logo ${filename}:`,
+          error,
+        );
 
-        if ((error as any).Code === 'NoSuchKey') {
+        if ((error as any).Code === "NoSuchKey") {
           return reply.code(404).send({
-            error: 'Immagine non trovata',
+            error: "Immagine non trovata",
             resource: `venue/${venueId}/logo/${filename}`,
           });
         }
 
         return reply.code(500).send({
           error: "Errore nel servire l'immagine",
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? error.message : "Unknown error",
         });
       }
-    }
+    },
   );
 
   // Proxy per foto venue
   fastify.get(
-    '/venue/:venueId/photos/:filename',
-    async (request: FastifyRequest<{ Params: MediaParams }>, reply: FastifyReply) => {
+    "/venue/:venueId/photos/:filename",
+    async (
+      request: FastifyRequest<{ Params: MediaParams }>,
+      reply: FastifyReply,
+    ) => {
       const { venueId, filename } = request.params;
 
       try {
@@ -63,7 +75,10 @@ export async function secureMediaRoutes(fastify: FastifyInstance) {
         const s3Key = `venues/${venueId}/photos/${filename}`;
 
         // Ottieni l'oggetto da S3
-        const s3Response = await request.s3.getObject(process.env.S3_REPORTS_BUCKET!, s3Key);
+        const s3Response = await request.s3.getObject(
+          process.env.S3_REPORTS_BUCKET!,
+          s3Key,
+        );
 
         // Determina il content type dall'estensione
         const contentType = getContentType(filename);
@@ -71,31 +86,37 @@ export async function secureMediaRoutes(fastify: FastifyInstance) {
         // Stream dell'immagine direttamente al client
         return reply
           .type(contentType)
-          .header('Cache-Control', 'public, max-age=3600') // Cache 1 ora
-          .header('ETag', s3Response.ETag || '')
+          .header("Cache-Control", "public, max-age=3600") // Cache 1 ora
+          .header("ETag", s3Response.ETag || "")
           .send(s3Response.Body);
       } catch (error) {
-        console.error(`❌ Error serving venue ${venueId} photo ${filename}:`, error);
+        console.error(
+          `❌ Error serving venue ${venueId} photo ${filename}:`,
+          error,
+        );
 
-        if ((error as any).Code === 'NoSuchKey') {
+        if ((error as any).Code === "NoSuchKey") {
           return reply.code(404).send({
-            error: 'Foto non trovata',
+            error: "Foto non trovata",
             resource: `venue/${venueId}/photos/${filename}`,
           });
         }
 
         return reply.code(500).send({
-          error: 'Errore nel servire la foto',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          error: "Errore nel servire la foto",
+          message: error instanceof Error ? error.message : "Unknown error",
         });
       }
-    }
+    },
   );
 
   // Proxy per foto pacchetti
   fastify.get(
-    '/package/:packageId/photos/:filename',
-    async (request: FastifyRequest<{ Params: MediaParams }>, reply: FastifyReply) => {
+    "/package/:packageId/photos/:filename",
+    async (
+      request: FastifyRequest<{ Params: MediaParams }>,
+      reply: FastifyReply,
+    ) => {
       const { packageId, filename } = request.params;
 
       try {
@@ -105,7 +126,10 @@ export async function secureMediaRoutes(fastify: FastifyInstance) {
         const s3Key = `packages/${packageId}/photos/${filename}`;
 
         // Ottieni l'oggetto da S3
-        const s3Response = await request.s3.getObject(process.env.S3_REPORTS_BUCKET!, s3Key);
+        const s3Response = await request.s3.getObject(
+          process.env.S3_REPORTS_BUCKET!,
+          s3Key,
+        );
 
         // Determina il content type dall'estensione
         const contentType = getContentType(filename);
@@ -113,31 +137,37 @@ export async function secureMediaRoutes(fastify: FastifyInstance) {
         // Stream dell'immagine direttamente al client
         return reply
           .type(contentType)
-          .header('Cache-Control', 'public, max-age=3600') // Cache 1 ora
-          .header('ETag', s3Response.ETag || '')
+          .header("Cache-Control", "public, max-age=3600") // Cache 1 ora
+          .header("ETag", s3Response.ETag || "")
           .send(s3Response.Body);
       } catch (error) {
-        console.error(`❌ Error serving package ${packageId} photo ${filename}:`, error);
+        console.error(
+          `❌ Error serving package ${packageId} photo ${filename}:`,
+          error,
+        );
 
-        if ((error as any).Code === 'NoSuchKey') {
+        if ((error as any).Code === "NoSuchKey") {
           return reply.code(404).send({
-            error: 'Foto pacchetto non trovata',
+            error: "Foto pacchetto non trovata",
             resource: `package/${packageId}/photos/${filename}`,
           });
         }
 
         return reply.code(500).send({
-          error: 'Errore nel servire la foto del pacchetto',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          error: "Errore nel servire la foto del pacchetto",
+          message: error instanceof Error ? error.message : "Unknown error",
         });
       }
-    }
+    },
   );
 
   // Proxy per avatar utenti
   fastify.get(
-    '/user/:userId/avatar/:filename',
-    async (request: FastifyRequest<{ Params: MediaParams }>, reply: FastifyReply) => {
+    "/user/:userId/avatar/:filename",
+    async (
+      request: FastifyRequest<{ Params: MediaParams }>,
+      reply: FastifyReply,
+    ) => {
       const { userId, filename } = request.params;
 
       try {
@@ -147,7 +177,10 @@ export async function secureMediaRoutes(fastify: FastifyInstance) {
         const s3Key = `host/${userId}/profile/avatar/${filename}`;
 
         // Ottieni l'oggetto da S3
-        const s3Response = await request.s3.getObject(process.env.S3_REPORTS_BUCKET!, s3Key);
+        const s3Response = await request.s3.getObject(
+          process.env.S3_REPORTS_BUCKET!,
+          s3Key,
+        );
 
         // Determina il content type dall'estensione
         const contentType = getContentType(filename);
@@ -155,59 +188,65 @@ export async function secureMediaRoutes(fastify: FastifyInstance) {
         // Stream dell'immagine direttamente al client
         return reply
           .type(contentType)
-          .header('Cache-Control', 'public, max-age=3600') // Cache 1 ora
-          .header('ETag', s3Response.ETag || '')
+          .header("Cache-Control", "public, max-age=3600") // Cache 1 ora
+          .header("ETag", s3Response.ETag || "")
           .send(s3Response.Body);
       } catch (error) {
-        console.error(`❌ Error serving user ${userId} avatar ${filename}:`, error);
+        console.error(
+          `❌ Error serving user ${userId} avatar ${filename}:`,
+          error,
+        );
 
-        if ((error as any).Code === 'NoSuchKey') {
+        if ((error as any).Code === "NoSuchKey") {
           return reply.code(404).send({
-            error: 'Avatar non trovato',
+            error: "Avatar non trovato",
             resource: `user/${userId}/avatar/${filename}`,
           });
         }
 
         return reply.code(500).send({
           error: "Errore nel servire l'avatar",
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? error.message : "Unknown error",
         });
       }
-    }
+    },
   );
 
   // Endpoint di health check per il proxy media
-  fastify.get('/health', async (request: FastifyRequest, reply: FastifyReply) => {
-    return reply.send({
-      status: 'healthy',
-      service: 'secure-media-proxy',
-      timestamp: new Date().toISOString(),
-    });
-  });
+  fastify.get(
+    "/health",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      return reply.send({
+        status: "healthy",
+        service: "secure-media-proxy",
+        timestamp: new Date().toISOString(),
+      });
+    },
+  );
 }
 
 // Utility per determinare il content type dall'estensione del file
 function getContentType(filename: string): string {
-  const extension = filename.split('.').pop()?.toLowerCase();
+  const extension = filename.split(".").pop()?.toLowerCase();
 
   switch (extension) {
-    case 'jpg':
-    case 'jpeg':
-      return 'image/jpeg';
-    case 'png':
-      return 'image/png';
-    case 'gif':
-      return 'image/gif';
-    case 'webp':
-      return 'image/webp';
-    case 'svg':
-      return 'image/svg+xml';
-    case 'bmp':
-      return 'image/bmp';
-    case 'tiff':
-    case 'tif':
-      return 'image/tiff';
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "png":
+      return "image/png";
+    case "gif":
+      return "image/gif";
+    case "webp":
+      return "image/webp";
+    case "svg":
+      return "image/svg+xml";
+    case "bmp":
+      return "image/bmp";
+    case "tiff":
+    case "tif":
+      return "image/tiff";
     default:
-      return 'image/jpeg'; // Default fallback
+      return "image/jpeg"; // Default fallback
   }
 }

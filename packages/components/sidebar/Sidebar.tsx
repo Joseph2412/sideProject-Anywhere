@@ -1,29 +1,39 @@
-'use client';
+"use client";
 
 //COMPONENTE SIDEBAR
 
-import { Menu, Layout, Modal, Select, Space, Button, Typography, Input, Form } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import {
+  Menu,
+  Layout,
+  Modal,
+  Select,
+  Space,
+  Button,
+  Typography,
+  Input,
+  Form,
+} from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-import { PrimaryButton, LogoSidebar, SidebarFooter } from '@repo/components';
-import { messageToast } from '@repo/ui/store/ToastStore';
+import { PrimaryButton, LogoSidebar, SidebarFooter } from "@repo/components";
+import { messageToast } from "@repo/ui/store/ToastStore";
 
-import { useSetAtom } from 'jotai';
-import { usePackages } from '@repo/hooks';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSetAtom } from "jotai";
+import { usePackages } from "@repo/hooks";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import sidebarStyles from './Sidebar.module.css';
-import { useVenues } from '@repo/hooks';
+import sidebarStyles from "./Sidebar.module.css";
+import { useVenues } from "@repo/hooks";
 
 //import di Icone CUSTOM
 
-import { VenueIcon } from '../customIcons';
-import { CalendarIcon } from '../customIcons';
-import { BundleIcon } from '../customIcons';
-import { ProfileIcon } from '../customIcons';
+import { VenueIcon } from "../customIcons";
+import { CalendarIcon } from "../customIcons";
+import { BundleIcon } from "../customIcons";
+import { ProfileIcon } from "../customIcons";
 
 const { Sider } = Layout;
 
@@ -32,7 +42,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ onLogout }: SidebarProps) {
-  console.log('SIDEBAR RENDER'); // DEBUG LOG
+  console.log("SIDEBAR RENDER"); // DEBUG LOG
 
   const { data } = useVenues();
   console.log(data?.venues); // DEBUG LOG
@@ -46,30 +56,37 @@ export default function Sidebar({ onLogout }: SidebarProps) {
   // Mutation per creare un nuovo pacchetto
   const createPackageMutation = useMutation({
     mutationFn: async (values: { name: string; type: string }) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/packages/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/api/packages/add`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            name: values.name,
+            type: values.type,
+            venueId: idVenue,
+          }),
         },
-        body: JSON.stringify({ name: values.name, type: values.type, venueId: idVenue }),
-      });
-      if (!res.ok) throw new Error('Errore creazione pacchetto');
+      );
+      if (!res.ok) throw new Error("Errore creazione pacchetto");
       return await res.json();
     },
-    onSuccess: data => {
+    onSuccess: (data) => {
       // Invalida la cache per aggiornare la lista
-      queryClient.invalidateQueries({ queryKey: ['packages'] });
+      queryClient.invalidateQueries({ queryKey: ["packages"] });
       // Redirect a /packages/:id
       if (data.id) {
         router.push(`/packages/${data.id}`);
       }
     },
-    onError: err => {
+    onError: (err) => {
       setToastMessage({
-        type: 'error',
-        message: 'Errore durante la creazione del pacchetto',
-        placement: 'bottomRight',
+        type: "error",
+        message: "Errore durante la creazione del pacchetto",
+        placement: "bottomRight",
       });
       console.error("Errore durante l'aggiunta del pacchetto:", err);
     },
@@ -78,21 +95,21 @@ export default function Sidebar({ onLogout }: SidebarProps) {
   // Ordina prima per tipologia (DESK prima di SALA), poi per id crescente
   const sortedPackages = [...packages].sort((a, b) => {
     if (a.type === b.type) return a.id - b.id;
-    if (a.type === 'SALA') return -1;
-    if (b.type === 'DESK') return 1;
+    if (a.type === "SALA") return -1;
+    if (b.type === "DESK") return 1;
     return 0;
   });
 
   // Debug: mostra la struttura dei pacchetti
-  console.log('Sidebar packages:', packages);
+  console.log("Sidebar packages:", packages);
   const [form] = Form.useForm();
   const router = useRouter();
   // Gestione click solo per il logout
   const handleMenuClick = ({ key }: { key: string }) => {
-    if (key === 'logout') {
+    if (key === "logout") {
       onLogout?.();
     }
-    if (key === 'addPackage') {
+    if (key === "addPackage") {
       setModalOpen(true);
     }
   };
@@ -112,59 +129,65 @@ export default function Sidebar({ onLogout }: SidebarProps) {
       // Usa la mutation per creare il pacchetto
       createPackageMutation.mutate(values);
     } catch (err) {
-      console.error('Errore nella validazione del form:', err);
+      console.error("Errore nella validazione del form:", err);
     }
   };
 
   return (
-    <Sider width={248} style={{ background: '#fff', height: '100vh' }}>
+    <Sider width={248} style={{ background: "#fff", height: "100vh" }}>
       <div
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          justifyContent: 'space-between',
-          borderRight: '1px solid #f0f0f0',
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          justifyContent: "space-between",
+          borderRight: "1px solid #f0f0f0",
         }}
       >
         <Menu
           mode="inline"
           onClick={handleMenuClick}
-          style={{ borderRight: 'none', flex: 1, overflowY: 'auto' }}
+          style={{ borderRight: "none", flex: 1, overflowY: "auto" }}
         >
           <div style={{ padding: 16 }}>
             <LogoSidebar size={48} showName={true} />
           </div>
-          <Menu.Divider style={{ margin: '8px 16px' }} />
+          <Menu.Divider style={{ margin: "8px 16px" }} />
           {/* Sezioni statiche */}
           <Menu.Item key="calendar" icon={<CalendarIcon />}>
             <Link href="/calendar">Calendario</Link>
           </Menu.Item>
-          <Menu.Divider style={{ margin: '8px 16px' }} />
+          <Menu.Divider style={{ margin: "8px 16px" }} />
           <Menu.SubMenu key="venue" icon={<VenueIcon />} title="Locale">
-            <Menu.Item key="venue-general" className={sidebarStyles['my-tab']}>
+            <Menu.Item key="venue-general" className={sidebarStyles["my-tab"]}>
               <Link href="/venue">Generali</Link>
             </Menu.Item>
-            <Menu.Item key="payments" className={sidebarStyles['my-tab']}>
+            <Menu.Item key="payments" className={sidebarStyles["my-tab"]}>
               <Link href="/payments">Pagamenti</Link>
             </Menu.Item>
 
-            <Menu.Item key="bookings" className={sidebarStyles['my-tab']}>
+            <Menu.Item key="bookings" className={sidebarStyles["my-tab"]}>
               <Link href="/bookings">Prenotazioni</Link>
             </Menu.Item>
           </Menu.SubMenu>
-          <Menu.Divider style={{ margin: '8px 16px' }} />
+          <Menu.Divider style={{ margin: "8px 16px" }} />
           {/* Pacchetti dinamici */}
           {isLoading ? (
             <Menu.Item disabled>
-              <span style={{ color: '#999' }}>Caricamento pacchetti...</span>
+              <span style={{ color: "#999" }}>Caricamento pacchetti...</span>
             </Menu.Item>
           ) : error ? (
             <Menu.Item disabled>
-              <span style={{ color: '#ff4d4f' }}>Errore caricamento pacchetti</span>
+              <span style={{ color: "#ff4d4f" }}>
+                Errore caricamento pacchetti
+              </span>
             </Menu.Item>
           ) : isEmpty ? (
-            <Menu.Item key="addPackage" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
+            <Menu.Item
+              key="addPackage"
+              icon={<PlusOutlined />}
+              onClick={() => setModalOpen(true)}
+            >
               Aggiungi Pacchetto
             </Menu.Item>
           ) : (
@@ -179,15 +202,15 @@ export default function Sidebar({ onLogout }: SidebarProps) {
                   fontWeight: 500,
                 }}
               >
-                {sortedPackages.map(pkg => (
+                {sortedPackages.map((pkg) => (
                   <Menu.Item
                     key={pkg.id}
                     style={{
                       paddingLeft: 40,
                       paddingRight: 16,
                       height: 48,
-                      display: 'flex',
-                      alignItems: 'center',
+                      display: "flex",
+                      alignItems: "center",
                       borderRadius: 16,
                       marginBottom: 5,
                     }}
@@ -195,38 +218,39 @@ export default function Sidebar({ onLogout }: SidebarProps) {
                   >
                     <div
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        width: '100%',
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        width: "100%",
                       }}
                     >
                       <span
                         style={{
                           flex: 1,
                           minWidth: 0,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
                         }}
                       >
                         {pkg.name}
                       </span>
                       <span
                         style={{
-                          whiteSpace: 'nowrap',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
+                          whiteSpace: "nowrap",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                           borderRadius: 6,
                           height: 20,
                           minWidth: 50,
-                          padding: '0px 10px',
-                          background: pkg.type === 'SALA' ? '#e6f0ff' : '#fff0f0',
-                          color: pkg.type === 'SALA' ? '#1976d2' : '#e53935',
+                          padding: "0px 10px",
+                          background:
+                            pkg.type === "SALA" ? "#e6f0ff" : "#fff0f0",
+                          color: pkg.type === "SALA" ? "#1976d2" : "#e53935",
                         }}
                       >
-                        {pkg.type === 'SALA' ? 'Room' : 'Desk'}
+                        {pkg.type === "SALA" ? "Room" : "Desk"}
                       </span>
                     </div>
                   </Menu.Item>
@@ -241,7 +265,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
               </Menu.Item>
             </>
           )}
-          <Menu.Divider style={{ margin: '8px 16px' }} />
+          <Menu.Divider style={{ margin: "8px 16px" }} />
           <Menu.SubMenu key="account" icon={<ProfileIcon />} title="Account">
             <Menu.Item key="profile">
               <Link href="/profile">Profilo</Link>
@@ -251,7 +275,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
             </Menu.Item>
             <Menu.Item key="logout">Logout</Menu.Item>
           </Menu.SubMenu>
-          <Menu.Divider style={{ margin: '8px 16px' }} />
+          <Menu.Divider style={{ margin: "8px 16px" }} />
         </Menu>
         <div
           style={{
@@ -278,21 +302,30 @@ export default function Sidebar({ onLogout }: SidebarProps) {
               onClick={() => {
                 setModalOpen(false);
               }}
-              style={{ borderColor: '#D9D9D9' }}
+              style={{ borderColor: "#D9D9D9" }}
             >
               Annulla
             </Button>
-            <PrimaryButton type="primary" style={{ color: 'white' }} onClick={handleAddPackage}>
+            <PrimaryButton
+              type="primary"
+              style={{ color: "white" }}
+              onClick={handleAddPackage}
+            >
               Aggiungi
             </PrimaryButton>
           </Space>
         }
       >
-        <Form form={form} layout="vertical" requiredMark={false} validateTrigger="onSubmit">
+        <Form
+          form={form}
+          layout="vertical"
+          requiredMark={false}
+          validateTrigger="onSubmit"
+        >
           <Form.Item
             name="name"
             label={<Typography.Text>Nome</Typography.Text>}
-            rules={[{ required: true, message: 'Inserisci il nome' }]}
+            rules={[{ required: true, message: "Inserisci il nome" }]}
             validateTrigger="onSubmit"
           >
             <Input />
@@ -300,14 +333,16 @@ export default function Sidebar({ onLogout }: SidebarProps) {
           <Form.Item
             name="type"
             label={
-              <label style={{ fontWeight: 500, marginBottom: 4, display: 'block' }}>
+              <label
+                style={{ fontWeight: 500, marginBottom: 4, display: "block" }}
+              >
                 Tipologia
               </label>
             }
-            rules={[{ required: true, message: 'Seleziona la tipologia' }]}
+            rules={[{ required: true, message: "Seleziona la tipologia" }]}
             validateTrigger="onSubmit"
           >
-            <Select style={{ width: '100%' }}>
+            <Select style={{ width: "100%" }}>
               <Select.Option value="SALA" label="Sala">
                 Sala
               </Select.Option>

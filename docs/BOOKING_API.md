@@ -250,11 +250,11 @@ Authorization: Bearer YOUR_JWT_TOKEN
 #### Esempio di Connessione
 
 ```javascript
-const eventSource = new EventSource('/venue/1/events?token=YOUR_JWT_TOKEN');
+const eventSource = new EventSource("/venue/1/events?token=YOUR_JWT_TOKEN");
 
 eventSource.onmessage = function (event) {
   const data = JSON.parse(event.data);
-  console.log('Aggiornamento prenotazione:', data);
+  console.log("Aggiornamento prenotazione:", data);
 };
 ```
 
@@ -343,19 +343,19 @@ Content-Type: application/json
 **Test Script da Aggiungere:**
 
 ```javascript
-pm.test('Status code is 201', function () {
+pm.test("Status code is 201", function () {
   pm.response.to.have.status(201);
 });
 
-pm.test('Response contains booking ID', function () {
+pm.test("Response contains booking ID", function () {
   var jsonData = pm.response.json();
-  pm.expect(jsonData).to.have.property('bookingId');
-  pm.environment.set('booking_id', jsonData.bookingId);
+  pm.expect(jsonData).to.have.property("bookingId");
+  pm.environment.set("booking_id", jsonData.bookingId);
 });
 
-pm.test('Response contains booking details', function () {
+pm.test("Response contains booking details", function () {
   var jsonData = pm.response.json();
-  pm.expect(jsonData.booking).to.have.property('status', 'PENDING');
+  pm.expect(jsonData.booking).to.have.property("status", "PENDING");
 });
 ```
 
@@ -371,15 +371,15 @@ Authorization: Bearer {{auth_token}}
 **Test Script:**
 
 ```javascript
-pm.test('Status code is 200', function () {
+pm.test("Status code is 200", function () {
   pm.response.to.have.status(200);
 });
 
-pm.test('Booking details are complete', function () {
+pm.test("Booking details are complete", function () {
   var jsonData = pm.response.json();
-  pm.expect(jsonData.booking).to.have.property('id');
-  pm.expect(jsonData.booking).to.have.property('venue');
-  pm.expect(jsonData.booking).to.have.property('package');
+  pm.expect(jsonData.booking).to.have.property("id");
+  pm.expect(jsonData.booking).to.have.property("venue");
+  pm.expect(jsonData.booking).to.have.property("package");
 });
 ```
 
@@ -395,14 +395,14 @@ Authorization: Bearer {{auth_token}}
 **Test Script:**
 
 ```javascript
-pm.test('Status code is 200', function () {
+pm.test("Status code is 200", function () {
   pm.response.to.have.status(200);
 });
 
-pm.test('Response contains bookings array', function () {
+pm.test("Response contains bookings array", function () {
   var jsonData = pm.response.json();
-  pm.expect(jsonData).to.have.property('bookings');
-  pm.expect(jsonData.bookings).to.be.an('array');
+  pm.expect(jsonData).to.have.property("bookings");
+  pm.expect(jsonData.bookings).to.be.an("array");
 });
 ```
 
@@ -418,13 +418,13 @@ Authorization: Bearer {{auth_token}}
 **Test Script:**
 
 ```javascript
-pm.test('Status code is 200', function () {
+pm.test("Status code is 200", function () {
   pm.response.to.have.status(200);
 });
 
-pm.test('Booking is cancelled', function () {
+pm.test("Booking is cancelled", function () {
   var jsonData = pm.response.json();
-  pm.expect(jsonData.booking.status).to.equal('Cancelled');
+  pm.expect(jsonData.booking.status).to.equal("Cancelled");
 });
 ```
 
@@ -471,18 +471,20 @@ Per testare gli SSE, puoi usare un client JavaScript o un tool specifico:
 
 ```javascript
 // Test client per SSE
-const eventSource = new EventSource('http://localhost:3000/venue/1/events?token=YOUR_JWT_TOKEN');
+const eventSource = new EventSource(
+  "http://localhost:3000/venue/1/events?token=YOUR_JWT_TOKEN",
+);
 
 eventSource.onopen = function (event) {
-  console.log('Connessione SSE aperta');
+  console.log("Connessione SSE aperta");
 };
 
 eventSource.onmessage = function (event) {
-  console.log('Nuovo evento ricevuto:', JSON.parse(event.data));
+  console.log("Nuovo evento ricevuto:", JSON.parse(event.data));
 };
 
 eventSource.onerror = function (event) {
-  console.error('Errore SSE:', event);
+  console.error("Errore SSE:", event);
 };
 ```
 
@@ -513,8 +515,8 @@ var now = new Date();
 var futureDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // +24 ore
 var endDate = new Date(futureDate.getTime() + 8 * 60 * 60 * 1000); // +8 ore
 
-pm.environment.set('booking_start', futureDate.toISOString());
-pm.environment.set('booking_end', endDate.toISOString());
+pm.environment.set("booking_start", futureDate.toISOString());
+pm.environment.set("booking_end", endDate.toISOString());
 ```
 
 ---

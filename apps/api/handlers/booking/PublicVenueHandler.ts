@@ -1,10 +1,10 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../../libs/prisma';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { prisma } from "../../libs/prisma";
 import {
   generateSecureVenueLogoUrl,
   generateSecureVenuePhotoUrl,
   generateSecurePackagePhotoUrl,
-} from '../../utils/secureMediaUtils';
+} from "../../utils/secureMediaUtils";
 
 interface PublicVenuesQuery {
   city?: string;
@@ -12,7 +12,7 @@ interface PublicVenuesQuery {
 
 export const getPublicVenuesHandler = async (
   request: FastifyRequest<{ Querystring: PublicVenuesQuery }>,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) => {
   try {
     const { id } = request.params as { id?: number };
@@ -32,7 +32,7 @@ export const getPublicVenuesHandler = async (
           latitude: true,
           longitude: true,
           openingDays: {
-            orderBy: [{ day: 'asc' }],
+            orderBy: [{ day: "asc" }],
             select: {
               day: true,
               isClosed: true,
@@ -63,7 +63,7 @@ export const getPublicVenuesHandler = async (
       });
 
       if (!venue) {
-        return reply.code(404).send({ message: 'Venue non trovato' });
+        return reply.code(404).send({ message: "Venue non trovato" });
       }
 
       // Genera URL proxy sicuro per il logo se esiste
@@ -72,7 +72,10 @@ export const getPublicVenuesHandler = async (
         try {
           logoURL = generateSecureVenueLogoUrl(venue.logoURL);
         } catch (error) {
-          console.warn(`Could not generate secure logo URL for venue ${venue.id}:`, error);
+          console.warn(
+            `Could not generate secure logo URL for venue ${venue.id}:`,
+            error,
+          );
           logoURL = null;
         }
       }
@@ -92,7 +95,7 @@ export const getPublicVenuesHandler = async (
     if (city) {
       whereClause.address = {
         contains: city,
-        mode: 'insensitive',
+        mode: "insensitive",
         // Case insensitive search
         //Prendi qualsiasi cosa come riscontro
       };
@@ -113,7 +116,7 @@ export const getPublicVenuesHandler = async (
         venueRatings: true,
         reviewsCounter: true,
         openingDays: {
-          orderBy: [{ day: 'asc' }],
+          orderBy: [{ day: "asc" }],
           select: {
             day: true,
             isClosed: true,
@@ -140,7 +143,7 @@ export const getPublicVenuesHandler = async (
                 rate: true,
                 price: true,
               },
-              orderBy: { price: 'asc' },
+              orderBy: { price: "asc" },
             },
           },
         },
@@ -149,38 +152,47 @@ export const getPublicVenuesHandler = async (
     });
 
     // Genera URL proxy sicuri per logos e photos
-    const venuesWithUrls = venues.map(venue => {
+    const venuesWithUrls = venues.map((venue) => {
       // Genera URL proxy sicuro per il logo
       let logoURL = null;
       if (venue.logoURL) {
         try {
           logoURL = generateSecureVenueLogoUrl(venue.logoURL);
         } catch (error) {
-          console.warn(`Could not generate logo URL for venue ${venue.id}:`, error);
+          console.warn(
+            `Could not generate logo URL for venue ${venue.id}:`,
+            error,
+          );
           logoURL = null;
         }
       }
 
       // Genera URL proxy sicuri per le photos
       const photos = venue.photos
-        .map(photo => {
+        .map((photo) => {
           try {
             return generateSecureVenuePhotoUrl(photo);
           } catch (error) {
-            console.warn(`Could not generate photo URL for venue ${venue.id}:`, error);
+            console.warn(
+              `Could not generate photo URL for venue ${venue.id}:`,
+              error,
+            );
             return null;
           }
         })
         .filter(Boolean); // Rimuovi URL null
 
       // Genera URL proxy sicuri per le photos dei packages
-      const packages = venue.packages.map(pkg => {
+      const packages = venue.packages.map((pkg) => {
         const packagePhotos = pkg.photos
-          .map(photo => {
+          .map((photo) => {
             try {
               return generateSecurePackagePhotoUrl(photo);
             } catch (error) {
-              console.warn(`Could not generate package photo URL for package ${pkg.id}:`, error);
+              console.warn(
+                `Could not generate package photo URL for package ${pkg.id}:`,
+                error,
+              );
               return null;
             }
           })
@@ -200,26 +212,26 @@ export const getPublicVenuesHandler = async (
     return reply.code(200).send({
       venues: venuesWithUrls,
       total: venuesWithUrls.length,
-      city: city || 'tutte le città',
+      city: city || "tutte le città",
     });
   } catch (error) {
-    console.error('Error in getPublicVenuesHandler:', error);
+    console.error("Error in getPublicVenuesHandler:", error);
     return reply.code(500).send({
-      error: 'Errore nel recupero dei locali',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      error: "Errore nel recupero dei locali",
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
 
 export const getPublicVenueDetailsHandler = async (
   request: FastifyRequest<{ Params: { id: string } }>,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) => {
   try {
     const venueId = parseInt(request.params.id);
 
     if (isNaN(venueId)) {
-      return reply.code(400).send({ error: 'ID venue non valido' });
+      return reply.code(400).send({ error: "ID venue non valido" });
     }
 
     const venue = await prisma.venue.findFirst({
@@ -252,7 +264,7 @@ export const getPublicVenueDetailsHandler = async (
             isClosed: true,
             periods: true,
           },
-          orderBy: { day: 'asc' },
+          orderBy: { day: "asc" },
         },
         closingPeriods: {
           where: {
@@ -288,7 +300,7 @@ export const getPublicVenueDetailsHandler = async (
                 rate: true,
                 price: true,
               },
-              orderBy: { price: 'asc' },
+              orderBy: { price: "asc" },
             },
           },
         },
@@ -296,7 +308,7 @@ export const getPublicVenueDetailsHandler = async (
     });
 
     if (!venue) {
-      return reply.code(404).send({ error: 'Locale non trovato' });
+      return reply.code(404).send({ error: "Locale non trovato" });
     }
 
     // Genera URL proxy sicuri
@@ -305,29 +317,38 @@ export const getPublicVenueDetailsHandler = async (
       try {
         logoURL = generateSecureVenueLogoUrl(venue.logoURL);
       } catch (error) {
-        console.warn(`Could not generate logo URL for venue ${venue.id}:`, error);
+        console.warn(
+          `Could not generate logo URL for venue ${venue.id}:`,
+          error,
+        );
         logoURL = null;
       }
     }
 
     const photos = venue.photos
-      .map(photo => {
+      .map((photo) => {
         try {
           return generateSecureVenuePhotoUrl(photo);
         } catch (error) {
-          console.warn(`Could not generate photo URL for venue ${venue.id}:`, error);
+          console.warn(
+            `Could not generate photo URL for venue ${venue.id}:`,
+            error,
+          );
           return null;
         }
       })
       .filter(Boolean); // Rimuovi URL null
 
-    const packages = venue.packages.map(pkg => {
+    const packages = venue.packages.map((pkg) => {
       const packagePhotos = pkg.photos
-        .map(photo => {
+        .map((photo) => {
           try {
             return generateSecurePackagePhotoUrl(photo);
           } catch (error) {
-            console.warn(`Could not generate package photo URL for package ${pkg.id}:`, error);
+            console.warn(
+              `Could not generate package photo URL for package ${pkg.id}:`,
+              error,
+            );
             return null;
           }
         })
@@ -345,10 +366,10 @@ export const getPublicVenueDetailsHandler = async (
       },
     });
   } catch (error) {
-    console.error('Error in getPublicVenueDetailsHandler:', error);
+    console.error("Error in getPublicVenueDetailsHandler:", error);
     return reply.code(500).send({
-      error: 'Errore nel recupero del locale',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      error: "Errore nel recupero del locale",
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };

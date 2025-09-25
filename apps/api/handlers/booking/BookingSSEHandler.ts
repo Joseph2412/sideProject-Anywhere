@@ -1,11 +1,11 @@
-import { FastifyReply } from 'fastify';
+import { FastifyReply } from "fastify";
 
 // Map per tenere traccia dei client SSE per ogni venue
 // Key: venueId, Value: Set di FastifyReply objects
 const clients = new Map<number, Set<FastifyReply>>();
 
 export interface BookingSSEData {
-  type: 'created' | 'deleted' | 'heartbeat';
+  type: "created" | "deleted" | "heartbeat";
   booking?: any;
   timestamp: string;
   venueId: number;
@@ -27,17 +27,17 @@ export function addSSEClient(venueId: number, reply: FastifyReply): void {
 
   // Configura headers SSE
   reply.raw.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    Connection: 'keep-alive',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
-    'Access-Control-Allow-Methods': 'GET',
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Authorization, Content-Type",
+    "Access-Control-Allow-Methods": "GET",
   });
 
   // Invia messaggio di connessione iniziale
   const welcomeMessage: BookingSSEData = {
-    type: 'heartbeat',
+    type: "heartbeat",
     timestamp: new Date().toISOString(),
     venueId,
   };
@@ -48,7 +48,7 @@ export function addSSEClient(venueId: number, reply: FastifyReply): void {
   const heartbeatInterval = setInterval(() => {
     try {
       const heartbeat: BookingSSEData = {
-        type: 'heartbeat',
+        type: "heartbeat",
         timestamp: new Date().toISOString(),
         venueId,
       };
@@ -61,7 +61,7 @@ export function addSSEClient(venueId: number, reply: FastifyReply): void {
   }, 30000);
 
   // Cleanup quando il client si disconnette
-  reply.raw.on('close', () => {
+  reply.raw.on("close", () => {
     clearInterval(heartbeatInterval);
     venueClients.delete(reply);
 
@@ -71,18 +71,18 @@ export function addSSEClient(venueId: number, reply: FastifyReply): void {
     }
 
     console.log(
-      `📱 SSE Client disconnesso per venue ${venueId}. Clients rimasti: ${venueClients.size}`
+      `📱 SSE Client disconnesso per venue ${venueId}. Clients rimasti: ${venueClients.size}`,
     );
   });
 
-  reply.raw.on('error', (error: Error) => {
+  reply.raw.on("error", (error: Error) => {
     console.error(`❌ Errore SSE per venue ${venueId}:`, error);
     clearInterval(heartbeatInterval);
     venueClients.delete(reply);
   });
 
   console.log(
-    `📱 Nuovo SSE Client connesso per venue ${venueId}. Clients totali: ${venueClients.size}`
+    `📱 Nuovo SSE Client connesso per venue ${venueId}. Clients totali: ${venueClients.size}`,
   );
 }
 
@@ -94,13 +94,15 @@ export function addSSEClient(venueId: number, reply: FastifyReply): void {
  */
 export function notifyBookingChange(
   venueId: number,
-  type: 'created' | 'deleted',
-  booking?: any
+  type: "created" | "deleted",
+  booking?: any,
 ): void {
   const venueClients = clients.get(venueId);
 
   if (!venueClients || venueClients.size === 0) {
-    console.log(`📭 Nessun client SSE per venue ${venueId} - notifica ignorata`);
+    console.log(
+      `📭 Nessun client SSE per venue ${venueId} - notifica ignorata`,
+    );
     return;
   }
 
@@ -115,22 +117,25 @@ export function notifyBookingChange(
   const clientsToRemove: FastifyReply[] = [];
 
   // Invia il messaggio a tutti i client connessi per questo venue
-  venueClients.forEach(client => {
+  venueClients.forEach((client) => {
     try {
       client.raw.write(`data: ${messageString}\n\n`);
     } catch (error) {
-      console.error(`❌ Errore invio SSE a client per venue ${venueId}:`, error);
+      console.error(
+        `❌ Errore invio SSE a client per venue ${venueId}:`,
+        error,
+      );
       clientsToRemove.push(client);
     }
   });
 
   // Rimuovi i client con errori
-  clientsToRemove.forEach(client => {
+  clientsToRemove.forEach((client) => {
     venueClients.delete(client);
   });
 
   console.log(
-    `📢 Notifica SSE inviata a ${venueClients.size} client(s) per venue ${venueId}: ${type.toUpperCase()}`
+    `📢 Notifica SSE inviata a ${venueClients.size} client(s) per venue ${venueId}: ${type.toUpperCase()}`,
   );
 }
 
@@ -150,7 +155,7 @@ export function getConnectedClientsCount(venueId: number): number {
  */
 export function getTotalConnectedClients(): number {
   let total = 0;
-  clients.forEach(venueClients => {
+  clients.forEach((venueClients) => {
     total += venueClients.size;
   });
   return total;
@@ -161,7 +166,7 @@ export function getTotalConnectedClients(): number {
  */
 export function closeAllSSEConnections(): void {
   clients.forEach((venueClients, venueId) => {
-    venueClients.forEach(client => {
+    venueClients.forEach((client) => {
       try {
         client.raw.end();
       } catch (error) {
@@ -171,5 +176,5 @@ export function closeAllSSEConnections(): void {
   });
 
   clients.clear();
-  console.log('🔌 Tutte le connessioni SSE chiuse');
+  console.log("🔌 Tutte le connessioni SSE chiuse");
 }

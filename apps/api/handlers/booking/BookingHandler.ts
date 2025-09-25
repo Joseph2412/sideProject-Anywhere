@@ -1,6 +1,6 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../../libs/prisma';
-import { notifyBookingChange } from './BookingSSEHandler';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { prisma } from "../../libs/prisma";
+import { notifyBookingChange } from "./BookingSSEHandler";
 
 interface ExternalBookingBody {
   venueId: number;
@@ -18,7 +18,10 @@ interface ExternalBookingBody {
 }
 
 // Handler unificato per prenotazioni esterne (da altra app)
-export const createNewBooking = async (request: FastifyRequest, reply: FastifyReply) => {
+export const createNewBooking = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   try {
     const body = request.body as ExternalBookingBody;
     const venueId = Number(body.venueId);
@@ -28,62 +31,84 @@ export const createNewBooking = async (request: FastifyRequest, reply: FastifyRe
     const { start, end, customerInfo } = body;
 
     // 🔍 DEBUG: Aggiungi questi log
-    console.log('========== DEBUG BOOKING ==========');
-    console.log('📋 Body ricevuto:', JSON.stringify(body, null, 2));
-    console.log('🔢 Parametri convertiti:');
-    console.log('  venueId:', venueId, 'type:', typeof venueId);
-    console.log('  packageId:', packageId, 'type:', typeof packageId);
-    console.log('  userId:', userId, 'type:', typeof userId);
-    console.log('===================================');
+    console.log("========== DEBUG BOOKING ==========");
+    console.log("📋 Body ricevuto:", JSON.stringify(body, null, 2));
+    console.log("🔢 Parametri convertiti:");
+    console.log("  venueId:", venueId, "type:", typeof venueId);
+    console.log("  packageId:", packageId, "type:", typeof packageId);
+    console.log("  userId:", userId, "type:", typeof userId);
+    console.log("===================================");
 
     if (isNaN(venueId) || isNaN(packageId) || isNaN(people) || isNaN(userId)) {
-      console.log('❌ Errore: Parametri numerici non validi');
-      return reply.code(400).send({ error: 'Parametri numerici non validi' });
+      console.log("❌ Errore: Parametri numerici non validi");
+      return reply.code(400).send({ error: "Parametri numerici non validi" });
     }
 
     // Validazione input
-    if (!venueId || !packageId || !start || !end || !people || !userId || !customerInfo) {
-      console.log('❌ Errore: Campi obbligatori mancanti');
-      return reply.code(400).send({ error: 'Tutti i campi sono obbligatori' });
+    if (
+      !venueId ||
+      !packageId ||
+      !start ||
+      !end ||
+      !people ||
+      !userId ||
+      !customerInfo
+    ) {
+      console.log("❌ Errore: Campi obbligatori mancanti");
+      return reply.code(400).send({ error: "Tutti i campi sono obbligatori" });
     }
 
-    if (!customerInfo.firstName || !customerInfo.lastName || !customerInfo.email) {
-      console.log('❌ Errore: Informazioni cliente incomplete');
-      return reply.code(400).send({ error: 'Informazioni cliente incomplete' });
+    if (
+      !customerInfo.firstName ||
+      !customerInfo.lastName ||
+      !customerInfo.email
+    ) {
+      console.log("❌ Errore: Informazioni cliente incomplete");
+      return reply.code(400).send({ error: "Informazioni cliente incomplete" });
     }
 
     // Verifica che l'utente esista (userId dall'altra app)
-    console.log('🔍 Cerco utente con ID:', userId);
+    console.log("🔍 Cerco utente con ID:", userId);
     const existingUser = await prisma.user.findUnique({
       where: { id: userId },
     });
 
-    console.log('👤 Utente trovato:', !!existingUser);
+    console.log("👤 Utente trovato:", !!existingUser);
     if (existingUser) {
-      console.log('👤 Dettagli utente:', { id: existingUser.id, email: existingUser.email });
+      console.log("👤 Dettagli utente:", {
+        id: existingUser.id,
+        email: existingUser.email,
+      });
     }
 
     if (!existingUser) {
-      console.log('❌ Utente non trovato nel database');
-      return reply.code(404).send({ error: 'Utente non trovato' });
+      console.log("❌ Utente non trovato nel database");
+      return reply.code(404).send({ error: "Utente non trovato" });
     }
 
     // 🔍 DEBUG: Controlla venue e package separatamente
-    console.log('🏢 Cerco venue con ID:', venueId);
-    const venueCheck = await prisma.venue.findUnique({ where: { id: venueId } });
+    console.log("🏢 Cerco venue con ID:", venueId);
+    const venueCheck = await prisma.venue.findUnique({
+      where: { id: venueId },
+    });
 
-    console.log('📦 Cerco package con ID:', packageId);
-    const packageCheck = await prisma.package.findUnique({ where: { id: packageId } });
+    console.log("📦 Cerco package con ID:", packageId);
+    const packageCheck = await prisma.package.findUnique({
+      where: { id: packageId },
+    });
 
-    console.log('🏢 Venue esiste:', !!venueCheck);
-    console.log('📦 Package esiste:', !!packageCheck);
+    console.log("🏢 Venue esiste:", !!venueCheck);
+    console.log("📦 Package esiste:", !!packageCheck);
 
     if (venueCheck) {
-      console.log('🏢 Venue details:', { id: venueCheck.id, name: venueCheck.name });
+      console.log("🏢 Venue details:", {
+        id: venueCheck.id,
+        name: venueCheck.name,
+      });
     }
 
     if (packageCheck) {
-      console.log('📦 Package details:', {
+      console.log("📦 Package details:", {
         id: packageCheck.id,
         name: packageCheck.name,
         isActive: packageCheck.isActive,
@@ -92,12 +117,12 @@ export const createNewBooking = async (request: FastifyRequest, reply: FastifyRe
     }
 
     // 🔍 DEBUG: Controlla i plans del package
-    console.log('🎯 Cerco plans per package ID:', packageId);
+    console.log("🎯 Cerco plans per package ID:", packageId);
     const plansCheck = await prisma.packagePlan.findMany({
       where: { packageId: packageId },
     });
 
-    console.log('🎯 Plans totali trovati:', plansCheck.length);
+    console.log("🎯 Plans totali trovati:", plansCheck.length);
 
     if (plansCheck.length > 0) {
       plansCheck.forEach((plan, index) => {
@@ -109,11 +134,11 @@ export const createNewBooking = async (request: FastifyRequest, reply: FastifyRe
         });
       });
     } else {
-      console.log('❌ NESSUN PLAN TROVATO per questo package!');
+      console.log("❌ NESSUN PLAN TROVATO per questo package!");
     }
 
     // Verifica esistenza venue e package
-    console.log('🔗 Cerco venue con package collegato...');
+    console.log("🔗 Cerco venue con package collegato...");
     const venue = await prisma.venue.findFirst({
       where: {
         id: venueId,
@@ -133,7 +158,7 @@ export const createNewBooking = async (request: FastifyRequest, reply: FastifyRe
           include: {
             plans: {
               where: { isEnabled: true },
-              orderBy: { price: 'asc' },
+              orderBy: { price: "asc" },
             },
           },
         },
@@ -141,7 +166,7 @@ export const createNewBooking = async (request: FastifyRequest, reply: FastifyRe
     });
 
     if (!venue || !venue.packages.length) {
-      return reply.code(404).send({ error: 'Venue o package non trovato' });
+      return reply.code(404).send({ error: "Venue o package non trovato" });
     }
 
     const selectedPackage = venue.packages[0];
@@ -159,18 +184,20 @@ export const createNewBooking = async (request: FastifyRequest, reply: FastifyRe
 
     if (startDate >= endDate) {
       return reply.code(400).send({
-        error: 'Data di fine deve essere successiva a quella di inizio',
+        error: "Data di fine deve essere successiva a quella di inizio",
       });
     }
 
     if (startDate < new Date()) {
-      return reply.code(400).send({ error: 'Non è possibile prenotare nel passato' });
+      return reply
+        .code(400)
+        .send({ error: "Non è possibile prenotare nel passato" });
     }
 
     const conflictingBookings = await prisma.booking.count({
       where: {
         packageId,
-        status: { in: ['reserved', 'PENDING', 'CONFIRMED'] },
+        status: { in: ["reserved", "PENDING", "CONFIRMED"] },
         OR: [
           {
             start: { lte: startDate },
@@ -190,7 +217,7 @@ export const createNewBooking = async (request: FastifyRequest, reply: FastifyRe
 
     if (conflictingBookings > 0) {
       return reply.code(409).send({
-        error: 'Slot temporale non disponibile per il periodo selezionato',
+        error: "Slot temporale non disponibile per il periodo selezionato",
       });
     }
 
@@ -203,7 +230,7 @@ export const createNewBooking = async (request: FastifyRequest, reply: FastifyRe
         start: startDate,
         end: endDate,
         people,
-        status: 'PENDING', // Le prenotazioni esterne iniziano come PENDING
+        status: "PENDING", // Le prenotazioni esterne iniziano come PENDING
         costumerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
         costumerEmail: customerInfo.email,
         createdAt: new Date(),
@@ -220,10 +247,10 @@ export const createNewBooking = async (request: FastifyRequest, reply: FastifyRe
     });
 
     // 🔥 Invia notifica SSE per aggiornamenti in tempo reale
-    notifyBookingChange(venueId, 'created', newBooking);
+    notifyBookingChange(venueId, "created", newBooking);
 
     return reply.code(201).send({
-      message: 'Prenotazione creata con successo',
+      message: "Prenotazione creata con successo",
       bookingId: newBooking.id,
       booking: {
         id: newBooking.id,
@@ -240,22 +267,25 @@ export const createNewBooking = async (request: FastifyRequest, reply: FastifyRe
       },
     });
   } catch (error) {
-    console.error('Error in createNewBooking:', error);
+    console.error("Error in createNewBooking:", error);
     return reply.code(500).send({
-      error: 'Errore nella creazione della prenotazione',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      error: "Errore nella creazione della prenotazione",
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
 
 // Handler per cancellare prenotazioni
-export const deleteBooking = async (request: FastifyRequest, reply: FastifyReply) => {
+export const deleteBooking = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   try {
     const { id } = request.params as { id: string };
     const bookingId = parseInt(id);
 
     if (isNaN(bookingId)) {
-      return reply.code(400).send({ error: 'ID prenotazione non valido' });
+      return reply.code(400).send({ error: "ID prenotazione non valido" });
     }
 
     // Trova la prenotazione
@@ -268,7 +298,7 @@ export const deleteBooking = async (request: FastifyRequest, reply: FastifyReply
     });
 
     if (!booking) {
-      return reply.code(404).send({ error: 'Prenotazione non trovata' });
+      return reply.code(404).send({ error: "Prenotazione non trovata" });
     }
 
     // Verifica se è cancellabile (es: almeno 24h prima)
@@ -279,7 +309,8 @@ export const deleteBooking = async (request: FastifyRequest, reply: FastifyReply
 
     if (hoursDiff < 24) {
       return reply.code(400).send({
-        error: 'Non è possibile cancellare prenotazioni con meno di 24 ore di anticipo',
+        error:
+          "Non è possibile cancellare prenotazioni con meno di 24 ore di anticipo",
       });
     }
 
@@ -287,7 +318,7 @@ export const deleteBooking = async (request: FastifyRequest, reply: FastifyReply
     const cancelledBooking = await prisma.booking.update({
       where: { id: bookingId },
       data: {
-        status: 'Cancelled',
+        status: "Cancelled",
         updatedAt: new Date(),
       },
       include: {
@@ -297,29 +328,32 @@ export const deleteBooking = async (request: FastifyRequest, reply: FastifyReply
     });
 
     // 🔥 Invia notifica SSE per aggiornamenti in tempo reale
-    notifyBookingChange(booking.venueId, 'deleted', cancelledBooking);
+    notifyBookingChange(booking.venueId, "deleted", cancelledBooking);
 
     return reply.code(200).send({
-      message: 'Prenotazione cancellata con successo',
+      message: "Prenotazione cancellata con successo",
       booking: cancelledBooking,
     });
   } catch (error) {
-    console.error('Error in deleteBooking:', error);
+    console.error("Error in deleteBooking:", error);
     return reply.code(500).send({
-      error: 'Errore nella cancellazione della prenotazione',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      error: "Errore nella cancellazione della prenotazione",
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
 
 // Handler per ottenere dettagli di una prenotazione
-export const getBookingDetails = async (request: FastifyRequest, reply: FastifyReply) => {
+export const getBookingDetails = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   try {
     const { id } = request.params as { id: string };
     const bookingId = parseInt(id);
 
     if (isNaN(bookingId)) {
-      return reply.code(400).send({ error: 'ID prenotazione non valido' });
+      return reply.code(400).send({ error: "ID prenotazione non valido" });
     }
 
     const booking = await prisma.booking.findUnique({
@@ -343,20 +377,23 @@ export const getBookingDetails = async (request: FastifyRequest, reply: FastifyR
     });
 
     if (!booking) {
-      return reply.code(404).send({ error: 'Prenotazione non trovata' });
+      return reply.code(404).send({ error: "Prenotazione non trovata" });
     }
 
     return reply.code(200).send({ booking });
   } catch (error) {
-    console.error('Error in getBookingDetails:', error);
+    console.error("Error in getBookingDetails:", error);
     return reply.code(500).send({
-      error: 'Errore nel recupero della prenotazione',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      error: "Errore nel recupero della prenotazione",
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
 
-export const getVenueBookings = async (request: FastifyRequest, reply: FastifyReply) => {
+export const getVenueBookings = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   try {
     const { venueId } = request.params as { venueId: string };
     const {
@@ -382,26 +419,42 @@ export const getVenueBookings = async (request: FastifyRequest, reply: FastifyRe
     });
 
     // Debug logs per diagnosticare il problema
-    console.log('🔍 Authorization Debug:');
-    console.log('Requested venueId:', venueId, 'type:', typeof venueId);
-    console.log('Parsed venueId:', parseInt(venueId), 'type:', typeof parseInt(venueId));
-    console.log('User from JWT:', { id: request.user.id, email: request.user.email });
-    console.log('User from DB:', user ? { id: user.id, email: user.email } : 'NULL');
+    console.log("🔍 Authorization Debug:");
+    console.log("Requested venueId:", venueId, "type:", typeof venueId);
     console.log(
-      'User venue from DB:',
-      user?.venue ? { id: user.venue.id, name: user.venue.name } : 'NO VENUE'
+      "Parsed venueId:",
+      parseInt(venueId),
+      "type:",
+      typeof parseInt(venueId),
     );
-    console.log('Match check:', user?.venue?.id === parseInt(venueId));
+    console.log("User from JWT:", {
+      id: request.user.id,
+      email: request.user.email,
+    });
+    console.log(
+      "User from DB:",
+      user ? { id: user.id, email: user.email } : "NULL",
+    );
+    console.log(
+      "User venue from DB:",
+      user?.venue ? { id: user.venue.id, name: user.venue.name } : "NO VENUE",
+    );
+    console.log("Match check:", user?.venue?.id === parseInt(venueId));
 
     if (!user?.venue?.id || user.venue.id !== parseInt(venueId)) {
-      console.log('❌ Authorization failed - user not owner of venue');
-      console.log('❌ Possible issues:');
-      console.log('  - User has no venue assigned:', !user?.venue?.id);
-      console.log('  - User venue ID mismatch:', user?.venue?.id !== parseInt(venueId));
-      return reply.code(403).send({ error: 'Non autorizzato per questa venue' });
+      console.log("❌ Authorization failed - user not owner of venue");
+      console.log("❌ Possible issues:");
+      console.log("  - User has no venue assigned:", !user?.venue?.id);
+      console.log(
+        "  - User venue ID mismatch:",
+        user?.venue?.id !== parseInt(venueId),
+      );
+      return reply
+        .code(403)
+        .send({ error: "Non autorizzato per questa venue" });
     }
 
-    console.log('✅ Authorization passed - user owns venue');
+    console.log("✅ Authorization passed - user owns venue");
 
     const whereClause: any = { venueId: parseInt(venueId) };
     if (status) {
@@ -418,7 +471,7 @@ export const getVenueBookings = async (request: FastifyRequest, reply: FastifyRe
           select: { id: true, name: true },
         },
       },
-      orderBy: { start: 'desc' },
+      orderBy: { start: "desc" },
       take: limit,
       skip: offset,
     });
@@ -432,16 +485,19 @@ export const getVenueBookings = async (request: FastifyRequest, reply: FastifyRe
       offset,
     });
   } catch (error) {
-    console.error('Error in getVenueBookings:', error);
+    console.error("Error in getVenueBookings:", error);
     return reply.code(500).send({
-      error: 'Errore nel recupero delle prenotazioni',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      error: "Errore nel recupero delle prenotazioni",
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
 
 // Nuovo handler che usa automaticamente il venue dell'utente autenticato
-export const getMyVenueBookings = async (request: FastifyRequest, reply: FastifyReply) => {
+export const getMyVenueBookings = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   try {
     const {
       status,
@@ -465,20 +521,28 @@ export const getMyVenueBookings = async (request: FastifyRequest, reply: Fastify
       },
     });
 
-    console.log('🔍 My Venue Bookings Debug:');
-    console.log('User from JWT:', { id: request.user.id, email: request.user.email });
-    console.log('User from DB:', user ? { id: user.id, email: user.email } : 'NULL');
+    console.log("🔍 My Venue Bookings Debug:");
+    console.log("User from JWT:", {
+      id: request.user.id,
+      email: request.user.email,
+    });
     console.log(
-      'User venue from DB:',
-      user?.venue ? { id: user.venue.id, name: user.venue.name } : 'NO VENUE'
+      "User from DB:",
+      user ? { id: user.id, email: user.email } : "NULL",
+    );
+    console.log(
+      "User venue from DB:",
+      user?.venue ? { id: user.venue.id, name: user.venue.name } : "NO VENUE",
     );
 
     if (!user?.venue?.id) {
-      console.log('❌ User has no venue assigned');
-      return reply.code(404).send({ error: 'Utente non ha un venue associato' });
+      console.log("❌ User has no venue assigned");
+      return reply
+        .code(404)
+        .send({ error: "Utente non ha un venue associato" });
     }
 
-    console.log('✅ User owns venue:', user.venue.id);
+    console.log("✅ User owns venue:", user.venue.id);
 
     const whereClause: any = { venueId: user.venue.id };
     if (status) {
@@ -495,7 +559,7 @@ export const getMyVenueBookings = async (request: FastifyRequest, reply: Fastify
           select: { id: true, name: true },
         },
       },
-      orderBy: { start: 'desc' },
+      orderBy: { start: "desc" },
       take: limit,
       skip: offset,
     });
@@ -509,10 +573,10 @@ export const getMyVenueBookings = async (request: FastifyRequest, reply: Fastify
       offset,
     });
   } catch (error) {
-    console.error('Error in getMyVenueBookings:', error);
+    console.error("Error in getMyVenueBookings:", error);
     return reply.code(500).send({
-      error: 'Errore nel recupero delle prenotazioni',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      error: "Errore nel recupero delle prenotazioni",
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };

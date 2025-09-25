@@ -1,13 +1,16 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../../libs/prisma';
-import { Prisma } from '@repo/database';
-import { generateSecureMediaUrl } from './../../utils/secureMediaUtils';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { prisma } from "../../libs/prisma";
+import { Prisma } from "@repo/database";
+import { generateSecureMediaUrl } from "./../../utils/secureMediaUtils";
 
-export const profileHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+export const profileHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   const auth = request.user as {
     id: number;
     email: string;
-    role: 'USER' | 'HOST';
+    role: "USER" | "HOST";
     name?: string;
   };
 
@@ -21,7 +24,7 @@ export const profileHandler = async (request: FastifyRequest, reply: FastifyRepl
   });
 
   if (!user) {
-    return reply.code(404).send({ message: 'Profilo non trovato' });
+    return reply.code(404).send({ message: "Profilo non trovato" });
   }
 
   // Genera URL proxy sicuro per l'avatar se esiste
@@ -30,7 +33,10 @@ export const profileHandler = async (request: FastifyRequest, reply: FastifyRepl
     try {
       avatarUrl = generateSecureMediaUrl(user.avatarUrl);
     } catch (error) {
-      console.warn(`Could not generate secure avatar URL for user ${user.id}:`, error);
+      console.warn(
+        `Could not generate secure avatar URL for user ${user.id}:`,
+        error,
+      );
       avatarUrl = null;
     }
   }
@@ -49,7 +55,10 @@ export const profileHandler = async (request: FastifyRequest, reply: FastifyRepl
   });
 };
 
-export const updateProfileHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+export const updateProfileHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   const { firstName, lastName, avatarUrl, preferences } = request.body as {
     firstName: string;
     lastName: string;
@@ -60,7 +69,7 @@ export const updateProfileHandler = async (request: FastifyRequest, reply: Fasti
   const userId = request.user?.id;
 
   if (!userId) {
-    return reply.code(401).send({ error: 'Non Autorizzato' });
+    return reply.code(401).send({ error: "Non Autorizzato" });
   }
 
   try {
@@ -77,7 +86,7 @@ export const updateProfileHandler = async (request: FastifyRequest, reply: Fasti
 
     return reply.code(200).send({ success: true, user: updatedUser });
   } catch (error) {
-    console.error('Errore aggiornamento profilo:', error);
-    return reply.code(500).send({ error: 'Errore interno del server' });
+    console.error("Errore aggiornamento profilo:", error);
+    return reply.code(500).send({ error: "Errore interno del server" });
   }
 };

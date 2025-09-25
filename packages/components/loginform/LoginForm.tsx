@@ -1,18 +1,18 @@
 // 'use client' - Next.js: componente client
-'use client';
+"use client";
 
 // Librerie esterne
-import { Form, Button, Divider } from 'antd';
+import { Form, Button, Divider } from "antd";
 // React hooks
-import { useState } from 'react';
+import { useState } from "react";
 
 // Import interni e stili
-import styles from './LoginForm.module.css';
-import { NibolInput } from '../inputs/Input';
-import { PrimaryButton } from '../buttons/PrimaryButton';
-import { GoogleLoginButton } from '../buttons/GoogleLoginButton';
-import { useSetAtom } from 'jotai';
-import { messageToast } from '@repo/ui/store/LayoutStore';
+import styles from "./LoginForm.module.css";
+import { NibolInput } from "../inputs/Input";
+import { PrimaryButton } from "../buttons/PrimaryButton";
+import { GoogleLoginButton } from "../buttons/GoogleLoginButton";
+import { useSetAtom } from "jotai";
+import { messageToast } from "@repo/ui/store/LayoutStore";
 
 // Tipi TypeScript
 type LoginResponse = {
@@ -29,14 +29,17 @@ type LoginResponse = {
 const endPoint = process.env.NEXT_PUBLIC_API_HOST;
 
 // Funzione login utente: chiama backend Fastify, ritorna JWT e dati utente
-const userLogin = async (email: string, password: string): Promise<LoginResponse> => {
+const userLogin = async (
+  email: string,
+  password: string,
+): Promise<LoginResponse> => {
   // CHIAMATA HTTP POST al nostro backend
-  const res = await fetch(endPoint + '/auth/login', {
-    method: 'POST', // POST perché stiamo inviando dati sensibili
+  const res = await fetch(endPoint + "/auth/login", {
+    method: "POST", // POST perché stiamo inviando dati sensibili
     headers: {
-      'Content-Type': 'application/json', // Diciamo al server che inviamo JSON
+      "Content-Type": "application/json", // Diciamo al server che inviamo JSON
     },
-    credentials: 'include', // Include cookie per gestione sessioni cross-origin
+    credentials: "include", // Include cookie per gestione sessioni cross-origin
     body: JSON.stringify({ email, password }), // Converte oggetto JS in stringa JSON
   });
 
@@ -161,35 +164,38 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
 
       // STEP 4: Salvataggio token per richieste future
       // localStorage - accessibile da JavaScript per header Authorization
-      localStorage.setItem('token', response.token);
+      localStorage.setItem("token", response.token);
       // Cookie - incluso automaticamente nelle richieste HTTP
       document.cookie = `token=${response.token}; path=/`;
 
       // STEP 5: Verifica accesso area protetta per validare token
       // Questo assicura che il token funzioni prima di dichiarare successo
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/user/profile`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${response.token}`, // Standard JWT authentication
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/user/profile`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${response.token}`, // Standard JWT authentication
+          },
         },
-      });
+      );
 
       // Parsing risposta della verifica accesso
       const userData = await res.json();
 
       // Se verifica accesso fallisce, trattiamo come errore login
       if (!res.ok) {
-        throw new Error(userData.message || userData.error || 'Accesso Negato');
+        throw new Error(userData.message || userData.error || "Accesso Negato");
       }
 
       // STEP 6: SUCCESS - Login completato con successo!
       // Mostra notifica toast di successo all'utente
       setMessage({
-        type: 'success',
-        message: 'Login effettuato!',
-        description: 'Accesso Area Personale OK',
+        type: "success",
+        message: "Login effettuato!",
+        description: "Accesso Area Personale OK",
         duration: 3, // secondi di visualizzazione
-        placement: 'bottomRight', // posizione toast
+        placement: "bottomRight", // posizione toast
       });
 
       //  Informa il componente padre che login è riuscito
@@ -202,7 +208,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
         // L'utente vedrà il messaggio di errore sotto l'input password
         form.setFields([
           {
-            name: 'password', // Campo specifico dove mostrare l'errore
+            name: "password", // Campo specifico dove mostrare l'errore
             errors: [err.message], // Array di messaggi di errore
           },
         ]);
@@ -246,7 +252,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
 
     try {
       // Valida SOLO il campo email, ignora altri campi del form
-      const values = await form.validateFields(['email']);
+      const values = await form.validateFields(["email"]);
       email = values.email;
     } catch {
       // EARLY RETURN: Se email non valida, fermati qui
@@ -261,9 +267,9 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
 
       // STEP 2: Richiesta reset password al backend
       const res = await fetch(`${endPoint}/auth/resetPassword`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }), // Invia solo email
       });
@@ -273,36 +279,37 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
 
       // STEP 3: Gestione errori (email non trovata, server down, etc.)
       if (!res.ok) {
-        console.warn('Reset password fallita:', data); // Log per debugging
+        console.warn("Reset password fallita:", data); // Log per debugging
         setMessage({
-          type: 'error',
-          message: 'Errore durante il reset password',
-          description: data.message || data.error || 'Email non Presente in Database.',
+          type: "error",
+          message: "Errore durante il reset password",
+          description:
+            data.message || data.error || "Email non Presente in Database.",
           duration: 4, // Errori mostrati più a lungo per leggibilità
-          placement: 'bottomRight',
+          placement: "bottomRight",
         });
         return; // Ferma esecuzione qui
       }
 
       // STEP 4: SUCCESS - Email inviata!
       setMessage({
-        type: 'success',
-        message: 'Email inviata!',
+        type: "success",
+        message: "Email inviata!",
         description: `Abbiamo inviato una mail all'indirizzo ${email} con le istruzioni per resettare la tua Password. Controlla la SPAM per sicurezza!`,
         duration: 4, // Messaggio importante, mostrato più a lungo
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     } catch (err) {
       // STEP 5: Gestione errori di rete o parsing
-      console.error('Errore Reset Password:', err);
+      console.error("Errore Reset Password:", err);
 
       if (err instanceof Error) {
         setMessage({
-          type: 'error',
+          type: "error",
           message: "Errore durante l'invio dell'email",
           description: err.message,
           duration: 4,
-          placement: 'bottomRight',
+          placement: "bottomRight",
         });
       }
     } finally {
@@ -324,7 +331,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
             <b>Accedi per gestire il tuo locale su Nibol</b>
           </div>
 
-          <Form form={form} layout="vertical" style={{ width: '100%' }}>
+          <Form form={form} layout="vertical" style={{ width: "100%" }}>
             <NibolInput
               validateTrigger="onSubmit" // Valida solo al submit, non ad ogni keystroke
               label="Email"
@@ -335,8 +342,8 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
               className={styles.input} // Stili custom dal CSS module
               rules={[
                 // Regole di validazione Ant Design
-                { required: true, message: 'Inserisci la tua email' },
-                { type: 'email', message: 'Email non valida' }, // Regex automatica email
+                { required: true, message: "Inserisci la tua email" },
+                { type: "email", message: "Email non valida" }, // Regex automatica email
               ]}
             />
 
@@ -347,7 +354,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
               hideAsterisk={true}
               className={styles.input}
               style={{ height: 32 }}
-              rules={[{ required: true, message: 'Inserisci la password' }]}
+              rules={[{ required: true, message: "Inserisci la password" }]}
               password // Prop custom per mostrare/nascondere password
             />
 
@@ -363,7 +370,7 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
               <Divider
                 plain // Stile semplice senza bordi
                 className={styles.orDivider}
-                style={{ marginTop: '0px', marginBottom: '8px' }}
+                style={{ marginTop: "0px", marginBottom: "8px" }}
               >
                 OR
               </Divider>
@@ -378,11 +385,11 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
 
         <div
           style={{
-            marginTop: '8px',
-            display: 'flex',
-            flexDirection: 'column', // Stack verticale
-            alignItems: 'center', // Centrati orizzontalmente
-            gap: '0px', // Nessuno spazio tra bottoni per design compatto
+            marginTop: "8px",
+            display: "flex",
+            flexDirection: "column", // Stack verticale
+            alignItems: "center", // Centrati orizzontalmente
+            gap: "0px", // Nessuno spazio tra bottoni per design compatto
           }}
         >
           <Button

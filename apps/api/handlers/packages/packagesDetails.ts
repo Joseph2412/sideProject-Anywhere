@@ -1,8 +1,11 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../../libs/prisma';
-import { PlansRate } from '@repo/database';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { prisma } from "../../libs/prisma";
+import { PlansRate } from "@repo/database";
 
-export const getAllPackagesHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+export const getAllPackagesHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   try {
     const { venueId } = request.query as { venueId?: string };
 
@@ -14,15 +17,20 @@ export const getAllPackagesHandler = async (request: FastifyRequest, reply: Fast
     });
     return reply.send(packages);
   } catch (error) {
-    return reply.status(500).send({ message: 'Errore nel recupero dei pacchetti' });
+    return reply
+      .status(500)
+      .send({ message: "Errore nel recupero dei pacchetti" });
   }
 };
 
 // Handler per la creazione di un nuovo pacchetto
-export const createPackageHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+export const createPackageHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   const { name, type, venueId } = request.body as {
     name: string;
-    type: 'SALA' | 'DESK';
+    type: "SALA" | "DESK";
     venueId: number;
   };
 
@@ -37,14 +45,14 @@ export const createPackageHandler = async (request: FastifyRequest, reply: Fasti
 
   // Crea subito tutti i piani di abbonamento associati (uno per rate)
   const rates = [
-    { name: 'Orario', rate: PlansRate.HOURLY },
-    { name: 'Giornaliero', rate: PlansRate.DAILY },
-    { name: 'Settimanale', rate: PlansRate.WEEKLY },
-    { name: 'Mensile', rate: PlansRate.MONTHLY },
-    { name: 'Annuale', rate: PlansRate.YEARLY },
+    { name: "Orario", rate: PlansRate.HOURLY },
+    { name: "Giornaliero", rate: PlansRate.DAILY },
+    { name: "Settimanale", rate: PlansRate.WEEKLY },
+    { name: "Mensile", rate: PlansRate.MONTHLY },
+    { name: "Annuale", rate: PlansRate.YEARLY },
   ];
   await Promise.all(
-    rates.map(r =>
+    rates.map((r) =>
       prisma.packagePlan.create({
         data: {
           name: r.name,
@@ -53,21 +61,21 @@ export const createPackageHandler = async (request: FastifyRequest, reply: Fasti
           isEnabled: false,
           packageId: newPackage.id,
         },
-      })
-    )
+      }),
+    ),
   );
 
   // Ritorna il pacchetto con i piani
   const plans = await prisma.packagePlan.findMany({
     where: { packageId: newPackage.id },
-    orderBy: { id: 'asc' },
+    orderBy: { id: "asc" },
   });
   return reply.status(201).send({ ...newPackage, plans });
 };
 
 export const getPackagesDetailsHandler: (
   request: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) => Promise<any> = async (request: FastifyRequest, reply: FastifyReply) => {
   const { id } = request.params as { id: string };
 
@@ -76,13 +84,13 @@ export const getPackagesDetailsHandler: (
   });
 
   if (!packageDetails) {
-    return reply.status(404).send({ message: 'Package not found' });
+    return reply.status(404).send({ message: "Package not found" });
   }
 
   // Recupera anche i piani associati
   const plans = await prisma.packagePlan.findMany({
     where: { packageId: Number(id) },
-    orderBy: { id: 'asc' },
+    orderBy: { id: "asc" },
   });
 
   return { ...packageDetails, plans };
@@ -90,7 +98,7 @@ export const getPackagesDetailsHandler: (
 
 export const updatePackagesDetailsHandler: (
   request: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) => Promise<any> = async (request: FastifyRequest, reply: FastifyReply) => {
   const { id } = request.params as { id: string };
   const {
@@ -110,7 +118,7 @@ export const updatePackagesDetailsHandler: (
     seats: number;
     services: string[];
     squareMetres: number;
-    type: 'SALA' | 'DESK';
+    type: "SALA" | "DESK";
     isActive: boolean;
     plans?: any[];
   };
@@ -118,29 +126,43 @@ export const updatePackagesDetailsHandler: (
   try {
     const updatedPackage = await prisma.package.update({
       where: { id: Number(id) },
-      data: { name, description, capacity, seats, services, squareMetres, type, isActive },
+      data: {
+        name,
+        description,
+        capacity,
+        seats,
+        services,
+        squareMetres,
+        type,
+        isActive,
+      },
     });
 
     // Ritorna il pacchetto aggiornato con i piani
     const updatedPlans = await prisma.packagePlan.findMany({
       where: { packageId: Number(id) },
-      orderBy: { id: 'asc' },
+      orderBy: { id: "asc" },
     });
     return { ...updatedPackage, plans: updatedPlans };
   } catch (error) {
-    return reply.status(404).send({ message: 'Package not found' });
+    return reply.status(404).send({ message: "Package not found" });
   }
 };
 
-export const deletePackagesHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+export const deletePackagesHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   const { id } = request.params as { id: string };
 
   try {
     await prisma.package.delete({
       where: { id: Number(id) },
     });
-    return reply.status(204).send({ message: 'Pacchetto eliminato con successo' });
+    return reply
+      .status(204)
+      .send({ message: "Pacchetto eliminato con successo" });
   } catch (error) {
-    return reply.status(404).send({ message: 'Package not found' });
+    return reply.status(404).send({ message: "Package not found" });
   }
 };

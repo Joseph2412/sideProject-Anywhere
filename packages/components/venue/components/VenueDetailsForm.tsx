@@ -1,34 +1,43 @@
-import { useEffect } from 'react'; // React
+import { useEffect } from "react"; // React
 
-import { Form, Button, Space, Row, Card, Select, Tag, Input, Col } from 'antd';
+import { Form, Button, Space, Row, Card, Select, Tag, Input, Col } from "antd";
 
-import { NibolInput } from '../../inputs/Input';
-import { AddressAutocomplete } from '../../inputs/AddressAutocomplete';
-import { LogoUpload } from '../../logoUpload';
-import styles from './VenueDetailsForm.module.css';
-import { useState } from 'react';
-import { useVenues } from '@repo/hooks';
-import { useQueryClient } from '@tanstack/react-query';
+import { NibolInput } from "../../inputs/Input";
+import { AddressAutocomplete } from "../../inputs/AddressAutocomplete";
+import { LogoUpload } from "../../logoUpload";
+import styles from "./VenueDetailsForm.module.css";
+import { useState } from "react";
+import { useVenues } from "@repo/hooks";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Jotai e store
-import { useSetAtom } from 'jotai';
-import { messageToast } from '@repo/ui/store/LayoutStore';
-import { PrimaryButton } from './../../buttons/PrimaryButton';
+import { useSetAtom } from "jotai";
+import { messageToast } from "@repo/ui/store/LayoutStore";
+import { PrimaryButton } from "./../../buttons/PrimaryButton";
 
-import type { VenueDetails } from '@repo/ui/store/LayoutStore';
-import type { PlaceResult } from '@repo/hooks';
+import type { VenueDetails } from "@repo/ui/store/LayoutStore";
+import type { PlaceResult } from "@repo/hooks";
 
 export const VenueDetailsForm = () => {
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
 
   // Array servizi disponibili per venue
-  const availableServices = ['WiFi', 'Stampante', 'Caffè', 'Reception', 'Parcheggio'];
+  const availableServices = [
+    "WiFi",
+    "Stampante",
+    "Caffè",
+    "Reception",
+    "Parcheggio",
+  ];
 
   const [loading, setLoading] = useState(false); // Stato loading
   const [venueDetails, setVenueDetails] = useState<VenueDetails | null>(null);
 
-  const [coordinates, setCoordinates] = useState<{ latitude?: number; longitude?: number }>({});
+  const [coordinates, setCoordinates] = useState<{
+    latitude?: number;
+    longitude?: number;
+  }>({});
 
   const { data, isLoading } = useVenues();
 
@@ -74,47 +83,50 @@ export const VenueDetailsForm = () => {
     setLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/venues`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/api/venues`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            ...values,
+            latitude: coordinates.latitude,
+            longitude: coordinates.longitude,
+          }),
         },
-        body: JSON.stringify({
-          ...values,
-          latitude: coordinates.latitude,
-          longitude: coordinates.longitude,
-        }),
-      });
+      );
 
       if (res.ok) {
         const data = await res.json();
         setVenueDetails(data.venue);
 
         // Invalida la query per aggiornare tutti i componenti che usano venue data (inclusa la sidebar)
-        await queryClient.invalidateQueries({ queryKey: ['venues'] });
+        await queryClient.invalidateQueries({ queryKey: ["venues"] });
 
         setMessage({
-          type: 'success',
-          message: 'Dettagli aggiornati con successo',
+          type: "success",
+          message: "Dettagli aggiornati con successo",
           duration: 3,
-          placement: 'bottomRight',
+          placement: "bottomRight",
         });
       } else {
         setMessage({
-          type: 'error',
-          message: 'Errore durante il salvataggio',
+          type: "error",
+          message: "Errore durante il salvataggio",
           duration: 3,
-          placement: 'bottomRight',
+          placement: "bottomRight",
         });
       }
     } catch (error) {
-      console.error('Errore:', error);
+      console.error("Errore:", error);
       setMessage({
-        type: 'error',
-        message: 'Errore durante il salvataggio',
+        type: "error",
+        message: "Errore durante il salvataggio",
         duration: 3,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     } finally {
       setLoading(false);
@@ -127,7 +139,7 @@ export const VenueDetailsForm = () => {
   return (
     <Form
       layout="vertical"
-      style={{ width: '100%', borderRadius: 8, height: '100%' }}
+      style={{ width: "100%", borderRadius: 8, height: "100%" }}
       form={form}
       onFinish={onFinish}
     >
@@ -138,7 +150,9 @@ export const VenueDetailsForm = () => {
           <Col span={12}>
             <Form.Item
               name="name"
-              rules={[{ required: true, message: 'Inserisci il Nome de Locale' }]}
+              rules={[
+                { required: true, message: "Inserisci il Nome de Locale" },
+              ]}
             >
               <NibolInput
                 validateTrigger="onSubmit"
@@ -146,23 +160,25 @@ export const VenueDetailsForm = () => {
                 name="name"
                 hideAsterisk={true}
                 required={true}
-                style={{ height: '32px', width: '100%' }}
+                style={{ height: "32px", width: "100%" }}
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
               name="address"
-              rules={[{ required: true, message: "Inserisci L'indirizzo del Locale" }]}
+              rules={[
+                { required: true, message: "Inserisci L'indirizzo del Locale" },
+              ]}
             >
               <AddressAutocomplete
-                value={form.getFieldValue('address') || ''}
-                onChange={value => {
-                  form.setFieldValue('address', value);
+                value={form.getFieldValue("address") || ""}
+                onChange={(value) => {
+                  form.setFieldValue("address", value);
                 }}
                 onPlaceSelect={handlePlaceSelect}
                 placeholder="Cerca indirizzo..."
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
                 label="Indirizzo"
                 required={true}
                 hideAsterisk={true}
@@ -172,14 +188,16 @@ export const VenueDetailsForm = () => {
         </Row>
 
         <Form.Item name="description" label="Descrizione">
-          <Input.TextArea style={{ height: 32, width: '100%', minHeight: 100 }} />
+          <Input.TextArea
+            style={{ height: 32, width: "100%", minHeight: 100 }}
+          />
         </Form.Item>
         <Form.Item name="services" label="Servizi">
           <Select
             mode="tags"
-            style={{ height: 32, width: '100%' }}
+            style={{ height: 32, width: "100%" }}
             placeholder="Inserisci o Selezione dei Servizi"
-            options={availableServices.map(service => ({
+            options={availableServices.map((service) => ({
               label: service,
               value: service,
             }))}
@@ -187,32 +205,34 @@ export const VenueDetailsForm = () => {
         </Form.Item>
         <div
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            marginTop: '8px',
-            marginLeft: '4px',
+            display: "inline-flex",
+            alignItems: "center",
+            marginTop: "8px",
+            marginLeft: "4px",
           }}
         >
-          {availableServices.map(service => (
+          {availableServices.map((service) => (
             <Tag
               key={service}
               className={styles.clickableTag}
               onClick={() => {
-                const current = form.getFieldValue('services') || [];
+                const current = form.getFieldValue("services") || [];
                 // Ensure we're working with a clean array of strings to avoid circular references
-                const cleanCurrent = Array.isArray(current) ? [...current].filter(Boolean) : [];
+                const cleanCurrent = Array.isArray(current)
+                  ? [...current].filter(Boolean)
+                  : [];
                 if (!cleanCurrent.includes(service)) {
                   const newServices = [...cleanCurrent, service];
-                  form.setFieldValue('services', newServices);
+                  form.setFieldValue("services", newServices);
                 }
               }}
             >
               <span
                 style={{
-                  display: 'flex',
-                  marginBottom: '3px',
-                  marginRight: '4px',
-                  fontSize: '14px',
+                  display: "flex",
+                  marginBottom: "3px",
+                  marginRight: "4px",
+                  fontSize: "14px",
                 }}
               >
                 +
@@ -238,12 +258,17 @@ export const VenueDetailsForm = () => {
                 }
               }}
               className={styles.secondary}
-              style={{ borderColor: '#D9D9D9' }}
+              style={{ borderColor: "#D9D9D9" }}
             >
               Annulla
             </Button>
-            <PrimaryButton type="primary" htmlType="submit" loading={loading} disabled={loading}>
-              {loading ? 'Salvando...' : 'Salva'}
+            <PrimaryButton
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              disabled={loading}
+            >
+              {loading ? "Salvando..." : "Salva"}
             </PrimaryButton>
           </Space>
         </Form.Item>

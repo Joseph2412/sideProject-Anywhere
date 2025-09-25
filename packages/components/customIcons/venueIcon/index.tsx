@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface VenueIconProps {
   width?: string | number;
@@ -12,8 +12,8 @@ export const VenueIcon: React.FC<VenueIconProps> = ({
   width = 16,
   height = 14,
   className,
-  fill = 'none',
-  stroke = '#00063E',
+  fill = "none",
+  stroke = "#00063E",
 }) => {
   return (
     <svg

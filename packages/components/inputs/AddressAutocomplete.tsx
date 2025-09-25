@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { AutoComplete } from 'antd';
-import { useGooglePlaces, GooglePrediction, PlaceResult } from '@repo/hooks';
+import React, { useState, useEffect, useRef } from "react";
+import { AutoComplete } from "antd";
+import { useGooglePlaces, GooglePrediction, PlaceResult } from "@repo/hooks";
 
 interface AddressAutocompleteProps {
   value?: string;
@@ -28,7 +28,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   const [options, setOptions] = useState<
     { value: string; label: React.ReactNode; placeId: string }[]
   >([]);
-  const [searchValue, setSearchValue] = useState(value || '');
+  const [searchValue, setSearchValue] = useState(value || "");
   const [isFocused, setIsFocused] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<React.ElementRef<typeof AutoComplete>>(null);
@@ -38,7 +38,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
   // Sincronizza il valore interno quando cambia il prop value
   useEffect(() => {
-    setSearchValue(value || '');
+    setSearchValue(value || "");
   }, [value]);
 
   // Ripristina il focus dopo che le opzioni sono state aggiornate
@@ -68,9 +68,11 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       const newOptions = predictions.map((prediction: GooglePrediction) => ({
         value: prediction.description,
         label: (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontWeight: 500 }}>{prediction.structured_formatting.main_text}</span>
-            <span style={{ fontSize: '12px', color: '#666' }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span style={{ fontWeight: 500 }}>
+              {prediction.structured_formatting.main_text}
+            </span>
+            <span style={{ fontSize: "12px", color: "#666" }}>
               {prediction.structured_formatting.secondary_text}
             </span>
           </div>
@@ -79,7 +81,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       }));
       setOptions(newOptions);
     } catch (error) {
-      console.error('Errore nella ricerca degli indirizzi:', error);
+      console.error("Errore nella ricerca degli indirizzi:", error);
       setOptions([]);
     }
   };
@@ -98,7 +100,10 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     }, 300);
   };
 
-  const handleSelect = async (selectedValue: string, option: { placeId: string }) => {
+  const handleSelect = async (
+    selectedValue: string,
+    option: { placeId: string },
+  ) => {
     setSearchValue(selectedValue);
     onChange?.(selectedValue);
 
@@ -109,7 +114,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
           onPlaceSelect(placeDetails);
         }
       } catch (error) {
-        console.error('Errore nel recupero dei dettagli del luogo:', error);
+        console.error("Errore nel recupero dei dettagli del luogo:", error);
       }
     }
 
@@ -130,9 +135,18 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   return (
     <div>
       {label && (
-        <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
+        <label
+          style={{
+            display: "block",
+            marginBottom: "4px",
+            fontSize: "14px",
+            fontWeight: 500,
+          }}
+        >
           {label}
-          {required && !hideAsterisk && <span style={{ color: 'red' }}> *</span>}
+          {required && !hideAsterisk && (
+            <span style={{ color: "red" }}> *</span>
+          )}
         </label>
       )}
       <AutoComplete

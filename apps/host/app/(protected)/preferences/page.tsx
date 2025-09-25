@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { PreferencesForm } from '@repo/components';
+import { PreferencesForm } from "@repo/components";
 
 export default function PreferencesPage() {
   return <PreferencesForm />;

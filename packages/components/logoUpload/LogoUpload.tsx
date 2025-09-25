@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
-import { Upload, Button, Avatar, message, Typography } from 'antd';
-import { ShopOutlined } from '@ant-design/icons';
-import { useSetAtom } from 'jotai';
-import { useQueryClient } from '@tanstack/react-query';
-import { messageToast } from '@repo/ui/store/LayoutStore';
-import { useVenues } from '@repo/hooks';
-import { UploadChangeParam, UploadFile } from 'antd/es/upload';
-import { RcFile } from 'antd/es/upload/interface';
-import styles from './LogoUpload.module.css';
+import { useState, useEffect } from "react";
+import { Upload, Button, Avatar, message, Typography } from "antd";
+import { ShopOutlined } from "@ant-design/icons";
+import { useSetAtom } from "jotai";
+import { useQueryClient } from "@tanstack/react-query";
+import { messageToast } from "@repo/ui/store/LayoutStore";
+import { useVenues } from "@repo/hooks";
+import { UploadChangeParam, UploadFile } from "antd/es/upload";
+import { RcFile } from "antd/es/upload/interface";
+import styles from "./LogoUpload.module.css";
 
-import { UploadIcon } from '../customIcons';
+import { UploadIcon } from "../customIcons";
 
 interface LogoUploadProps {
   size?: number;
@@ -32,7 +32,7 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
   const { data: venueData } = useVenues();
 
   // SEMPRE gestisce SOLO il logo della venue, mai l'avatar
-  const uploadType = 'logo';
+  const uploadType = "logo";
 
   // ID per upload (sempre venue)
   const uploadId = venueData?.venues.venue.id;
@@ -48,9 +48,9 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
 
   // Validazione file
   const beforeUpload = (file: File) => {
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
     if (!isJpgOrPng) {
-      message.error('Puoi caricare solo file JPG/PNG!');
+      message.error("Puoi caricare solo file JPG/PNG!");
       return false;
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
@@ -66,12 +66,12 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
     // Verifica se il file è disponibile (con fallback come ProfilePhotoUpload)
     const file = info.file.originFileObj || (info.file as RcFile);
     if (!file) {
-      console.error('Nessun file selezionato.');
+      console.error("Nessun file selezionato.");
       return;
     }
 
     if (!uploadId) {
-      console.error('Upload ID non disponibile (venue ID mancante).');
+      console.error("Upload ID non disponibile (venue ID mancante).");
       return;
     }
 
@@ -79,19 +79,22 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('type', uploadType);
-      formData.append('id', uploadId.toString());
-      formData.append('filename', file.name);
-      formData.append('entity', 'venues');
+      formData.append("file", file);
+      formData.append("type", uploadType);
+      formData.append("id", uploadId.toString());
+      formData.append("filename", file.name);
+      formData.append("entity", "venues");
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/media/upload`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_HOST}/media/upload`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: formData,
         },
-        body: formData,
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Errore durante l'upload");
@@ -101,23 +104,24 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
       setImageUrl(data.url);
 
       // Invalida la cache per aggiornare i dati della venue
-      await queryClient.invalidateQueries({ queryKey: ['venues'] });
+      await queryClient.invalidateQueries({ queryKey: ["venues"] });
 
       setToast({
-        type: 'success',
-        message: 'Upload completato!',
-        description: 'Logo caricato con successo.',
+        type: "success",
+        message: "Upload completato!",
+        description: "Logo caricato con successo.",
         duration: 3,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     } catch (error) {
-      console.error('Errore upload:', error);
+      console.error("Errore upload:", error);
       setToast({
-        type: 'error',
-        message: 'Errore upload',
-        description: error instanceof Error ? error.message : 'Errore sconosciuto',
+        type: "error",
+        message: "Errore upload",
+        description:
+          error instanceof Error ? error.message : "Errore sconosciuto",
         duration: 4,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     } finally {
       setLoading(false);
@@ -134,43 +138,44 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
       // Estrai la chiave S3 dall'URL
       const key = extractS3KeyFromUrl(imageUrl);
       if (!key) {
-        throw new Error('Impossibile estrarre la chiave S3');
+        throw new Error("Impossibile estrarre la chiave S3");
       }
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_HOST}/media/delete?type=${uploadType}&id=${uploadId}&filename=${encodeURIComponent(key)}`,
         {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
-        throw new Error('Errore durante la rimozione');
+        throw new Error("Errore durante la rimozione");
       }
 
       setImageUrl(null);
 
       // Invalida la cache per aggiornare i dati della venue
-      await queryClient.invalidateQueries({ queryKey: ['venues'] });
+      await queryClient.invalidateQueries({ queryKey: ["venues"] });
 
       setToast({
-        type: 'success',
-        message: 'Immagine rimossa!',
-        description: 'Logo rimosso con successo.',
+        type: "success",
+        message: "Immagine rimossa!",
+        description: "Logo rimosso con successo.",
         duration: 3,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     } catch (error) {
-      console.error('Errore rimozione:', error);
+      console.error("Errore rimozione:", error);
       setToast({
-        type: 'error',
-        message: 'Errore rimozione',
-        description: error instanceof Error ? error.message : 'Errore sconosciuto',
+        type: "error",
+        message: "Errore rimozione",
+        description:
+          error instanceof Error ? error.message : "Errore sconosciuto",
         duration: 4,
-        placement: 'bottomRight',
+        placement: "bottomRight",
       });
     } finally {
       setLoading(false);
@@ -184,7 +189,7 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
   };
 
   return (
-    <div className={`${styles.container} ${className || ''}`}>
+    <div className={`${styles.container} ${className || ""}`}>
       <div className={styles.logoContainer}>
         <Avatar
           size={size}
@@ -204,7 +209,7 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
               icon={<UploadIcon />}
               loading={loading}
               disabled={loading}
-              style={{ borderColor: '#D9D9D9', minWidth: 100 }}
+              style={{ borderColor: "#D9D9D9", minWidth: 100 }}
             >
               Upload
             </Button>
@@ -215,7 +220,7 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({
               onClick={handleRemove}
               loading={loading}
               disabled={loading}
-              style={{ borderColor: '#D9D9D9', minWidth: 100 }}
+              style={{ borderColor: "#D9D9D9", minWidth: 100 }}
             >
               Remove
             </Button>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface IconNoPicProps {
   width?: string | number;
@@ -11,7 +11,7 @@ export const IconNoPic: React.FC<IconNoPicProps> = ({
   width = 32,
   height = 32,
   className,
-  fill = 'white',
+  fill = "white",
 }) => {
   return (
     <svg

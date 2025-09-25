@@ -1,1 +1,1 @@
-export * from './ProfilePhotoUpload';
+export * from "./ProfilePhotoUpload";

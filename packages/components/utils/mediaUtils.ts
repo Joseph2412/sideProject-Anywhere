@@ -27,22 +27,22 @@ export function extractS3KeyFromUrl(url: string): string | null {
     const pathParts = proxyMatch[1];
 
     // Converti il path del proxy nella chiave S3 effettiva
-    if (pathParts.startsWith('venue/')) {
+    if (pathParts.startsWith("venue/")) {
       // venue/1/logo/filename.jpg -> venues/1/logo/filename.jpg
       // venue/1/photos/filename.jpg -> venues/1/photos/filename.jpg
-      return pathParts.replace('venue/', 'venues/');
+      return pathParts.replace("venue/", "venues/");
     }
 
-    if (pathParts.startsWith('package/')) {
+    if (pathParts.startsWith("package/")) {
       // package/1/photos/filename.jpg -> packages/1/photos/filename.jpg
-      return pathParts.replace('package/', 'packages/');
+      return pathParts.replace("package/", "packages/");
     }
 
-    if (pathParts.startsWith('user/')) {
+    if (pathParts.startsWith("user/")) {
       // user/1/avatar/filename.jpg -> host/1/profile/avatar/filename.jpg
-      const parts = pathParts.split('/');
-      if (parts.length >= 3 && parts[2] === 'avatar') {
-        return `host/${parts[1]}/profile/avatar/${parts.slice(3).join('/')}`;
+      const parts = pathParts.split("/");
+      if (parts.length >= 3 && parts[2] === "avatar") {
+        return `host/${parts[1]}/profile/avatar/${parts.slice(3).join("/")}`;
       }
     }
   }
@@ -60,12 +60,12 @@ export function extractS3KeyFromUrl(url: string): string | null {
  * Verifica se un URL è una URL proxy sicura
  */
 export function isSecureProxyUrl(url: string): boolean {
-  return url.includes('/secure-media/');
+  return url.includes("/secure-media/");
 }
 
 /**
  * Verifica se un URL è una signed URL Amazon
  */
 export function isAmazonSignedUrl(url: string): boolean {
-  return url.includes('amazonaws.com') && url.includes('X-Amz-');
+  return url.includes("amazonaws.com") && url.includes("X-Amz-");
 }

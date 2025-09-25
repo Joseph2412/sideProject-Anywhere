@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export interface BookingData {
   id: number;
@@ -8,7 +8,7 @@ export interface BookingData {
   start: string;
   end: string;
   people: number;
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  status: "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
   costumerName: string;
   costumerEmail: string;
   createdAt: string;
@@ -57,54 +57,58 @@ export function useVenueBookings(
     pageSize?: number;
     startDate?: string;
     endDate?: string;
-  }
+  },
 ) {
   return useQuery({
-    queryKey: ['my-venue-bookings', options], // Cambiato da venue-bookings specifico a my-venue-bookings
+    queryKey: ["my-venue-bookings", options], // Cambiato da venue-bookings specifico a my-venue-bookings
     queryFn: async (): Promise<BookingsResponse> => {
       if (!venueId) {
-        throw new Error('Venue ID richiesto');
+        throw new Error("Venue ID richiesto");
       }
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const params = new URLSearchParams();
 
-      if (options?.status) params.append('status', options.status);
-      if (options?.page) params.append('page', options.page.toString());
-      if (options?.pageSize) params.append('pageSize', options.pageSize.toString());
+      if (options?.status) params.append("status", options.status);
+      if (options?.page) params.append("page", options.page.toString());
+      if (options?.pageSize)
+        params.append("pageSize", options.pageSize.toString());
 
       const queryString = params.toString();
       // Usa il nuovo endpoint che non richiede venueId
-      const url = `${process.env.NEXT_PUBLIC_API_HOST}/api/bookings/venues/bookings${queryString ? `?${queryString}` : ''}`;
+      const url = `${process.env.NEXT_PUBLIC_API_HOST}/api/bookings/venues/bookings${queryString ? `?${queryString}` : ""}`;
 
       //Debug
-      console.log('🔍 Debug useVenueBookings (NEW ENDPOINT):');
-      console.log('Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
-      console.log('URL:', url);
-      console.log('VenueId (unused):', venueId);
-      console.log('Options:', options);
+      console.log("🔍 Debug useVenueBookings (NEW ENDPOINT):");
+      console.log(
+        "Token:",
+        token ? `${token.substring(0, 20)}...` : "NO TOKEN",
+      );
+      console.log("URL:", url);
+      console.log("VenueId (unused):", venueId);
+      console.log("Options:", options);
 
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
+      console.log("Response status:", response.status);
+      console.log("Response ok:", response.ok);
 
       if (!response.ok) {
         // Aggiungiamo più dettagli sull'errore
         const errorText = await response.text();
-        console.log('Error response:', errorText);
+        console.log("Error response:", errorText);
         throw new Error(
-          `Errore nel recupero prenotazioni: ${response.status} ${response.statusText}`
+          `Errore nel recupero prenotazioni: ${response.status} ${response.statusText}`,
         );
       }
 
       const data = await response.json();
-      console.log('Response data:', data);
+      console.log("Response data:", data);
       return data;
     },
     enabled: !!venueId, // Query abilitata solo se venueId è presente
@@ -119,25 +123,27 @@ export function useVenueBookings(
  */
 export function useBookingDetails(bookingId: number | undefined) {
   return useQuery({
-    queryKey: ['booking-details', bookingId],
+    queryKey: ["booking-details", bookingId],
     queryFn: async (): Promise<BookingData> => {
       if (!bookingId) {
-        throw new Error('Booking ID richiesto');
+        throw new Error("Booking ID richiesto");
       }
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_HOST}/api/bookings/booking/${bookingId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
-        throw new Error(`Errore nel recupero dettagli prenotazione: ${response.statusText}`);
+        throw new Error(
+          `Errore nel recupero dettagli prenotazione: ${response.statusText}`,
+        );
       }
 
       return response.json();
@@ -154,34 +160,38 @@ export function useCreateBooking() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (bookingData: CreateBookingRequest): Promise<BookingData> => {
-      const token = localStorage.getItem('token');
+    mutationFn: async (
+      bookingData: CreateBookingRequest,
+    ): Promise<BookingData> => {
+      const token = localStorage.getItem("token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_HOST}/api/bookings/booking/${bookingData.venueId}`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(bookingData),
-        }
+        },
       );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Errore nella creazione della prenotazione');
+        throw new Error(
+          errorData.error || "Errore nella creazione della prenotazione",
+        );
       }
 
       return response.json();
     },
-    onSuccess: data => {
+    onSuccess: (data) => {
       // Invalida le query delle prenotazioni per ricaricarne i dati
       queryClient.invalidateQueries({
-        queryKey: ['my-venue-bookings'], // Usa il nuovo query key
+        queryKey: ["my-venue-bookings"], // Usa il nuovo query key
       });
       queryClient.invalidateQueries({
-        queryKey: ['venue-bookings'], // Mantieni anche il vecchio per compatibilità
+        queryKey: ["venue-bookings"], // Mantieni anche il vecchio per compatibilità
       });
     },
   });
@@ -195,21 +205,23 @@ export function useDeleteBooking() {
 
   return useMutation({
     mutationFn: async (bookingId: number): Promise<{ message: string }> => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_HOST}/api/bookings/booking/${bookingId}`,
         {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Errore nella cancellazione della prenotazione');
+        throw new Error(
+          errorData.error || "Errore nella cancellazione della prenotazione",
+        );
       }
 
       return response.json();
@@ -217,13 +229,13 @@ export function useDeleteBooking() {
     onSuccess: (_, bookingId) => {
       // Invalida tutte le query delle prenotazioni
       queryClient.invalidateQueries({
-        queryKey: ['my-venue-bookings'], // Nuovo key
+        queryKey: ["my-venue-bookings"], // Nuovo key
       });
       queryClient.invalidateQueries({
-        queryKey: ['venue-bookings'], // Vecchio key per compatibilità
+        queryKey: ["venue-bookings"], // Vecchio key per compatibilità
       });
       queryClient.invalidateQueries({
-        queryKey: ['booking-details', bookingId],
+        queryKey: ["booking-details", bookingId],
       });
     },
   });
@@ -238,40 +250,42 @@ export function useUpdateBookingStatus() {
   return useMutation({
     mutationFn: async (params: {
       bookingId: number;
-      status: 'PENDING' | 'CONFIRMED' | 'Cancelled';
+      status: "PENDING" | "CONFIRMED" | "Cancelled";
     }): Promise<BookingData> => {
       const { bookingId, status } = params;
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_HOST}/api/bookings/booking/${bookingId}/status`,
         {
-          method: 'PATCH',
+          method: "PATCH",
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ status }),
-        }
+        },
       );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Errore nell'aggiornamento dello status");
+        throw new Error(
+          errorData.error || "Errore nell'aggiornamento dello status",
+        );
       }
 
       return response.json();
     },
-    onSuccess: data => {
+    onSuccess: (data) => {
       // Invalida le query correlate
       queryClient.invalidateQueries({
-        queryKey: ['my-venue-bookings'], // Nuovo key
+        queryKey: ["my-venue-bookings"], // Nuovo key
       });
       queryClient.invalidateQueries({
-        queryKey: ['venue-bookings'], // Vecchio key per compatibilità
+        queryKey: ["venue-bookings"], // Vecchio key per compatibilità
       });
       queryClient.invalidateQueries({
-        queryKey: ['booking-details', data.id],
+        queryKey: ["booking-details", data.id],
       });
     },
   });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface BundleIconProps {
   width?: string | number;
@@ -12,8 +12,8 @@ export const BundleIcon: React.FC<BundleIconProps> = ({
   width = 14,
   height = 16,
   className,
-  fill = 'none',
-  stroke = '#00063E',
+  fill = "none",
+  stroke = "#00063E",
 }) => {
   return (
     <svg

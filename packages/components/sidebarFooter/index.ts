@@ -1,1 +1,1 @@
-export * from './SidebarFooter';
+export * from "./SidebarFooter";

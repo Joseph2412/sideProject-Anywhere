@@ -1,15 +1,19 @@
 // ToastMessageProvider: gestisce notifiche toast globali con Ant Design
 
-'use client'; // Indica che questo è un Client Component (Next.js 13+)
+"use client"; // Indica che questo è un Client Component (Next.js 13+)
 
-import * as React from 'react';
-import { useEffect, useState, useRef } from 'react';
-import { messageToast, ToastPayload } from '@repo/ui/store/ToastStore';
-import { useAtom } from 'jotai';
-import { notification } from 'antd';
+import * as React from "react";
+import { useEffect, useState, useRef } from "react";
+import { messageToast, ToastPayload } from "@repo/ui/store/ToastStore";
+import { useAtom } from "jotai";
+import { notification } from "antd";
 
 // MessageProvider: provider per notifiche toast globali
-export function MessageProvider({ children }: { children: React.ReactNode }): React.ReactElement {
+export function MessageProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}): React.ReactElement {
   // Jotai atom connection per toast
   const [toast, setToast] = useAtom<ToastPayload | false>(messageToast);
 
@@ -84,11 +88,11 @@ export function MessageProvider({ children }: { children: React.ReactNode }): Re
 
     // MOSTRA NOTIFICA: Usa API Ant Design con configurazione da ToastPayload
     api.open({
-      type: toast.type || 'info', // Tipo: success, error, warning, info
+      type: toast.type || "info", // Tipo: success, error, warning, info
       message: toast.message, // Titolo principale
-      description: toast.description || '', // Testo aggiuntivo
+      description: toast.description || "", // Testo aggiuntivo
       duration: toast.duration ?? 3, // Durata in secondi (default 3)
-      placement: toast.placement || 'bottomRight', // Posizione schermo
+      placement: toast.placement || "bottomRight", // Posizione schermo
       onClose: () => {
         setToast(false); // Reset atom quando notifica si chiude
       },

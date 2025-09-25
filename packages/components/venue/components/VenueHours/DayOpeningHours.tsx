@@ -1,9 +1,17 @@
-import React from 'react';
-import { Checkbox, TimePicker, Button, Space, Typography, Row, Col } from 'antd';
-import type { CheckboxChangeEvent } from 'antd/es/checkbox';
-import dayjs from 'dayjs';
-import { parsePeriodString, formatPeriodString } from './openingHours.types';
-import { useUpdateVenueOpeningDays } from '@repo/hooks';
+import React from "react";
+import {
+  Checkbox,
+  TimePicker,
+  Button,
+  Space,
+  Typography,
+  Row,
+  Col,
+} from "antd";
+import type { CheckboxChangeEvent } from "antd/es/checkbox";
+import dayjs from "dayjs";
+import { parsePeriodString, formatPeriodString } from "./openingHours.types";
+import { useUpdateVenueOpeningDays } from "@repo/hooks";
 
 interface DayOpeningHoursProps {
   day: string;
@@ -12,7 +20,10 @@ interface DayOpeningHoursProps {
     isClosed: boolean;
     periods: string[];
   };
-  onUpdateDay: (dayKey: string, data: { isClosed: boolean; periods: string[] }) => void;
+  onUpdateDay: (
+    dayKey: string,
+    data: { isClosed: boolean; periods: string[] },
+  ) => void;
 }
 
 export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
@@ -42,7 +53,7 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
       ]);
     } else {
       // Aperto: aggiungi periodo 08:00-18:00
-      const defaultPeriod = formatPeriodString('08:00', '18:00');
+      const defaultPeriod = formatPeriodString("08:00", "18:00");
       onUpdateDay(dayKey, {
         isClosed: false,
         periods: [defaultPeriod],
@@ -58,7 +69,10 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
   };
 
   // Modifica periodo esistente
-  const handlePeriodChange = async (index: number, timeStrings: [string, string] | null) => {
+  const handlePeriodChange = async (
+    index: number,
+    timeStrings: [string, string] | null,
+  ) => {
     if (!timeStrings || !timeStrings[0] || !timeStrings[1]) return;
     const newPeriods = [...periods];
     newPeriods[index] = formatPeriodString(timeStrings[0], timeStrings[1]);
@@ -77,7 +91,7 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
 
   // Aggiungi periodo 08:00-18:00 e salva
   const handleAddPeriod = async () => {
-    const defaultPeriod = formatPeriodString('08:00', '18:00');
+    const defaultPeriod = formatPeriodString("08:00", "18:00");
     const updatedPeriods = [...periods, defaultPeriod];
     onUpdateDay(dayKey, {
       isClosed: false,
@@ -114,10 +128,10 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
         <div
           style={{
             marginBottom: 6,
-            display: 'flex',
-            alignItems: 'center',
+            display: "flex",
+            alignItems: "center",
             gap: 12,
-            justifyContent: 'space-between',
+            justifyContent: "space-between",
           }}
         >
           <Typography.Text strong>{day}</Typography.Text>
@@ -130,16 +144,16 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
           {periods.map((period, index) => {
             const parsed = parsePeriodString(period);
             const timeRange: [dayjs.Dayjs | null, dayjs.Dayjs | null] = parsed
-              ? [dayjs(parsed.start, 'HH:mm'), dayjs(parsed.end, 'HH:mm')]
+              ? [dayjs(parsed.start, "HH:mm"), dayjs(parsed.end, "HH:mm")]
               : [null, null];
 
             return (
               <div key={index}>
                 <Typography.Text
                   style={{
-                    fontSize: '12px',
-                    display: 'block',
-                    marginBottom: '4px',
+                    fontSize: "12px",
+                    display: "block",
+                    marginBottom: "4px",
                   }}
                 >
                   Dalle - Alle
@@ -150,7 +164,10 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
                       format="HH:mm"
                       value={timeRange}
                       onChange={(_, timeStrings) =>
-                        handlePeriodChange(index, timeStrings as [string, string])
+                        handlePeriodChange(
+                          index,
+                          timeStrings as [string, string],
+                        )
                       }
                       disabled={isClosed}
                     />
@@ -158,13 +175,16 @@ export const DayOpeningHours: React.FC<DayOpeningHoursProps> = ({
                   {!isClosed && (
                     <Col>
                       {index === 0 ? (
-                        <Button onClick={handleAddPeriod} style={{ borderColor: '#D9D9D9' }}>
+                        <Button
+                          onClick={handleAddPeriod}
+                          style={{ borderColor: "#D9D9D9" }}
+                        >
                           Aggiungi periodo
                         </Button>
                       ) : (
                         <Button
                           onClick={() => handleRemovePeriod(index)}
-                          style={{ borderColor: '#D9D9D9' }}
+                          style={{ borderColor: "#D9D9D9" }}
                         >
                           Rimuovi
                         </Button>

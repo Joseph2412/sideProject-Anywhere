@@ -1,7 +1,7 @@
-import Tab from '../tabs/tab';
-import { PackageDetails } from './details/PackageDetails';
-import { PackagePlans } from './plans/PackagePlans';
-import { ImageUpload } from '../imageUpload/imageUpload';
+import Tab from "../tabs/tab";
+import { PackageDetails } from "./details/PackageDetails";
+import { PackagePlans } from "./plans/PackagePlans";
+import { ImageUpload } from "../imageUpload/imageUpload";
 
 //Componente CONTENITORE PACCHETTI
 //Comprende le tab con le diciture Dettagli,Piani,Immagini
@@ -14,12 +14,12 @@ import { ImageUpload } from '../imageUpload/imageUpload';
 export const PackageForm = () => {
   const tabs = [
     {
-      key: 'details',
-      label: 'Dettagli',
+      key: "details",
+      label: "Dettagli",
       children: <PackageDetails />,
     },
-    { key: 'plans', label: 'Piani', children: <PackagePlans /> },
-    { key: 'images', label: 'Immagini', children: <ImageUpload /> },
+    { key: "plans", label: "Piani", children: <PackagePlans /> },
+    { key: "images", label: "Immagini", children: <ImageUpload /> },
   ];
 
   return (

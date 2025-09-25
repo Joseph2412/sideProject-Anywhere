@@ -3,12 +3,16 @@ import {
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
-} from '@aws-sdk/client-s3';
-import { FastifyInstance, FastifyPluginAsync, FastifyPluginOptions } from 'fastify';
-import fastifyPlugin from 'fastify-plugin';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+} from "@aws-sdk/client-s3";
+import {
+  FastifyInstance,
+  FastifyPluginAsync,
+  FastifyPluginOptions,
+} from "fastify";
+import fastifyPlugin from "fastify-plugin";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const FASTIFY_VERSION = '5.5.0';
+const FASTIFY_VERSION = "5.5.0";
 
 export class S3Service {
   // private s3: S3;
@@ -29,11 +33,18 @@ export class S3Service {
 
   public getSignedUrl = async (bucket: string, key: string) => {
     const getCommand = new GetObjectCommand({ Bucket: bucket, Key: key });
-    return await getSignedUrl(this.client, getCommand, { expiresIn: this.expirationSignedUrl });
+    return await getSignedUrl(this.client, getCommand, {
+      expiresIn: this.expirationSignedUrl,
+    });
   };
 
-  public uploadFile = async (bucket: string, file: any, fileName: string, type: string) => {
-    console.log('UPLOAD FILE CALLED'); // LOG DI TEST
+  public uploadFile = async (
+    bucket: string,
+    file: any,
+    fileName: string,
+    type: string,
+  ) => {
+    console.log("UPLOAD FILE CALLED"); // LOG DI TEST
     try {
       const params = {
         Bucket: bucket,
@@ -41,7 +52,7 @@ export class S3Service {
         Body: file,
         ContentType: type,
       };
-      console.log('S3 upload params:', params); // LOG DETTAGLIATO
+      console.log("S3 upload params:", params); // LOG DETTAGLIATO
       //put to s3 bucket
       const putCommand = new PutObjectCommand(params);
       await this.client.send(putCommand);
@@ -49,9 +60,9 @@ export class S3Service {
       // ✅ SICURO: Restituisce solo la chiave S3, non la signed URL
       return fileName;
     } catch (err) {
-      console.error('S3 upload error:', err); // LOG ERRORE ORIGINALE
+      console.error("S3 upload error:", err); // LOG ERRORE ORIGINALE
       this.instance.log.error(err);
-      throw new Error('Error uploading file to S3');
+      throw new Error("Error uploading file to S3");
     }
   };
 
@@ -68,12 +79,12 @@ export class S3Service {
 
 const plugin: FastifyPluginAsync = async (
   instance: FastifyInstance,
-  _options: FastifyPluginOptions
+  _options: FastifyPluginOptions,
 ) => {
   const s3: S3Service = new S3Service(instance);
 
-  instance.decorate('s3', s3);
-  instance.addHook('onRequest', (request, _reply, done) => {
+  instance.decorate("s3", s3);
+  instance.addHook("onRequest", (request, _reply, done) => {
     request.s3 = s3;
     done();
   });
@@ -82,4 +93,7 @@ const plugin: FastifyPluginAsync = async (
 /**
  * Make s3 plugin accesible to root context with fastify plugin
  */
-export const s3Plugin = fastifyPlugin(plugin, { fastify: FASTIFY_VERSION, name: 'env' });
+export const s3Plugin = fastifyPlugin(plugin, {
+  fastify: FASTIFY_VERSION,
+  name: "env",
+});

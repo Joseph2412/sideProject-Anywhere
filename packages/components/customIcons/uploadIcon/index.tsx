@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface UploadIconProps {
   width?: string | number;
@@ -11,7 +11,7 @@ export const UploadIcon: React.FC<UploadIconProps> = ({
   width = 16,
   height = 16,
   className,
-  fill = '#00063E',
+  fill = "#00063E",
 }) => {
   return (
     <svg

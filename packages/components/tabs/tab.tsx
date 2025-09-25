@@ -1,5 +1,5 @@
-import React from 'react';
-import { Tabs } from 'antd';
+import React from "react";
+import { Tabs } from "antd";
 
 type TabItem = {
   key: string;
@@ -13,7 +13,11 @@ type Props = {
 
 const CustomTab: React.FC<Props> = ({ tabs }) => {
   return (
-    <Tabs defaultActiveKey={tabs[0]?.key} items={tabs} style={{ marginRight: '16px !important' }} />
+    <Tabs
+      defaultActiveKey={tabs[0]?.key}
+      items={tabs}
+      style={{ marginRight: "16px !important" }}
+    />
   );
 };
 

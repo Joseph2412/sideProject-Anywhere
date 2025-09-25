@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface ProfileIconProps {
   width?: string | number;
@@ -12,8 +12,8 @@ export const ProfileIcon: React.FC<ProfileIconProps> = ({
   width = 16,
   height = 16,
   className,
-  fill = 'none',
-  stroke = '#00063E',
+  fill = "none",
+  stroke = "#00063E",
 }) => {
   return (
     <svg

@@ -1,8 +1,11 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../../libs/prisma';
-import { WeekDay } from '@repo/database';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { prisma } from "../../libs/prisma";
+import { WeekDay } from "@repo/database";
 
-export const getVenueOpeningDaysHandler = async (request: FastifyRequest, reply: FastifyReply) => {
+export const getVenueOpeningDaysHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   try {
     const userId = request.user.id;
 
@@ -12,10 +15,10 @@ export const getVenueOpeningDaysHandler = async (request: FastifyRequest, reply:
     });
 
     if (!venue) {
-      return reply.code(404).send({ message: 'Venue non trovato' });
+      return reply.code(404).send({ message: "Venue non trovato" });
     }
 
-    const openingDays = venue.openingDays.map(day => ({
+    const openingDays = venue.openingDays.map((day) => ({
       day: day.day,
       isClosed: day.isClosed, // Boolean diretto
       periods: day.periods, // Array stringhe diretto
@@ -24,13 +27,13 @@ export const getVenueOpeningDaysHandler = async (request: FastifyRequest, reply:
     return reply.code(200).send({ openingDays });
   } catch (error) {
     console.error(error);
-    return reply.code(500).send({ message: 'Internal Server Error' });
+    return reply.code(500).send({ message: "Internal Server Error" });
   }
 };
 
 export const updateVenueOpeningDaysHandler = async (
   request: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) => {
   const { openingDays } = request.body as {
     openingDays: { day: string; isClosed: boolean; periods: string[] }[];
@@ -44,16 +47,19 @@ export const updateVenueOpeningDaysHandler = async (
     });
 
     if (!venue) {
-      return reply.code(404).send({ message: 'Venue non trovato' });
+      return reply.code(404).send({ message: "Venue non trovato" });
     }
 
     // Validazione e pulizia
-    const validatedOpeningDays = openingDays.map(dayData => {
+    const validatedOpeningDays = openingDays.map((dayData) => {
       const result = {
         day: dayData.day,
         isClosed: Boolean(dayData.isClosed), // Assicura boolean
-        periods: dayData.periods.filter(period => {
-          const isValid = /^([01]?\d|2[0-3]):([0-5]\d)-([01]?\d|2[0-3]):([0-5]\d)$/.test(period);
+        periods: dayData.periods.filter((period) => {
+          const isValid =
+            /^([01]?\d|2[0-3]):([0-5]\d)-([01]?\d|2[0-3]):([0-5]\d)$/.test(
+              period,
+            );
           return isValid;
         }), //  SALVA sempre i periodi, indipendentemente da isClosed
       };
@@ -63,7 +69,7 @@ export const updateVenueOpeningDaysHandler = async (
 
     // Salvataggio ultra-semplice
     await prisma.$transaction(
-      validatedOpeningDays.map(dayData => {
+      validatedOpeningDays.map((dayData) => {
         return prisma.openDays.upsert({
           where: {
             venueId_day: {
@@ -82,19 +88,19 @@ export const updateVenueOpeningDaysHandler = async (
             periods: dayData.periods, // Array stringhe diretto
           },
         });
-      })
+      }),
     );
 
     return reply.code(200).send({
-      message: 'Orari di apertura aggiornati con successo.',
+      message: "Orari di apertura aggiornati con successo.",
       success: true,
     });
   } catch (error) {
-    console.error('Error in updateVenueOpeningDaysHandler:', error);
+    console.error("Error in updateVenueOpeningDaysHandler:", error);
     return reply.code(500).send({
       message: "Errore durante l'aggiornamento degli orari di apertura.",
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
