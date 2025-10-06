@@ -32,7 +32,10 @@ import { secureMediaRoutes } from "./routes/media/secureMediaRoutes";
 const server: FastifyInstance = fastify();
 
 server.register(cors, {
-  origin: process.env.APP_HOST,
+  origin: [
+    process.env.APP_HOST,     // http://localhost:3000 (host app)
+    process.env.APP_CLIENT,   // http://localhost:3002 (client app)
+  ].filter((origin): origin is string => Boolean(origin)), // Rimuove eventuali undefined
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
 
   credentials: true,
@@ -93,6 +96,10 @@ server.register(secureMediaRoutes, { prefix: "/secure-media" });
 
 server.register(googlePlacesRoutes, { prefix: "/api/google" });
 
+//Rotte esterne per Applicazione Cliente
+server.register(publicVenuesRoutes);
+
+
 //Rotta di Servizio per Avvio BACKEND
 server.listen({ port: 3001 }, (err, address) => {
   if (err) {
@@ -105,6 +112,3 @@ server.listen({ port: 3001 }, (err, address) => {
 //Continua con il Backend
 //Imposta un componente per visualizzare le prenotazioni presenti e passate.
 
-//Rotte esterne per Applicazione Cliente
-
-server.register(publicVenuesRoutes, { prefix: "/api" });

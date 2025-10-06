@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,93 +8,73 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  password String  
-  firstName   String
-  lastName    String
-  avatarUrl   String? //String di URLs su S3 
-  preferences Json? //Riferimento a sezione NOTIFICHE del Componente Profio
+  id                Int       @id @default(autoincrement())
+  email             String    @unique
+  password          String
+  role              Role
+  resetToken        String?
+  resetTokenExpires DateTime?
+  avatarUrl         String?
+  createdAt         DateTime  @default(now())
+  firstName         String
+  lastName          String
+  preferences       Json?
+  updatedAt         DateTime  @updatedAt
+  venueId           Int?      @unique
+  venue             Venue?    @relation(fields: [venueId], references: [id])
 
-
-  venue   Venue? @relation(fields: [venueId], references: [id])//Coworking Collegato ad utente 
-  venueId Int? @unique
-
-  role     Role
-  
-  resetToken String? // Token per il reset della password
-  resetTokenExpires DateTime? // Data di scadenza del token
-  
-  createdAt DateTime @default(now()) //Idea: Sezione Profilo "Sei Nostro Cliente da..."/"Data Iscrizione...." . Comuqnue utile per Analisi db
-  updatedAt DateTime @updatedAt //Idea: "Data Ultima Modifica" Su Sezione Profilo. Utile per Behavior Insight Su db
-  
   @@index([createdAt])
 }
 
-
-//Enum per USER
-enum Role {
-  USER
-  HOST
-}
-
-//Modelli Componenti Locale, Pacchetti e Piani
-
 model Venue {
-
-  id           Int           @id @default(autoincrement())
-  name         String
-  address      String        @db.VarChar(200)
-  latitude     Float?
-  longitude    Float?
-  services     String[]
-  description  String?        @db.VarChar(200)
-  photos       String[] //URLs di S3
-  packages     Package[] //1 Locale ha tanti pacchetti
+  id             Int             @id @default(autoincrement())
+  name           String
+  address        String          @db.VarChar(200)
+  services       String[]
+  description    String?         @db.VarChar(200)
+  photos         String[]
+  logoURL        String?
+  latitude       Float?
+  longitude      Float?
+  reviewsCounter Float           @default(0)
+  venueRatings   Int             @default(0)
+  bookings       Booking[]
   closingPeriods ClosingPeriod[]
-  logoURL  String?
-  openingDays OpenDays[]
-  paymentInfo PaymentInfo?
+  openingDays    OpenDays[]
+  packages       Package[]
+  paymentInfo    PaymentInfo?
+  user           User?
 
-  user User? //Senza questa Prisma mi da errore. Se provo ad eliminarlo mi ritorna
-  //Error validating field `venue` in model `User`: The relation field `venue` on model `User` is missing an opposite relation field on the model `Venue`. Either run `prisma format` or add it manually.Prisma
-
-  bookings Booking[]
-
-  venueRatings  Int   @default(0)//Valutazione di recensioni totali
-  reviewsCounter Float  @default(0) //Contatore di recensioni QUANTE RECENSIONI Ha la VENUE
   @@index([name])
 }
 
-
-
 model OpenDays {
-  id       Int             @id @default(autoincrement())
-  day      WeekDay       
-  isClosed Boolean         @default(false)
-  periods  String[]        // Array di stringhe: ["09:00-12:00", "14:00-18:00"] 
-  venue    Venue  @relation(fields: [venueId], references: [id])
+  id       Int      @id @default(autoincrement())
+  day      WeekDay
+  isClosed Boolean  @default(false)
   venueId  Int
-  
-  @@index([venueId])
+  periods  String[]
+  venue    Venue    @relation(fields: [venueId], references: [id])
+
   @@unique([venueId, day])
+  @@index([venueId])
 }
 
 model Package {
-  id               Int             @id @default(autoincrement())
-  name             String          @db.VarChar(200)
-  description      String?         @db.VarChar(200)
-  squareMetres     Int?
-  capacity         Int?
-  seats            Int?
-  isActive         Boolean         @default(true)
-  services         String[]
-  type             typeCoworking //Può essere 1 di questi 2 typeCoworking
-  plans            PackagePlan[] //Un pacchetto può avere + Piani = Orario, Giornaliero, Settimanale, Mensile ed Annuale
-  photos           String[] //Array di URLs S3
-  venue           Venue? @relation(fields: [venueId], references: [id])
-  venueId       Int?
-  bookings        Booking[]
+  id           Int           @id @default(autoincrement())
+  description  String?       @db.VarChar(200)
+  squareMetres Int?
+  capacity     Int?
+  services     String[]
+  type         typeCoworking
+  photos       String[]
+  venueId      Int?
+  seats        Int?
+  name         String        @db.VarChar(200)
+  isActive     Boolean       @default(true)
+  bookings     Booking[]
+  venue        Venue?        @relation(fields: [venueId], references: [id])
+  plans        PackagePlan[]
 
   @@index([venueId])
   @@index([type])
@@ -111,15 +85,69 @@ model PackagePlan {
   id        Int       @id @default(autoincrement())
   name      String
   rate      PlansRate
-  price     Decimal @db.Decimal(10, 2) //Prezzo del piano
+  price     Decimal   @db.Decimal(10, 2)
   isEnabled Boolean   @default(false)
-  package   Package   @relation(fields: [packageId], references: [id], onDelete: Cascade)
   packageId Int
+  package   Package   @relation(fields: [packageId], references: [id], onDelete: Cascade)
 
+  @@unique([packageId, name, rate])
   @@index([packageId, isEnabled])
   @@index([packageId])
   @@index([price])
-  @@unique([packageId, name, rate])
+}
+
+model ClosingPeriod {
+  id      Int       @id @default(autoincrement())
+  start   DateTime?
+  end     DateTime?
+  venueId Int
+  venue   Venue     @relation(fields: [venueId], references: [id])
+
+  @@unique([venueId, start, end])
+  @@index([venueId])
+  @@index([venueId, start, end])
+}
+
+model PaymentInfo {
+  id           Int     @id @default(autoincrement())
+  companyName  String
+  address      String
+  iban         String? @db.VarChar(34)
+  bicSwift     String  @db.VarChar(11)
+  countryCode  String  @db.VarChar(3)
+  currencyCode String  @db.VarChar(3)
+  venueId      Int     @unique
+  venue        Venue   @relation(fields: [venueId], references: [id])
+}
+
+model Booking {
+  id            Int      @id @default(autoincrement())
+  start         DateTime
+  end           DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  venueId       Int
+  packageId     Int
+  reviewComfort Int      @default(0)
+  reviewQuiet   Int      @default(0)
+  reviewStaff   Int      @default(0)
+  reviewWifi    Int      @default(0)
+  people        Int      @default(1)
+  status        String
+  userId        Int
+  costumerEmail String?
+  costumerName  String
+  package       Package  @relation(fields: [packageId], references: [id])
+  venue         Venue    @relation(fields: [venueId], references: [id])
+
+  @@index([venueId])
+  @@index([packageId])
+  @@index([start, end])
+}
+
+enum Role {
+  USER
+  HOST
 }
 
 enum PlansRate {
@@ -143,74 +171,4 @@ enum WeekDay {
   FRIDAY
   SATURDAY
   SUNDAY
-}
-
-
-model ClosingPeriod {
-  id Int @id @default(autoincrement())
-  start DateTime?
-  end DateTime?
-  venue Venue @relation(fields: [venueId], references: [id])
-  venueId Int
-
-  @@index([venueId])
-  @@index([venueId, start, end])
-  @@unique([venueId, start, end])
-}
-
-model PaymentInfo {
-
-  id Int @id @default(autoincrement())
-  companyName String
-  address String
-  iban String? @db.VarChar(34)
-  bicSwift String @db.VarChar(11)
-  countryCode String @db.VarChar(3) //ISO 3166-1 alpha-2 code
-  currencyCode String @db.VarChar(3) //ISO 4217 code
-  venue Venue @relation(fields: [venueId], references: [id])
-  venueId Int @unique
-
-}
-
-
-
-
-
-model Booking {
-
-  id        Int      @id @default(autoincrement())
-  
-  start     DateTime
-  end       DateTime
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  people Int @default(1)
-  userId  Int  //Riferimento all'utente che ha fatto la prenotazione
-  costumerName String //Nome del cliente esterno che ha fatto la prenotazione
-  costumerEmail String? //Email del cliente esterno che ha fatto la prenotazione
-
-  status String 
-  // Reserved, Confirmed, Canceled, Completed, in Review, Reviewed
-
-
-  venue     Venue    @relation(fields: [venueId], references: [id])
-  venueId   Int
-  
-  package   Package  @relation(fields: [packageId], references: [id])
-  packageId Int
-
-
-  //Campi Valutazione 
-  reviewWifi Int @default(0) //Valutazione Wifi
-  reviewStaff Int @default(0) //Valutazione Personale
-  reviewQuiet Int @default(0) //Valutazione Traquillità
-  reviewComfort Int @default(0) //Valutazione Comfort
-
-
-  @@index([venueId])
-  @@index([packageId])
-  @@index([start, end])
-
 }
