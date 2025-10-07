@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Client App - Anywhere
 
-## Getting Started
+> 📖 **Per la documentazione completa, vedi [CLIENT_README.md](./CLIENT_README.md)**
 
-First, run the development server:
+## 🚀 Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 1. Setup environment
+cp .env.example .env.local
+
+# 2. Start backend (terminal 1)
+cd apps/api
+pnpm dev  # → http://localhost:3001
+
+# 3. Start client (terminal 2)
+cd apps/client
+pnpm dev  # → http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📚 Documentazione
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Documentazione completa e aggiornata**: [CLIENT_README.md](./CLIENT_README.md)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Include:
+- ✅ Quick Start dettagliato
+- ✅ Struttura progetto completa
+- ✅ Architettura e diagrammi
+- ✅ Sistema autenticazione JWT
+- ✅ Guida componenti
+- ✅ Endpoint API
+- ✅ TypeScript types
+- ✅ Guida testing
+- ✅ Troubleshooting
+- ✅ Deploy guide
 
-## Learn More
+## 🎯 Main Routes
 
-To learn more about Next.js, take a look at the following resources:
+| Route | Description |
+|-------|-------------|
+| `/` | Homepage con featured venues |
+| `/login` | Login utente |
+| `/register` | Registrazione utente |
+| `/venues` | Lista venues |
+| `/venues/[id]` | Dettaglio venue |
+| `/bookings` | Prenotazioni (protetta) |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔗 Links Utili
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Documentazione Completa**: [CLIENT_README.md](./CLIENT_README.md)
+- **Backend API**: [../../docs/BOOKING_API.md](../../docs/BOOKING_API.md)
+- **Monorepo**: [../../README.md](../../README.md)

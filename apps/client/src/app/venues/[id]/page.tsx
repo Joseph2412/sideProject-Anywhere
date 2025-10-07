@@ -27,22 +27,39 @@ export default function VenueDetailPage() {
   }, [venueId]);
 
   const fetchVenueDetails = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_URL}/public/venues/${venueId}`);
-      
-      if (!response.ok) {
-        throw new Error("Impossibile caricare i dettagli del venue");
-      }
-      
-      const data = await response.json();
-      setVenue(data.venue);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Errore nel caricamento");
-    } finally {
-      setLoading(false);
+  try {
+    setLoading(true);
+    setError(null);
+    
+    const url = `${API_URL}/public/venues/${venueId}`;
+    console.log('🔍 Fetching venue details from:', url);
+    
+    const response = await fetch(url);
+    
+    console.log('📊 Response status:', response.status);
+    console.log('📊 Response ok:', response.ok);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('❌ Error response:', errorData);
+      throw new Error(errorData.error || "Impossibile caricare i dettagli del venue");
     }
-  };
+    
+    const data = await response.json();
+    console.log('✅ Data received:', data);
+    
+    if (!data.venue) {
+      throw new Error("Dati venue mancanti nella risposta");
+    }
+    
+    setVenue(data.venue);
+  } catch (err) {
+    console.error('❌ Fetch error:', err);
+    setError(err instanceof Error ? err.message : "Errore nel caricamento");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleBookPackage = (packageId: number) => {
     setSelectedPackage(packageId);

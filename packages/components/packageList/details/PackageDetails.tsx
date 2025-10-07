@@ -333,7 +333,7 @@ export const PackageDetails = () => {
             <Col span={12}>
               <Form.Item
                 name="capacity"
-                label="Capienza"
+                label="Capienza Persone"
                 rules={requiredRule("Inserisci la capienza")}
               >
                 <Input
