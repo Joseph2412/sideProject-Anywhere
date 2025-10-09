@@ -6,12 +6,12 @@ export interface CustomerInfo {
 }
 
 export interface BookingFormData {
-  venueId: number;
-  packageId: number;
-  start: string;
-  end: string;
+  venueId: string;      // ✅ MODIFICATO: da number a string
+  packageId: string;    // ✅ MODIFICATO: da number a string
+  start: string;        // Formato ISO 8601 (es. "2025-10-09T10:30:00.000Z")
+  end: string;          // Formato ISO 8601
   people: number;
-  userId: number;
+  userId: number;       // Questo rimarrà un numero come da logica backend
   customerInfo: CustomerInfo;
 }
 

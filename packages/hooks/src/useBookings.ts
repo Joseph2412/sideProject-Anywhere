@@ -206,6 +206,10 @@ export function useDeleteBooking() {
   return useMutation({
     mutationFn: async (bookingId: number): Promise<{ message: string }> => {
       const token = localStorage.getItem("token");
+
+      console.log("🗑️ Deleting booking:", bookingId);
+      console.log("Token:", token ? `${token.substring(0, 20)}...` : "NO TOKEN");
+      
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_HOST}/api/bookings/booking/${bookingId}`,
         {
@@ -217,10 +221,13 @@ export function useDeleteBooking() {
         },
       );
 
+      console.log("Delete response status:", response.status);
+      console.log("Delete response ok:", response.ok);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
-          errorData.error || "Errore nella cancellazione della prenotazione",
+          errorData.error || `Errore nella cancellazione della prenotazione: ${response.status}`,
         );
       }
 

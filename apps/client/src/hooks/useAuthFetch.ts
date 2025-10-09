@@ -1,6 +1,6 @@
 "use client";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_HOST || "http://localhost:3001";
 
 export function useAuthFetch() {
     const authFetch = async <T>(

@@ -28,23 +28,27 @@
 ### Setup in 3 Passi
 
 #### 1️⃣ Configura Environment
+
 ```bash
 cd apps/client
 cp .env.example .env.local
 ```
 
 File `.env.local`:
+
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_API_HOST=http://localhost:3001
 ```
 
 #### 2️⃣ Avvia il Backend
+
 ```bash
 cd apps/api
 pnpm dev  # → http://localhost:3001
 ```
 
 #### 3️⃣ Avvia il Client
+
 ```bash
 cd apps/client
 pnpm dev  # → http://localhost:3000
@@ -53,6 +57,7 @@ pnpm dev  # → http://localhost:3000
 ### ✅ Verifica Installazione
 
 Apri `http://localhost:3000` e verifica:
+
 - ✅ Homepage si carica
 - ✅ Navbar appare con logo "Anywhere"
 - ✅ Featured venues visibili (se ci sono dati nel DB)
@@ -141,16 +146,17 @@ apps/client/
 
 ### Stack Tecnologico
 
-| Layer | Tecnologia | Versione |
-|-------|-----------|----------|
-| **Framework** | Next.js | 15.x |
-| **Language** | TypeScript | 5.x |
-| **Styling** | CSS Modules + globals.css | - |
-| **State** | React Context API | 18.x |
-| **Auth** | JWT (7 giorni) | - |
-| **HTTP** | Fetch API | Native |
-| **Backend** | Fastify | 4.x |
-| **Database** | PostgreSQL + Prisma | - |
+
+| Layer         | Tecnologia                | Versione |
+| ------------- | ------------------------- | -------- |
+| **Framework** | Next.js                   | 15.x     |
+| **Language**  | TypeScript                | 5.x      |
+| **Styling**   | CSS Modules + globals.css | -        |
+| **State**     | React Context API         | 18.x     |
+| **Auth**      | JWT (7 giorni)            | -        |
+| **HTTP**      | Fetch API                 | Native   |
+| **Backend**   | Fastify                   | 4.x      |
+| **Database**  | PostgreSQL + Prisma       | -        |
 
 ### Diagramma Architettura
 
@@ -192,21 +198,21 @@ apps/client/
         ├─ <SearchBar />
         ├─ <VenueCard /> × 6
         └─ <Footer />
-    
+  
     /login → <LoginPage />
-    
+  
     /register → <RegisterPage />
-    
+  
     /venues → <VenuesListPage />
         ├─ <SearchBar />
         ├─ <VenueCard /> × N
         └─ <Footer />
-    
+  
     /venues/[id] → <VenueDetailPage />
         ├─ <PackageCard /> × N
         ├─ <BookingForm /> (modal)
         └─ <Footer />
-    
+  
     /bookings → <ProtectedRoute>      ← Auth richiesta
         <BookingsPage />
         ├─ Booking cards
@@ -221,9 +227,11 @@ apps/client/
 ## 🚀 Funzionalità
 
 ### 1. **Homepage** (`/`)
+
 **Descrizione**: Landing page con venues in evidenza
 
 **Features**:
+
 - 🏠 Hero section con titolo e sottotitolo
 - 🔍 SearchBar per ricerca città
 - 🎯 6 venues featured (primi nel DB)
@@ -235,9 +243,11 @@ apps/client/
 ---
 
 ### 2. **Autenticazione** (`/login`, `/register`)
+
 **Descrizione**: Sistema completo JWT authentication
 
 **Features**:
+
 - 🔐 Login con email + password
 - ✍️ Registrazione con nome, email, password
 - 🔄 Auto-redirect dopo login/register
@@ -246,6 +256,7 @@ apps/client/
 - 🔒 Verifica automatica token all'avvio
 
 **Endpoints**:
+
 - `POST /auth/login`
 - `POST /auth/signup`
 - `GET /auth/me`
@@ -255,9 +266,11 @@ apps/client/
 ---
 
 ### 3. **Lista Venues** (`/venues`)
+
 **Descrizione**: Griglia di tutti i venues, filtrabile per città
 
 **Features**:
+
 - 📋 Lista completa venues
 - 🔍 Filtro per città: `?city=Milano`
 - 🎴 VenueCard con preview
@@ -270,9 +283,11 @@ apps/client/
 ---
 
 ### 4. **Dettaglio Venue** (`/venues/[id]`)
+
 **Descrizione**: Pagina completa informazioni venue
 
 **Features**:
+
 - 🖼️ Logo e galleria foto (max 4)
 - 📍 Nome, indirizzo, descrizione
 - 🏷️ Tags servizi disponibili
@@ -286,9 +301,11 @@ apps/client/
 ---
 
 ### 5. **Sistema Prenotazioni** (`/bookings`)
+
 **Descrizione**: Pagina privata con prenotazioni utente
 
 **Features**:
+
 - 🔒 **Protetta** con `ProtectedRoute`
 - 📋 Lista bookings utente
 - 📅 Date inizio/fine
@@ -303,9 +320,11 @@ apps/client/
 ---
 
 ### 6. **Form Prenotazione** (Modal)
+
 **Descrizione**: Form completo per creare booking
 
 **Features**:
+
 - 📅 Date picker inizio/fine
 - 👥 Numero persone
 - 👤 Info cliente (nome, cognome, email, telefono)
@@ -327,16 +346,17 @@ Sistema JWT completo con token a **7 giorni** (no refresh token necessario).
 ### Componenti Auth
 
 1. **AuthContext** (`src/contexts/AuthContext.tsx`)
+
    - State globale: `user`, `loading`, `error`, `isAuthenticated`
    - Funzioni: `login()`, `register()`, `logout()`, `clearError()`
    - Verifica token all'avvio con `GET /auth/me`
-
 2. **useAuthFetch** (`src/hooks/useAuthFetch.ts`)
+
    - Hook per API calls autenticate
    - Aggiunge automaticamente `Authorization: Bearer <token>`
    - Metodi: `get()`, `post()`, `put()`, `delete()`
-
 3. **ProtectedRoute** (`src/components/ProtectedRoute/ProtectedRoute.tsx`)
+
    - HOC per proteggere route private
    - Redirect a `/login` se non autenticato
    - Loading spinner durante verifica
@@ -435,10 +455,12 @@ export default function BookingsPage() {
 ### Navbar con User Menu
 
 **Utente NON autenticato**:
+
 - Bottone "Accedi" → `/login`
 - Bottone "Registrati" → `/register`
 
 **Utente autenticato**:
+
 - User button con nome utente + icona
 - Dropdown menu:
   - Info: email e ruolo
@@ -446,6 +468,7 @@ export default function BookingsPage() {
   - Button: "Logout" (rosso)
 
 **Mobile**:
+
 - Hamburger menu con tutti i link
 - Sezione user nel mobile menu
 - Logout button evidenziato
@@ -463,11 +486,12 @@ Value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." // JWT string
 
 ### Endpoint Backend Auth
 
-| Method | Endpoint | Auth | Body | Response |
-|--------|----------|------|------|----------|
-| POST | `/auth/login` | ❌ | `{ email, password }` | `{ token, user }` |
-| POST | `/auth/signup` | ❌ | `{ email, password, firstName, lastName }` | `{ token, user }` |
-| GET | `/auth/me` | ✅ | - | `{ id, email, firstName, lastName, role }` |
+
+| Method | Endpoint       | Auth | Body                                       | Response                                   |
+| ------ | -------------- | ---- | ------------------------------------------ | ------------------------------------------ |
+| POST   | `/auth/login`  | ❌   | `{ email, password }`                      | `{ token, user }`                          |
+| POST   | `/auth/signup` | ❌   | `{ email, password, firstName, lastName }` | `{ token, user }`                          |
+| GET    | `/auth/me`     | ✅   | -                                          | `{ id, email, firstName, lastName, role }` |
 
 ### Security Notes
 
@@ -483,6 +507,7 @@ Value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." // JWT string
 ## 🧩 Componenti
 
 ### Navbar
+
 **Path**: `src/components/Navbar/Navbar.tsx`
 
 **Descrizione**: Navigazione principale sticky con auth system
@@ -490,6 +515,7 @@ Value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." // JWT string
 **Props**: Nessuna (usa `useAuth()` hook)
 
 **Features**:
+
 - Logo "Anywhere" → Link a `/`
 - Links desktop: Home, Esplora, Le mie prenotazioni (se auth)
 - User menu dropdown (se autenticato)
@@ -498,6 +524,7 @@ Value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." // JWT string
 - Sticky position on scroll
 
 **Stati**:
+
 ```typescript
 const { user, isAuthenticated, logout } = useAuth();
 const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -509,11 +536,13 @@ const [userMenuOpen, setUserMenuOpen] = useState(false);
 ---
 
 ### SearchBar
+
 **Path**: `src/components/SearchBar/SearchBar.tsx`
 
 **Descrizione**: Form ricerca venues per città
 
 **Props**:
+
 ```typescript
 interface SearchBarProps {
   initialValue?: string;      // Valore iniziale input
@@ -522,12 +551,14 @@ interface SearchBarProps {
 ```
 
 **Features**:
+
 - Input text con placeholder "Cerca per città"
 - Button submit con icona 🔍
 - Submit → `router.push(/venues?city=${city})`
 - Gestione form onSubmit
 
 **Esempio**:
+
 ```tsx
 <SearchBar initialValue="Milano" />
 <SearchBar onSearch={(city) => console.log(city)} />
@@ -536,11 +567,13 @@ interface SearchBarProps {
 ---
 
 ### VenueCard
+
 **Path**: `src/components/VenueCard/VenueCard.tsx`
 
 **Descrizione**: Card preview venue per liste/grid
 
 **Props**:
+
 ```typescript
 interface VenueCardProps {
   venue: Venue;  // Oggetto venue completo
@@ -548,6 +581,7 @@ interface VenueCardProps {
 ```
 
 **Features**:
+
 - Immagine (logo o prima foto array)
 - Nome venue (h3)
 - Indirizzo (con icona 📍)
@@ -557,6 +591,7 @@ interface VenueCardProps {
 - Hover effect e transition
 
 **Esempio**:
+
 ```tsx
 <VenueCard venue={venueData} />
 ```
@@ -564,11 +599,13 @@ interface VenueCardProps {
 ---
 
 ### PackageCard
+
 **Path**: `src/components/PackageCard/PackageCard.tsx`
 
 **Descrizione**: Card pacchetto con piani tariffari
 
 **Props**:
+
 ```typescript
 interface PackageCardProps {
   package: Package;
@@ -577,6 +614,7 @@ interface PackageCardProps {
 ```
 
 **Features**:
+
 - Immagine package
 - Badge tipo (Sala Riunioni, Postazione, etc.)
 - Nome e descrizione
@@ -588,11 +626,13 @@ interface PackageCardProps {
 ---
 
 ### BookingForm
+
 **Path**: `src/components/BookingForm/BookingForm.tsx`
 
 **Descrizione**: Form modale per creare prenotazione
 
 **Props**:
+
 ```typescript
 interface BookingFormProps {
   venueId: number;
@@ -603,6 +643,7 @@ interface BookingFormProps {
 ```
 
 **Features**:
+
 - 2 sezioni: Dettagli Prenotazione + Info Cliente
 - Campi: data inizio, data fine, persone, nome, cognome, email, telefono
 - Validazione required fields
@@ -612,6 +653,7 @@ interface BookingFormProps {
 - Success → close + callback
 
 **Esempio**:
+
 ```tsx
 {showBookingForm && (
   <div className="modal-overlay" onClick={handleClose}>
@@ -628,6 +670,7 @@ interface BookingFormProps {
 ---
 
 ### Footer
+
 **Path**: `src/components/Footer/Footer.tsx`
 
 **Descrizione**: Footer sito con info e link
@@ -635,6 +678,7 @@ interface BookingFormProps {
 **Props**: Nessuna
 
 **Features**:
+
 - 4 colonne: Anywhere, Link Utili, Informazioni, Contatti
 - Link navigazione
 - Info contatto
@@ -644,11 +688,13 @@ interface BookingFormProps {
 ---
 
 ### ProtectedRoute
+
 **Path**: `src/components/ProtectedRoute/ProtectedRoute.tsx`
 
 **Descrizione**: HOC per proteggere route che richiedono auth
 
 **Props**:
+
 ```typescript
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -656,6 +702,7 @@ interface ProtectedRouteProps {
 ```
 
 **Logic**:
+
 ```typescript
 const { isAuthenticated, isLoading } = useAuth();
 
@@ -665,6 +712,7 @@ return <>{children}</>;
 ```
 
 **Uso**:
+
 ```tsx
 export default function BookingsPage() {
   return (
@@ -680,19 +728,23 @@ export default function BookingsPage() {
 ## 🔌 Endpoint API
 
 ### Base URL
+
 ```typescript
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_HOST || "http://localhost:3001";
 ```
 
 ### Venues Pubblici (No Auth)
 
 #### GET `/public/venues`
+
 **Descrizione**: Lista tutti i venues o filtra per città
 
 **Query Params**:
+
 - `city` (optional): string - Filtra per città
 
 **Response**:
+
 ```typescript
 {
   venues: Venue[]
@@ -700,6 +752,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 ```
 
 **Esempio**:
+
 ```typescript
 // Tutti i venues
 fetch(`${API_URL}/public/venues`)
@@ -711,12 +764,15 @@ fetch(`${API_URL}/public/venues?city=Milano`)
 ---
 
 #### GET `/public/venues/:id`
+
 **Descrizione**: Dettagli completi venue singolo
 
 **Params**:
+
 - `id`: number - ID venue
 
 **Response**:
+
 ```typescript
 {
   venue: Venue & {
@@ -731,9 +787,11 @@ fetch(`${API_URL}/public/venues?city=Milano`)
 ### Autenticazione
 
 #### POST `/auth/login`
+
 **Descrizione**: Login utente
 
 **Body**:
+
 ```json
 {
   "email": "user@example.com",
@@ -742,6 +800,7 @@ fetch(`${API_URL}/public/venues?city=Milano`)
 ```
 
 **Response**:
+
 ```json
 {
   "message": "Login Effettuato con Successo",
@@ -759,9 +818,11 @@ fetch(`${API_URL}/public/venues?city=Milano`)
 ---
 
 #### POST `/auth/signup`
+
 **Descrizione**: Registrazione nuovo utente
 
 **Body**:
+
 ```json
 {
   "email": "newuser@example.com",
@@ -777,14 +838,17 @@ fetch(`${API_URL}/public/venues?city=Milano`)
 ---
 
 #### GET `/auth/me`
+
 **Descrizione**: Verifica token e ottiene dati utente corrente
 
-**Headers**: 
+**Headers**:
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Response**:
+
 ```json
 {
   "id": 1,
@@ -800,14 +864,17 @@ Authorization: Bearer <token>
 ### Prenotazioni (Auth Required)
 
 #### GET `/api/bookings/venues/bookings`
+
 **Descrizione**: Lista prenotazioni utente autenticato
 
 **Headers**:
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Response**:
+
 ```json
 {
   "bookings": [
@@ -830,14 +897,17 @@ Authorization: Bearer <token>
 ---
 
 #### POST `/booking/:venueId`
+
 **Descrizione**: Crea nuova prenotazione
 
 **Headers**:
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Body**:
+
 ```json
 {
   "venueId": 1,
@@ -856,6 +926,7 @@ Authorization: Bearer <token>
 ```
 
 **Response**:
+
 ```json
 {
   "booking": {
@@ -874,14 +945,17 @@ Authorization: Bearer <token>
 ---
 
 #### DELETE `/api/bookings/booking/:bookingId`
+
 **Descrizione**: Cancella prenotazione
 
 **Headers**:
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Response**:
+
 ```json
 {
   "message": "Prenotazione cancellata con successo"
@@ -893,6 +967,7 @@ Authorization: Bearer <token>
 ## 🎯 TypeScript Types
 
 ### Venue
+
 **Path**: `src/types/venue.ts`
 
 ```typescript
@@ -921,6 +996,7 @@ interface VenueOpeningDay {
 ---
 
 ### Package
+
 **Path**: `src/types/venue.ts`
 
 ```typescript
@@ -947,6 +1023,7 @@ interface PackagePlan {
 ---
 
 ### Booking
+
 **Path**: `src/types/booking.ts`
 
 ```typescript
@@ -990,6 +1067,7 @@ interface CustomerInfo {
 ---
 
 ### User (Auth)
+
 **Path**: `src/contexts/AuthContext.tsx`
 
 ```typescript
@@ -1027,13 +1105,16 @@ interface RegisterData {
 ### Approccio CSS
 
 **Due strategie**:
+
 1. **globals.css** - Stili globali, layout, auth components
 2. **CSS Modules** - Stili specifici per pagina/component
 
 ### globals.css
+
 **Path**: `src/app/globals.css`
 
 **Contiene**:
+
 - Reset CSS e variabili globali
 - Layout (navbar, footer)
 - Stili auth (login, register, user menu)
@@ -1041,6 +1122,7 @@ interface RegisterData {
 - Responsive breakpoint @768px
 
 **Variabili CSS**:
+
 ```css
 :root {
   --background: #ffffff;
@@ -1056,9 +1138,11 @@ interface RegisterData {
 ---
 
 ### CSS Modules
+
 **Path**: `src/app/bookings/bookings.module.css`
 
 **Esempio**:
+
 ```css
 .bookingsPageContainer {
   min-height: 100vh;
@@ -1074,6 +1158,7 @@ interface RegisterData {
 ```
 
 **Uso**:
+
 ```tsx
 import styles from './bookings.module.css';
 
@@ -1085,6 +1170,7 @@ import styles from './bookings.module.css';
 ```
 
 **Vantaggi**:
+
 - ✅ Scope locale (no conflitti)
 - ✅ Separazione responsabilità
 - ✅ Type-safe con TypeScript
@@ -1119,6 +1205,7 @@ import styles from './bookings.module.css';
 ```
 
 **Grid System**:
+
 ```
 Mobile (<768px)     → 1 colonna (stack)
 Tablet (768-1024px) → 2 colonne
@@ -1154,105 +1241,120 @@ Desktop (>1024px)   → 3 colonne
 ### Testing Checklist
 
 #### ✅ Homepage
-- [ ] Navbar appare
-- [ ] Hero section visibile
-- [ ] SearchBar funziona
-- [ ] Featured venues (max 6) caricano
-- [ ] Footer completo
-- [ ] Links navigano correttamente
+
+- [ ]  Navbar appare
+- [ ]  Hero section visibile
+- [ ]  SearchBar funziona
+- [ ]  Featured venues (max 6) caricano
+- [ ]  Footer completo
+- [ ]  Links navigano correttamente
 
 #### ✅ Autenticazione
+
 **Login**:
-- [ ] Form login visibile
-- [ ] Validazione email
-- [ ] Password required
-- [ ] Errore: credenziali invalide
-- [ ] Successo: redirect + token salvato
-- [ ] Link a /register funziona
+
+- [ ]  Form login visibile
+- [ ]  Validazione email
+- [ ]  Password required
+- [ ]  Errore: credenziali invalide
+- [ ]  Successo: redirect + token salvato
+- [ ]  Link a /register funziona
 
 **Register**:
-- [ ] Form register completo
-- [ ] Validazione: email valida
-- [ ] Validazione: password >= 8 caratteri
-- [ ] Validazione: conferma password match
-- [ ] Tutti campi required
-- [ ] Successo: redirect + token salvato
-- [ ] Link a /login funziona
+
+- [ ]  Form register completo
+- [ ]  Validazione: email valida
+- [ ]  Validazione: password >= 8 caratteri
+- [ ]  Validazione: conferma password match
+- [ ]  Tutti campi required
+- [ ]  Successo: redirect + token salvato
+- [ ]  Link a /login funziona
 
 **Auth Flow**:
-- [ ] Token salvato in localStorage come "token"
-- [ ] Navbar mostra user menu dopo login
-- [ ] Logout pulisce token e redirect
-- [ ] Refresh page mantiene auth (se token valido)
-- [ ] Token scaduto → auto-logout
+
+- [ ]  Token salvato in localStorage come "token"
+- [ ]  Navbar mostra user menu dopo login
+- [ ]  Logout pulisce token e redirect
+- [ ]  Refresh page mantiene auth (se token valido)
+- [ ]  Token scaduto → auto-logout
 
 #### ✅ Venues
+
 **Lista**:
-- [ ] Pagina /venues mostra tutti i venues
-- [ ] Query ?city=Milano filtra correttamente
-- [ ] SearchBar filtra e aggiorna URL
-- [ ] Loading state durante fetch
-- [ ] Empty state se nessun risultato
-- [ ] VenueCard link a /venues/:id
+
+- [ ]  Pagina /venues mostra tutti i venues
+- [ ]  Query ?city=Milano filtra correttamente
+- [ ]  SearchBar filtra e aggiorna URL
+- [ ]  Loading state durante fetch
+- [ ]  Empty state se nessun risultato
+- [ ]  VenueCard link a /venues/:id
 
 **Dettaglio**:
-- [ ] Logo e nome venue
-- [ ] Galleria foto (max 4)
-- [ ] Descrizione completa
-- [ ] Tags servizi
-- [ ] Orari apertura (7 giorni)
-- [ ] Packages con piani
-- [ ] Button "Prenota" apre modal
+
+- [ ]  Logo e nome venue
+- [ ]  Galleria foto (max 4)
+- [ ]  Descrizione completa
+- [ ]  Tags servizi
+- [ ]  Orari apertura (7 giorni)
+- [ ]  Packages con piani
+- [ ]  Button "Prenota" apre modal
 
 #### ✅ Prenotazioni
+
 **Pagina Bookings** (/bookings):
-- [ ] Redirect a /login se non autenticato
-- [ ] Lista bookings utente carica
-- [ ] Ogni card mostra: venue, package, date, persone, prezzo
-- [ ] Button cancella chiede conferma
-- [ ] Cancellazione aggiorna lista
-- [ ] CSS Module applicato (no inline styles)
+
+- [ ]  Redirect a /login se non autenticato
+- [ ]  Lista bookings utente carica
+- [ ]  Ogni card mostra: venue, package, date, persone, prezzo
+- [ ]  Button cancella chiede conferma
+- [ ]  Cancellazione aggiorna lista
+- [ ]  CSS Module applicato (no inline styles)
 
 **Form Booking**:
-- [ ] Modal si apre da PackageCard
-- [ ] Tutti campi visibili
-- [ ] Validazione required
-- [ ] Date inizio < data fine
-- [ ] Email valida
-- [ ] Submit invia POST
-- [ ] Success: modal chiude + alert
-- [ ] Error: messaggio visibile
-- [ ] Click overlay chiude modal
+
+- [ ]  Modal si apre da PackageCard
+- [ ]  Tutti campi visibili
+- [ ]  Validazione required
+- [ ]  Date inizio < data fine
+- [ ]  Email valida
+- [ ]  Submit invia POST
+- [ ]  Success: modal chiude + alert
+- [ ]  Error: messaggio visibile
+- [ ]  Click overlay chiude modal
 
 #### ✅ Responsive
-- [ ] Mobile (<768px): hamburger menu
-- [ ] Mobile: grid 1 colonna
-- [ ] Tablet (768px): grid 2 colonne
-- [ ] Desktop (>1024px): grid 3 colonne
-- [ ] Form usabili su mobile
-- [ ] Modal non esce da schermo mobile
+
+- [ ]  Mobile (<768px): hamburger menu
+- [ ]  Mobile: grid 1 colonna
+- [ ]  Tablet (768px): grid 2 colonne
+- [ ]  Desktop (>1024px): grid 3 colonne
+- [ ]  Form usabili su mobile
+- [ ]  Modal non esce da schermo mobile
 
 #### ✅ Navbar
-- [ ] Logo → /
-- [ ] "Home" → /
-- [ ] "Esplora" → /venues
-- [ ] "Le mie prenotazioni" → /bookings (solo se auth)
-- [ ] Sticky on scroll
-- [ ] User menu dropdown funziona
-- [ ] Login/Register buttons (se non auth)
-- [ ] Hamburger mobile (<768px)
+
+- [ ]  Logo → /
+- [ ]  "Home" → /
+- [ ]  "Esplora" → /venues
+- [ ]  "Le mie prenotazioni" → /bookings (solo se auth)
+- [ ]  Sticky on scroll
+- [ ]  User menu dropdown funziona
+- [ ]  Login/Register buttons (se non auth)
+- [ ]  Hamburger mobile (<768px)
 
 #### ✅ Footer
-- [ ] 4 sezioni visibili
-- [ ] Copyright anno corrente
-- [ ] Links funzionanti
-- [ ] Responsive mobile (stack)
+
+- [ ]  4 sezioni visibili
+- [ ]  Copyright anno corrente
+- [ ]  Links funzionanti
+- [ ]  Responsive mobile (stack)
 
 ---
 
 ### Testing con DevTools
 
 #### Network Tab
+
 ```
 Monitora chiamate API:
 - Status codes (200, 401, 404, 500)
@@ -1262,6 +1364,7 @@ Monitora chiamate API:
 ```
 
 #### Console
+
 ```
 Verifica:
 - Nessun errore TypeScript
@@ -1270,6 +1373,7 @@ Verifica:
 ```
 
 #### React DevTools
+
 ```
 Installa extension:
 - Ispeziona component tree
@@ -1278,6 +1382,7 @@ Installa extension:
 ```
 
 #### Application Tab
+
 ```
 localStorage:
 - Key "token" presente dopo login
@@ -1289,26 +1394,27 @@ localStorage:
 ### Test Manuali Critici
 
 1. **Auth Flow Completo**:
+
    ```
    Register → Login → Browse venue → Book → View bookings → Logout
    ```
-
 2. **Responsive Test**:
+
    ```
    DevTools → Device toolbar → Test:
    - iPhone SE (375px)
    - iPad (768px)
    - Desktop (1920px)
    ```
-
 3. **Error Handling**:
+
    ```
    - Stop backend → Verifica error messages
    - Invalid credentials → Verifica form error
    - Network throttling → Verifica loading states
    ```
-
 4. **Browser Compatibility**:
+
    ```
    Test su:
    - Chrome/Edge ✅
@@ -1323,9 +1429,11 @@ localStorage:
 ## 🐛 Troubleshooting
 
 ### Problema: "Failed to fetch venues"
+
 **Causa**: Backend non avviato o URL sbagliato
 
 **Soluzione**:
+
 ```bash
 # 1. Verifica backend running
 cd apps/api
@@ -1333,7 +1441,7 @@ pnpm dev  # Deve essere su http://localhost:3001
 
 # 2. Verifica .env.local
 cat apps/client/.env.local
-# NEXT_PUBLIC_API_URL=http://localhost:3001
+# NEXT_PUBLIC_API_HOST=http://localhost:3001
 
 # 3. Restart client
 cd apps/client
@@ -1343,9 +1451,11 @@ pnpm dev
 ---
 
 ### Problema: Token non viene salvato
+
 **Causa**: localStorage non disponibile (SSR) o errore JS
 
 **Soluzione**:
+
 ```typescript
 // Verifica console browser
 localStorage.getItem("token")  // Deve restituire token string
@@ -1357,9 +1467,11 @@ localStorage.getItem("token")  // Deve restituire token string
 ---
 
 ### Problema: 401 Unauthorized continui
+
 **Causa**: Token malformato o header sbagliato
 
 **Soluzione**:
+
 ```typescript
 // Verifica formato header in useAuthFetch:
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -1372,9 +1484,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ---
 
 ### Problema: Redirect loop /login
+
 **Causa**: `/auth/me` non ritorna user o token invalido
 
 **Debug**:
+
 ```bash
 # 1. Verifica console logs
 # Deve mostrare: "✅ Token valid, user: {...}"
@@ -1388,6 +1502,7 @@ curl -H "Authorization: Bearer <your-token>" \
 ```
 
 **Soluzione**:
+
 - Verifica endpoint `/auth/me` implementato backend
 - Verifica `fastify.authenticate` middleware funziona
 - Rigenera token con nuovo login
@@ -1395,9 +1510,11 @@ curl -H "Authorization: Bearer <your-token>" \
 ---
 
 ### Problema: CSS non applicato
+
 **Causa**: Import sbagliato o classname errata
 
 **Soluzione**:
+
 ```typescript
 // ❌ Sbagliato
 import './bookings.css';  // Non CSS Module
@@ -1411,9 +1528,11 @@ import styles from './bookings.module.css';  // .module.css!
 ---
 
 ### Problema: Immagini non caricano
+
 **Causa**: URL proxy S3 non configurato o CORS
 
 **Soluzione**:
+
 ```bash
 # Verifica configurazione S3 backend
 # apps/api/plugins/s3.ts
@@ -1425,9 +1544,11 @@ import styles from './bookings.module.css';  // .module.css!
 ---
 
 ### Problema: Modal non si chiude
+
 **Causa**: Event propagation
 
 **Soluzione**:
+
 ```tsx
 // Assicurati stopPropagation sul content:
 <div className="modal-overlay" onClick={handleClose}>
@@ -1440,9 +1561,11 @@ import styles from './bookings.module.css';  // .module.css!
 ---
 
 ### Problema: TypeScript errors
+
 **Causa**: Types mancanti o disallineati
 
 **Soluzione**:
+
 ```bash
 # Rigenera types
 cd apps/client
@@ -1459,9 +1582,11 @@ pnpm dev
 ---
 
 ### CORS Errors
+
 **Sintomi**: "Access to fetch blocked by CORS policy"
 
 **Soluzione Backend**:
+
 ```typescript
 // apps/api/index.ts
 await server.register(cors, {
@@ -1478,12 +1603,14 @@ await server.register(cors, {
 ### Preparazione Pre-Deploy
 
 #### 1. Environment Variables
+
 ```env
 # Production .env
-NEXT_PUBLIC_API_URL=https://your-api.com
+NEXT_PUBLIC_API_HOST=https://your-api.com
 ```
 
 #### 2. Build Test
+
 ```bash
 cd apps/client
 pnpm build
@@ -1491,6 +1618,7 @@ pnpm start  # Test production build locally
 ```
 
 #### 3. Type Check
+
 ```bash
 pnpm tsc --noEmit
 # Zero errors prima di deploy!
@@ -1501,6 +1629,7 @@ pnpm tsc --noEmit
 ### Opzioni Deploy
 
 #### Vercel (Raccomandato)
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -1510,10 +1639,11 @@ cd apps/client
 vercel
 
 # Aggiungi environment variables su Vercel dashboard:
-# NEXT_PUBLIC_API_URL=https://your-api.com
+# NEXT_PUBLIC_API_HOST=https://your-api.com
 ```
 
 **Vantaggi**:
+
 - ✅ Zero config per Next.js
 - ✅ CDN globale
 - ✅ Auto SSL
@@ -1522,6 +1652,7 @@ vercel
 ---
 
 #### Netlify
+
 ```bash
 # netlify.toml
 [build]
@@ -1535,6 +1666,7 @@ netlify deploy --prod
 ---
 
 #### Docker
+
 ```dockerfile
 # Dockerfile
 FROM node:18-alpine
@@ -1550,7 +1682,7 @@ CMD ["pnpm", "start"]
 ```bash
 docker build -t anywhere-client .
 docker run -p 3000:3000 \
-  -e NEXT_PUBLIC_API_URL=https://api.com \
+  -e NEXT_PUBLIC_API_HOST=https://api.com \
   anywhere-client
 ```
 
@@ -1558,15 +1690,15 @@ docker run -p 3000:3000 \
 
 ### Post-Deploy Checklist
 
-- [ ] Homepage carica correttamente
-- [ ] API calls funzionano (verifica Network tab)
-- [ ] Login/Register funzionanti
-- [ ] Token persiste dopo refresh
-- [ ] Immagini venues caricano
-- [ ] Responsive su mobile
-- [ ] SSL attivo (https)
-- [ ] Lighthouse score > 90
-- [ ] Console senza errori
+- [ ]  Homepage carica correttamente
+- [ ]  API calls funzionano (verifica Network tab)
+- [ ]  Login/Register funzionanti
+- [ ]  Token persiste dopo refresh
+- [ ]  Immagini venues caricano
+- [ ]  Responsive su mobile
+- [ ]  SSL attivo (https)
+- [ ]  Lighthouse score > 90
+- [ ]  Console senza errori
 
 ---
 
@@ -1574,13 +1706,14 @@ docker run -p 3000:3000 \
 
 ### Metriche Target
 
-| Metrica | Target | Note |
-|---------|--------|------|
-| First Contentful Paint | < 1.5s | Primo elemento visibile |
-| Largest Contentful Paint | < 2.5s | Contenuto principale |
-| Time to Interactive | < 3.5s | Pagina interattiva |
-| Cumulative Layout Shift | < 0.1 | Layout stabile |
-| Bundle Size (Initial) | < 200KB | Gzipped |
+
+| Metrica                  | Target  | Note                    |
+| ------------------------ | ------- | ----------------------- |
+| First Contentful Paint   | < 1.5s  | Primo elemento visibile |
+| Largest Contentful Paint | < 2.5s  | Contenuto principale    |
+| Time to Interactive      | < 3.5s  | Pagina interattiva      |
+| Cumulative Layout Shift  | < 0.1   | Layout stabile          |
+| Bundle Size (Initial)    | < 200KB | Gzipped                 |
 
 ### Ottimizzazioni Implementate
 
@@ -1601,12 +1734,14 @@ docker run -p 3000:3000 \
 ## 📚 Riferimenti
 
 ### Documentazione Esterna
+
 - [Next.js 15 Docs](https://nextjs.org/docs)
 - [React 18 Docs](https://react.dev)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [CSS Modules](https://github.com/css-modules/css-modules)
 
 ### Documentazione Progetto
+
 - **Backend API**: `../../docs/BOOKING_API.md`
 - **Monorepo Setup**: `../../README.md`
 - **Auth Details**: `./AUTH_IMPLEMENTATION.md`
@@ -1620,107 +1755,115 @@ docker run -p 3000:3000 \
 ### Features da Implementare
 
 #### Alta Priorità
-- [ ] **Reviews System**: Rating e recensioni per venues
-- [ ] **Favorites**: Salva venues preferiti
-- [ ] **Notifications**: Sistema notifiche (email/push)
-- [ ] **Payment Integration**: Stripe/PayPal per pagamenti
-- [ ] **Advanced Filters**: Prezzo, servizi, capacità, disponibilità
-- [ ] **Calendar View**: Vista calendario per bookings
+
+- [ ]  **Reviews System**: Rating e recensioni per venues
+- [ ]  **Favorites**: Salva venues preferiti
+- [ ]  **Notifications**: Sistema notifiche (email/push)
+- [ ]  **Payment Integration**: Stripe/PayPal per pagamenti
+- [ ]  **Advanced Filters**: Prezzo, servizi, capacità, disponibilità
+- [ ]  **Calendar View**: Vista calendario per bookings
 
 #### Media Priorità
-- [ ] **User Profile**: Pagina profilo editabile
-- [ ] **Password Reset**: Recovery password via email
-- [ ] **Email Verification**: Conferma email registrazione
-- [ ] **Map Integration**: Google Maps per venues
-- [ ] **Multi-language**: i18n (IT/EN)
-- [ ] **Dark Mode**: Toggle tema dark/light
+
+- [ ]  **User Profile**: Pagina profilo editabile
+- [ ]  **Password Reset**: Recovery password via email
+- [ ]  **Email Verification**: Conferma email registrazione
+- [ ]  **Map Integration**: Google Maps per venues
+- [ ]  **Multi-language**: i18n (IT/EN)
+- [ ]  **Dark Mode**: Toggle tema dark/light
 
 #### Bassa Priorità
-- [ ] **Social Login**: Google/Facebook OAuth
-- [ ] **Chat Support**: Sistema messaggistica host-user
-- [ ] **Analytics Dashboard**: Stats per users
-- [ ] **PWA**: Progressive Web App support
-- [ ] **Mobile App**: React Native version
+
+- [ ]  **Social Login**: Google/Facebook OAuth
+- [ ]  **Chat Support**: Sistema messaggistica host-user
+- [ ]  **Analytics Dashboard**: Stats per users
+- [ ]  **PWA**: Progressive Web App support
+- [ ]  **Mobile App**: React Native version
 
 ---
 
 ### Miglioramenti Tecnici
 
 #### Code Quality
-- [ ] Unit tests (Jest + React Testing Library)
-- [ ] E2E tests (Playwright)
-- [ ] Storybook per componenti
-- [ ] ESLint strict rules
-- [ ] Prettier auto-format
+
+- [ ]  Unit tests (Jest + React Testing Library)
+- [ ]  E2E tests (Playwright)
+- [ ]  Storybook per componenti
+- [ ]  ESLint strict rules
+- [ ]  Prettier auto-format
 
 #### Performance
-- [ ] Image optimization (`next/image`)
-- [ ] Font optimization (`next/font`)
-- [ ] API response caching (React Query)
-- [ ] Service Worker (offline mode)
-- [ ] Code splitting lazy components
+
+- [ ]  Image optimization (`next/image`)
+- [ ]  Font optimization (`next/font`)
+- [ ]  API response caching (React Query)
+- [ ]  Service Worker (offline mode)
+- [ ]  Code splitting lazy components
 
 #### Security
-- [ ] Migrate to httpOnly cookies (no localStorage)
-- [ ] Implement CSRF protection
-- [ ] Rate limiting frontend
-- [ ] Content Security Policy (CSP)
-- [ ] XSS sanitization
+
+- [ ]  Migrate to httpOnly cookies (no localStorage)
+- [ ]  Implement CSRF protection
+- [ ]  Rate limiting frontend
+- [ ]  Content Security Policy (CSP)
+- [ ]  XSS sanitization
 
 ---
 
 ## ✅ Checklist Implementazione Completa
 
 ### Core Features
-- [x] Homepage con featured venues
-- [x] Lista venues con ricerca città
-- [x] Dettaglio venue completo
-- [x] Sistema autenticazione JWT (7 giorni)
-- [x] Login e registrazione
-- [x] Pagina prenotazioni protetta
-- [x] Form prenotazione con validazione
-- [x] Navbar con user menu
-- [x] Footer completo
-- [x] Responsive design mobile-first
+
+- [X]  Homepage con featured venues
+- [X]  Lista venues con ricerca città
+- [X]  Dettaglio venue completo
+- [X]  Sistema autenticazione JWT (7 giorni)
+- [X]  Login e registrazione
+- [X]  Pagina prenotazioni protetta
+- [X]  Form prenotazione con validazione
+- [X]  Navbar con user menu
+- [X]  Footer completo
+- [X]  Responsive design mobile-first
 
 ### Components
-- [x] Navbar (con auth system)
-- [x] SearchBar
-- [x] VenueCard
-- [x] PackageCard
-- [x] BookingForm
-- [x] Footer
-- [x] ProtectedRoute HOC
+
+- [X]  Navbar (con auth system)
+- [X]  SearchBar
+- [X]  VenueCard
+- [X]  PackageCard
+- [X]  BookingForm
+- [X]  Footer
+- [X]  ProtectedRoute HOC
 
 ### Auth System
-- [x] AuthContext con state globale
-- [x] useAuthFetch hook
-- [x] Token verification all'avvio
-- [x] Login/Logout/Register
-- [x] Protected routes
-- [x] User menu dropdown
-- [x] Error handling
+
+- [X]  AuthContext con state globale
+- [X]  useAuthFetch hook
+- [X]  Token verification all'avvio
+- [X]  Login/Logout/Register
+- [X]  Protected routes
+- [X]  User menu dropdown
+- [X]  Error handling
 
 ### Styling
-- [x] globals.css completo
-- [x] CSS Modules (bookings.module.css)
-- [x] Responsive breakpoints
-- [x] Hover/focus states
-- [x] Loading spinners
-- [x] Modal overlays
+
+- [X]  globals.css completo
+- [X]  CSS Modules (bookings.module.css)
+- [X]  Responsive breakpoints
+- [X]  Hover/focus states
+- [X]  Loading spinners
+- [X]  Modal overlays
 
 ### Documentation
-- [x] CLIENT_README.md (questo file)
-- [x] AUTH_IMPLEMENTATION.md
-- [x] ARCHITECTURE.md
-- [x] TESTING_GUIDE.md
-- [x] QUICKSTART.md
+
+- [X]  CLIENT_README.md (questo file)
 
 ### TypeScript
-- [x] Types per Venue, Package, Booking
-- [x] AuthContext types
-- [x] Component props interfaces
-- [x] API response types
+
+- [X]  Types per Venue, Package, Booking
+- [X]  AuthContext types
+- [X]  Component props interfaces
+- [X]  API response types
 
 ---
 
@@ -1748,24 +1891,28 @@ pnpm dev
 ### Coding Standards
 
 **TypeScript**:
+
 - Strict mode enabled
 - No `any` types (usa `unknown` se necessario)
 - Interfaces per props e data
 - Export types da `@/types`
 
 **React**:
+
 - Functional components + hooks
 - `"use client"` per client components
 - Custom hooks in `src/hooks/`
 - Componenti riutilizzabili in `src/components/`
 
 **Styling**:
+
 - CSS Modules per componenti specifici
 - globals.css per stili condivisi
 - camelCase per class names CSS Modules
 - Mobile-first responsive
 
 **Git**:
+
 - Branch naming: `feature/nome-feature` o `fix/nome-bug`
 - Commit messages: `feat:`, `fix:`, `docs:`, `style:`, `refactor:`
 - PR con descrizione chiara
@@ -1775,6 +1922,7 @@ pnpm dev
 ## 📝 Changelog
 
 ### v2.0.0 (Gennaio 2025)
+
 - ✨ Sistema autenticazione completo (JWT 7 giorni)
 - ✨ Pagina login e registrazione
 - ✨ Pagina bookings protetta
@@ -1786,6 +1934,7 @@ pnpm dev
 - 📚 Documentazione completa unificata
 
 ### v1.0.0 (Ottobre 2024)
+
 - 🎉 Release iniziale
 - ✨ Homepage con featured venues
 - ✨ Lista e dettaglio venues

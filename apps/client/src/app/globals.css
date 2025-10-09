@@ -1203,3 +1203,54 @@ a {
     max-width: 100px;
   }
 }
+
+/* ============================================
+   NO PLANS MESSAGE (Venue Detail)
+   ============================================ */
+
+.no-plans-message {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: #f5f5f5;
+  border-radius: 12px;
+  border: 2px dashed #d1d5db;
+  margin: 2rem 0;
+}
+
+.no-plans-message p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.no-plans-message p:first-child {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--foreground);
+  margin-bottom: 0.75rem;
+}
+
+.no-plans-suggestion {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.no-plans-suggestion .link {
+  color: var(--primary);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.no-plans-suggestion .link:hover {
+  color: var(--primary-hover);
+}
+
+@media (max-width: 768px) {
+  .no-plans-message {
+    padding: 2rem 1.5rem;
+  }
+
+  .no-plans-message p:first-child {
+    font-size: 1rem;
+  }
+}

@@ -9,7 +9,8 @@ export default function RegisterPage() {
   const router = useRouter();
   const { register, error, clearError, isLoading } = useAuth();
   
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -21,7 +22,7 @@ export default function RegisterPage() {
     clearError();
 
     // Validazione base
-    if (!name || !email || !password || !confirmPassword) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       setLocalError('Compila tutti i campi');
       return;
     }
@@ -45,7 +46,7 @@ export default function RegisterPage() {
     }
 
     try {
-      await register({ name, email, password });
+      await register({ firstName, lastName, email, password });
       // Redirect gestito nel context
     } catch (err) {
       // L'errore è già gestito nel context
@@ -63,15 +64,29 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="name">Nome completo</label>
+            <label htmlFor="firstName">Nome</label>
             <input
               type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Mario Rossi"
+              id="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="Mario"
               disabled={isLoading}
-              autoComplete="name"
+              autoComplete="given-name"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="lastName">Cognome</label>
+            <input
+              type="text"
+              id="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Rossi"
+              disabled={isLoading}
+              autoComplete="family-name"
               required
             />
           </div>

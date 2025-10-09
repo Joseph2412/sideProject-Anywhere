@@ -7,8 +7,9 @@ import { VenueCard } from "@/components/VenueCard";
 import { SearchBar } from "@/components/SearchBar";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { filterVenuesWithPlans } from "@/lib/venueFilters";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_HOST || "http://localhost:3001";
 
 export default function VenuesPage() {
   const searchParams = useSearchParams();
@@ -39,7 +40,10 @@ export default function VenuesPage() {
       }
       
       const data = await response.json();
-      setVenues(data.venues || []);
+      
+      // ✅ FILTRA solo venues con piani disponibili
+      const venuesWithPlans = filterVenuesWithPlans(data.venues || []);
+      setVenues(venuesWithPlans);
       setSearchCity(city);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Errore nel caricamento");

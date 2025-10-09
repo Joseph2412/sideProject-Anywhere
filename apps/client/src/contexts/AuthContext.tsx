@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_HOST || "http://localhost:3001";
 
 interface User {
     id: number;
@@ -14,7 +14,8 @@ interface User {
 }
 
 interface RegisterData {
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
 }
@@ -128,23 +129,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(true);
         
         try {
+            const requestBody = {
+                email: data.email,
+                password: data.password,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                role: "USER",
+            };
+            
+            console.log("📤 Request body:", requestBody);
+            
             const response = await fetch(`${API_URL}/auth/signup`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    email: data.email,
-                    password: data.password,
-                    firstName: data.name.split(' ')[0], // Prendi il primo nome
-                    lastName: data.name.split(' ').slice(1).join(' '), // Il resto come cognome
-                    role: "USER", // Default role
-                }),
+                body: JSON.stringify(requestBody),
             });
             
+            console.log("📥 Response status:", response.status);
+            console.log("📥 Response ok:", response.ok);
+            
             if (!response.ok) {
-                const errorData = await response.json();
-                const errorMessage = errorData.message || "Registrazione fallita";
+                // Get detailed error information
+                let errorMessage = "Registrazione fallita";
+                try {
+                    const responseText = await response.text();
+                    console.log("❌ Raw error response:", responseText);
+                    
+                    if (responseText) {
+                        try {
+                            const errorData = JSON.parse(responseText);
+                            console.log("❌ Parsed error data:", errorData);
+                            errorMessage = errorData.message || errorData.error || `Registration failed: ${response.status}`;
+                        } catch (parseError) {
+                            console.log("❌ Could not parse error as JSON, using text:", responseText);
+                            errorMessage = responseText || `Registration failed: ${response.status}`;
+                        }
+                    }
+                } catch (textError) {
+                    console.log("❌ Could not read error response:", textError);
+                    errorMessage = `Registration failed: ${response.status} ${response.statusText}`;
+                }
+                
                 setError(errorMessage);
                 throw new Error(errorMessage);
             }
@@ -152,9 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const responseData = await response.json();
             console.log("✅ Registration successful:", responseData);
             
-            // Salva il token
             localStorage.setItem("token", responseData.token);
-            
             setUser(responseData.user);
             setError(null);
             

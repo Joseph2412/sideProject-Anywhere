@@ -6,8 +6,9 @@ import { SearchBar } from "@/components/SearchBar";
 import { VenueCard } from "@/components/VenueCard";
 import { Footer } from "@/components/Footer";
 import { Venue } from "@/types";
+import { filterVenuesWithPlans } from "@/lib/venueFilters";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_HOST || "http://localhost:3001";
 
 export default function HomePage() {
   const [featuredVenues, setFeaturedVenues] = useState<Venue[]>([]);
@@ -27,8 +28,13 @@ export default function HomePage() {
       if (response.ok) {
         const data = await response.json();
         console.log('Data received:', data); // Debug
-        // Mostra solo i primi 6 venues come featured
-        setFeaturedVenues(data.venues?.slice(0, 6) || []);
+        
+        // ✅ FILTRA solo venues con piani disponibili
+        const venuesWithPlans = filterVenuesWithPlans(data.venues || []);
+        console.log('Venues with plans:', venuesWithPlans.length); // Debug
+        
+        // Mostra solo i primi 6 venues featured con piani disponibili
+        setFeaturedVenues(venuesWithPlans.slice(0, 6));
       }
     } catch (error) {
       console.error("Errore nel caricamento dei venues:", error);

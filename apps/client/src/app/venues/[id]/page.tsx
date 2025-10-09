@@ -7,8 +7,10 @@ import { PackageCard } from "@/components/PackageCard";
 import { BookingForm } from "@/components/BookingForm";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { hasAvailablePlans } from "@/lib/venueFilters";
+import { useAuthFetch } from "@/hooks/useAuthFetch"; // ✅ Import hook
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_HOST || "http://localhost:3001";
 
 export default function VenueDetailPage() {
   const params = useParams();
@@ -19,6 +21,8 @@ export default function VenueDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
+  
+  const { post } = useAuthFetch(); // Usa hook per auth
 
   useEffect(() => {
     if (venueId) {
@@ -27,39 +31,32 @@ export default function VenueDetailPage() {
   }, [venueId]);
 
   const fetchVenueDetails = async () => {
-  try {
-    setLoading(true);
-    setError(null);
-    
-    const url = `${API_URL}/public/venues/${venueId}`;
-    console.log('🔍 Fetching venue details from:', url);
-    
-    const response = await fetch(url);
-    
-    console.log('📊 Response status:', response.status);
-    console.log('📊 Response ok:', response.ok);
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('❌ Error response:', errorData);
-      throw new Error(errorData.error || "Impossibile caricare i dettagli del venue");
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const url = `${API_URL}/public/venues?id=${venueId}`;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Impossibile caricare i dettagli del venue");
+      }
+      
+      const data = await response.json();
+      
+      if (!data.venue) {
+        throw new Error("Dati venue mancanti nella risposta");
+      }
+      
+      setVenue(data.venue);
+    } catch (err) {
+      console.error('❌ Fetch error:', err);
+      setError(err instanceof Error ? err.message : "Errore nel caricamento");
+    } finally {
+      setLoading(false);
     }
-    
-    const data = await response.json();
-    console.log('✅ Data received:', data);
-    
-    if (!data.venue) {
-      throw new Error("Dati venue mancanti nella risposta");
-    }
-    
-    setVenue(data.venue);
-  } catch (err) {
-    console.error('❌ Fetch error:', err);
-    setError(err instanceof Error ? err.message : "Errore nel caricamento");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleBookPackage = (packageId: number) => {
     setSelectedPackage(packageId);
@@ -68,22 +65,17 @@ export default function VenueDetailPage() {
 
   const handleBookingSubmit = async (bookingData: BookingFormData) => {
     try {
-      const response = await fetch(`${API_URL}/booking/${venue?.id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(bookingData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Errore nella creazione della prenotazione");
-      }
-
+      // usa useAuthFetch con endpoint
+      const result = await post(`/api/bookings/booking/${venue?.id}`, bookingData);
+      
+      console.log('✅ Booking created:', result);
       alert("Prenotazione effettuata con successo!");
+      
       setShowBookingForm(false);
       setSelectedPackage(null);
     } catch (err) {
+      console.error('❌ Booking error:', err);
+      alert(err instanceof Error ? err.message : "Errore nella prenotazione");
       throw err;
     }
   };
@@ -111,6 +103,9 @@ export default function VenueDetailPage() {
         <Navbar />
         <div className="venue-detail-error">
           <p>{error || "Venue non trovato"}</p>
+          <a href="/venues" className="btn-primary">
+            Torna alla lista
+          </a>
         </div>
         <Footer />
       </>
@@ -203,15 +198,28 @@ export default function VenueDetailPage() {
         {venue.packages && venue.packages.length > 0 && (
           <section className="venue-detail-section">
             <h2 className="venue-detail-section-title">Spazi Disponibili</h2>
-            <div className="venue-detail-packages">
-              {venue.packages.map((pkg) => (
-                <PackageCard 
-                  key={pkg.id} 
-                  package={pkg}
-                  onBook={handleBookPackage}
-                />
-              ))}
-            </div>
+            
+            {hasAvailablePlans(venue) ? (
+              <div className="venue-detail-packages">
+                {venue.packages
+                  .filter(pkg => pkg.plans && pkg.plans.length > 0)
+                  .map((pkg) => (
+                    <PackageCard 
+                      key={pkg.id} 
+                      package={pkg}
+                      onBook={handleBookPackage}
+                    />
+                  ))}
+              </div>
+            ) : (
+              <div className="no-plans-message">
+                <p>⚠️ Questo spazio non ha ancora piani disponibili per la prenotazione.</p>
+                <p className="no-plans-suggestion">
+                  Contatta direttamente lo spazio o{" "}
+                  <a href="/venues" className="link">esplora altri spazi</a>
+                </p>
+              </div>
+            )}
           </section>
         )}
 

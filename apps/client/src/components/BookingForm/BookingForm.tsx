@@ -45,15 +45,13 @@ export function BookingForm({
     setLoading(true);
 
     try {
-      // Nota: userId dovrebbe venire dall'autenticazione
-      // Per ora usiamo un valore di esempio
       const bookingData: BookingFormData = {
-        venueId,
-        packageId,
-        start: formData.start,
-        end: formData.end,
+        venueId: venueId.toString(),
+        packageId: packageId.toString(),
+        start: new Date(formData.start).toISOString(),
+        end: new Date(formData.end).toISOString(),
         people: formData.people,
-        userId: 1, // TODO: Implementare autenticazione
+        userId: 1,
         customerInfo: {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -64,7 +62,6 @@ export function BookingForm({
 
       await onSubmit(bookingData);
       
-      // Reset form on success
       setFormData({
         start: "",
         end: "",
@@ -244,3 +241,4 @@ export function BookingForm({
     </div>
   );
 }
+

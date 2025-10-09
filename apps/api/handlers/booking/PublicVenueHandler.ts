@@ -8,6 +8,7 @@ import {
 
 interface PublicVenuesQuery {
   city?: string;
+  id?: string;
 }
 
 export const getPublicVenuesHandler = async (
@@ -15,12 +16,16 @@ export const getPublicVenuesHandler = async (
   reply: FastifyReply,
 ) => {
   try {
-    const { id } = request.params as { id?: number };
-    const { city } = request.query as { city?: string };
+    const { city, id } = request.query;
 
     if (id) {
+      const venueId = parseInt(id);
+
+      if (isNaN(venueId)) {
+        return reply.code(400).send({ error: "ID venue non valido" });
+      }
       const venue = await prisma.venue.findUnique({
-        where: { id: id },
+        where: { id: venueId },
         select: {
           id: true,
           name: true,
@@ -223,153 +228,153 @@ export const getPublicVenuesHandler = async (
   }
 };
 
-export const getPublicVenueDetailsHandler = async (
-  request: FastifyRequest<{ Params: { id: string } }>,
-  reply: FastifyReply,
-) => {
-  try {
-    const venueId = parseInt(request.params.id);
+// export const getPublicVenueDetailsHandler = async (
+//   request: FastifyRequest<{ Params: { id: string } }>,
+//   reply: FastifyReply,
+// ) => {
+//   try {
+//     const venueId = parseInt(request.params.id);
 
-    if (isNaN(venueId)) {
-      return reply.code(400).send({ error: "ID venue non valido" });
-    }
+//     if (isNaN(venueId)) {
+//       return reply.code(400).send({ error: "ID venue non valido" });
+//     }
 
-    const venue = await prisma.venue.findFirst({
-      where: {
-        id: venueId,
-        packages: {
-          some: {
-            isActive: true,
-            plans: {
-              some: { isEnabled: true },
-            },
-          },
-        },
-      },
-      select: {
-        id: true,
-        name: true,
-        address: true,
-        latitude: true,
-        longitude: true,
-        description: true,
-        logoURL: true,
-        photos: true,
-        services: true,
-        venueRatings: true,
-        reviewsCounter: true,
-        openingDays: {
-          select: {
-            day: true,
-            isClosed: true,
-            periods: true,
-          },
-          orderBy: { day: "asc" },
-        },
-        closingPeriods: {
-          where: {
-            end: { gte: new Date() }, // Solo periodi di chiusura futuri
-          },
-          select: {
-            start: true,
-            end: true,
-          },
-        },
-        packages: {
-          where: {
-            isActive: true,
-            plans: {
-              some: { isEnabled: true },
-            },
-          },
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            type: true,
-            capacity: true,
-            seats: true,
-            squareMetres: true,
-            services: true,
-            photos: true,
-            plans: {
-              where: { isEnabled: true },
-              select: {
-                id: true,
-                name: true,
-                rate: true,
-                price: true,
-              },
-              orderBy: { price: "asc" },
-            },
-          },
-        },
-      },
-    });
+//     const venue = await prisma.venue.findFirst({
+//       where: {
+//         id: venueId,
+//         packages: {
+//           some: {
+//             isActive: true,
+//             plans: {
+//               some: { isEnabled: true },
+//             },
+//           },
+//         },
+//       },
+//       select: {
+//         id: true,
+//         name: true,
+//         address: true,
+//         latitude: true,
+//         longitude: true,
+//         description: true,
+//         logoURL: true,
+//         photos: true,
+//         services: true,
+//         venueRatings: true,
+//         reviewsCounter: true,
+//         openingDays: {
+//           select: {
+//             day: true,
+//             isClosed: true,
+//             periods: true,
+//           },
+//           orderBy: { day: "asc" },
+//         },
+//         closingPeriods: {
+//           where: {
+//             end: { gte: new Date() }, // Solo periodi di chiusura futuri
+//           },
+//           select: {
+//             start: true,
+//             end: true,
+//           },
+//         },
+//         packages: {
+//           where: {
+//             isActive: true,
+//             plans: {
+//               some: { isEnabled: true },
+//             },
+//           },
+//           select: {
+//             id: true,
+//             name: true,
+//             description: true,
+//             type: true,
+//             capacity: true,
+//             seats: true,
+//             squareMetres: true,
+//             services: true,
+//             photos: true,
+//             plans: {
+//               where: { isEnabled: true },
+//               select: {
+//                 id: true,
+//                 name: true,
+//                 rate: true,
+//                 price: true,
+//               },
+//               orderBy: { price: "asc" },
+//             },
+//           },
+//         },
+//       },
+//     });
 
-    if (!venue) {
-      return reply.code(404).send({ error: "Locale non trovato" });
-    }
+//     if (!venue) {
+//       return reply.code(404).send({ error: "Locale non trovato" });
+//     }
 
-    // Genera URL proxy sicuri
-    let logoURL = null;
-    if (venue.logoURL) {
-      try {
-        logoURL = generateSecureVenueLogoUrl(venue.logoURL);
-      } catch (error) {
-        console.warn(
-          `Could not generate logo URL for venue ${venue.id}:`,
-          error,
-        );
-        logoURL = null;
-      }
-    }
+//     // Genera URL proxy sicuri
+//     let logoURL = null;
+//     if (venue.logoURL) {
+//       try {
+//         logoURL = generateSecureVenueLogoUrl(venue.logoURL);
+//       } catch (error) {
+//         console.warn(
+//           `Could not generate logo URL for venue ${venue.id}:`,
+//           error,
+//         );
+//         logoURL = null;
+//       }
+//     }
 
-    const photos = venue.photos
-      .map((photo) => {
-        try {
-          return generateSecureVenuePhotoUrl(photo);
-        } catch (error) {
-          console.warn(
-            `Could not generate photo URL for venue ${venue.id}:`,
-            error,
-          );
-          return null;
-        }
-      })
-      .filter(Boolean); // Rimuovi URL null
+//     const photos = venue.photos
+//       .map((photo) => {
+//         try {
+//           return generateSecureVenuePhotoUrl(photo);
+//         } catch (error) {
+//           console.warn(
+//             `Could not generate photo URL for venue ${venue.id}:`,
+//             error,
+//           );
+//           return null;
+//         }
+//       })
+//       .filter(Boolean); // Rimuovi URL null
 
-    const packages = venue.packages.map((pkg) => {
-      const packagePhotos = pkg.photos
-        .map((photo) => {
-          try {
-            return generateSecurePackagePhotoUrl(photo);
-          } catch (error) {
-            console.warn(
-              `Could not generate package photo URL for package ${pkg.id}:`,
-              error,
-            );
-            return null;
-          }
-        })
-        .filter(Boolean); // Rimuovi URL null
+//     const packages = venue.packages.map((pkg) => {
+//       const packagePhotos = pkg.photos
+//         .map((photo) => {
+//           try {
+//             return generateSecurePackagePhotoUrl(photo);
+//           } catch (error) {
+//             console.warn(
+//               `Could not generate package photo URL for package ${pkg.id}:`,
+//               error,
+//             );
+//             return null;
+//           }
+//         })
+//         .filter(Boolean); // Rimuovi URL null
 
-      return { ...pkg, photos: packagePhotos };
-    });
+//       return { ...pkg, photos: packagePhotos };
+//     });
 
-    return reply.code(200).send({
-      venue: {
-        ...venue,
-        logoURL,
-        photos,
-        packages,
-      },
-    });
-  } catch (error) {
-    console.error("Error in getPublicVenueDetailsHandler:", error);
-    return reply.code(500).send({
-      error: "Errore nel recupero del locale",
-      message: error instanceof Error ? error.message : "Unknown error",
-    });
-  }
-};
+//     return reply.code(200).send({
+//       venue: {
+//         ...venue,
+//         logoURL,
+//         photos,
+//         packages,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error in getPublicVenueDetailsHandler:", error);
+//     return reply.code(500).send({
+//       error: "Errore nel recupero del locale",
+//       message: error instanceof Error ? error.message : "Unknown error",
+//     });
+//   }
+// };
