@@ -1,10 +1,10 @@
 import React from "react";
-import type { BadgeProps, CalendarProps } from "antd";
-import { Badge, Calendar } from "antd";
+import type { CalendarProps } from "antd";
+import { Calendar } from "antd";
 import type { Dayjs } from "dayjs";
 
 const getListData = (value: Dayjs) => {
-  let listData: { type: string; content: string }[] = []; // Specify the type of listData
+  let listData: { type: string; content: string }[] = [];
   switch (value.date()) {
     case 8:
       listData = [
@@ -34,33 +34,17 @@ const getListData = (value: Dayjs) => {
   return listData || [];
 };
 
-const getMonthData = (value: Dayjs) => {
-  if (value.month() === 8) {
-    return 1394;
-  }
-};
-
 const App: React.FC = () => {
-  const monthCellRender = (value: Dayjs) => {
-    const num = getMonthData(value);
-    return num ? (
-      <div className="notes-month">
-        <section>{num}</section>
-        <span>Backlog number</span>
-      </div>
-    ) : null;
-  };
-
   const dateCellRender = (value: Dayjs) => {
     const listData = getListData(value);
     return (
-      <ul className="events">
-        {listData.map((item) => (
-          <li key={item.content}>
-            <Badge
-              status={item.type as BadgeProps["status"]}
-              text={item.content}
-            />
+      <ul className="calendar-events-list">
+        {listData.map((item, index) => (
+          <li
+            key={`${item.content}-${index}`}
+            className={`calendar-event calendar-event-${item.type}`}
+          >
+            {item.content}
           </li>
         ))}
       </ul>
@@ -69,7 +53,6 @@ const App: React.FC = () => {
 
   const cellRender: CalendarProps<Dayjs>["cellRender"] = (current, info) => {
     if (info.type === "date") return dateCellRender(current);
-    if (info.type === "month") return monthCellRender(current);
     return info.originNode;
   };
 

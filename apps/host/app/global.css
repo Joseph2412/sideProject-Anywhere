@@ -322,6 +322,97 @@ body {
 }
 
 /* ============================================
+   CALENDAR STYLES
+   ============================================ */
+
+/* Lista eventi nel calendario */
+.calendar-events-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Evento base */
+.calendar-event {
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.calendar-event:hover {
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Colori per tipo di evento */
+.calendar-event-success {
+  background-color: #52c41a; /* Verde */
+}
+
+.calendar-event-error {
+  background-color: #ff4d4f; /* Rosso */
+}
+
+.calendar-event-warning {
+  background-color: #faad14; /* Giallo/Arancione */
+}
+
+.calendar-event-processing {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradiente navbar */
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.calendar-event-default {
+  background-color: #d9d9d9; /* Grigio */
+  color: #333;
+}
+
+/* Stili per il componente Calendar di Ant Design */
+.ant-picker-calendar {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+.ant-picker-calendar-header {
+  padding: 12px 0;
+}
+
+.ant-picker-calendar-date-value {
+  font-weight: 500;
+}
+
+/* Celle del calendario */
+.ant-picker-cell {
+  color: #333;
+}
+
+.ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}
+
+.ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+  border-color: #667eea;
+}
+
+/* Header del calendario */
+.ant-picker-calendar-mode-switch {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+/* Dropdown del mese/anno */
+.ant-select-selector {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+/* ============================================
    SCROLLBAR CUSTOM (optional)
    ============================================ */
 
