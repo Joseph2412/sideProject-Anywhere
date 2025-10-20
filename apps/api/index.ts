@@ -35,6 +35,8 @@ server.register(cors, {
   origin: [
     process.env.APP_HOST,     // http://localhost:3000 (host app)
     process.env.APP_CLIENT,   // http://localhost:3002 (client app)
+    'http://192.168.1.101:3000', // IP locale host app
+    'http://192.168.1.101:3002', // IP locale client app
   ].filter((origin): origin is string => Boolean(origin)), // Rimuove eventuali undefined
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
 

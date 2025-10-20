@@ -13,7 +13,7 @@ export const ProfileIcon: React.FC<ProfileIconProps> = ({
   height = 16,
   className,
   fill = "none",
-  stroke = "#00063E",
+  stroke = "currentColor",
 }) => {
   return (
     <svg

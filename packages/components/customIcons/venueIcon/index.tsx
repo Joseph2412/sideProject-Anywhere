@@ -13,7 +13,7 @@ export const VenueIcon: React.FC<VenueIconProps> = ({
   height = 14,
   className,
   fill = "none",
-  stroke = "#00063E",
+  stroke = "currentColor",
 }) => {
   return (
     <svg

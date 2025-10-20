@@ -11,24 +11,115 @@
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
-/* CheckBox con Colore Custom */
-.ant-checkbox-inner {
-  border-radius: 4px;
-  border-color: #000639 !important;
+/* ============================================
+   SIDEBAR STYLES - Dark Theme
+   ============================================ */
+
+/* Sidebar principale con sfondo scuro */
+.ant-layout-sider {
+  background: #0a0a0a !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3) !important;
 }
 
-.ant-checkbox-checked .ant-checkbox-inner {
-  background-color: #000639 !important;
-  border-color: #000639 !important;
+/* Menu con sfondo scuro */
+.ant-menu {
+  background: #0a0a0a !important;
+  color: #ededed !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
-.ant-checkbox-checked .ant-checkbox-inner::after {
-  border-color: white !important; /* Colore della spunta */
+/* Menu items */
+.ant-menu-item,
+.ant-menu-submenu-title {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  color: #ededed !important;
+  transition: all 0.2s ease !important;
+  border-radius: 8px !important;
+  margin: 4px 8px !important;
+}
+
+/* Menu item hover */
+.ant-menu-item:hover,
+.ant-menu-submenu-title:hover {
+  background: rgba(0, 112, 243, 0.1) !important;
+  color: #0070f3 !important;
+  border-radius: 8px !important;
+}
+
+/* Menu item selezionato con gradiente blu (come la navbar) */
+.ant-menu-item-selected {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+}
+
+/* Icone dei menu items */
+.ant-menu-item .anticon,
+.ant-menu-submenu-title .anticon {
+  color: #ededed !important;
+  transition: color 0.2s ease !important;
+}
+
+.ant-menu-item-icon {
+  color: #0070f3 !important;
+}
+
+.ant-menu-item:hover .anticon,
+.ant-menu-submenu-title:hover .anticon {
+  color: #0070f3 !important;
+}
+
+.ant-menu-item-selected .anticon {
+  color: #fff !important;
+}
+
+/* SubMenu */
+.ant-menu-submenu {
+  color: #ededed !important;
 }
 
 .ant-menu-submenu-selected > .ant-menu-submenu-title {
-  color: black !important;
+  color: #0070f3 !important;
+  background: rgba(0, 112, 243, 0.1) !important;
+  border-radius: 8px !important;
 }
+
+/* SubMenu dropdown */
+.ant-menu-sub {
+  background: #171717 !important;
+}
+
+.ant-menu-sub .ant-menu-item {
+  color: #ededed !important;
+}
+
+/* Divider nel menu */
+.ant-menu-item-divider {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Logo/Brand area nella sidebar */
+.ant-layout-sider-children {
+  background: #0a0a0a !important;
+}
+
+/* Trigger per collassare la sidebar */
+.ant-layout-sider-trigger {
+  background: #171717 !important;
+  color: #ededed !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  transition: background 0.2s ease !important;
+}
+
+.ant-layout-sider-trigger:hover {
+  background: #0070f3 !important;
+}
+
+/* ============================================
+   TABS STYLES - Consistent with navbar
+   ============================================ */
 
 .ant-tabs,
 .ant-tabs-tab,
@@ -37,81 +128,79 @@
 .ant-select-item-option-content,
 .ant-select-selection-item,
 .ant-select-selection-overflow-item {
-  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
-html,
-body {
-  min-height: 100vh !important;
-  overflow-y: auto !important;
-  /* se disattivi l'overflow-y,l'header rimane sticky ma il mainContent scrolla. Valuta tu*/
-}
 .ant-tabs-tab-active,
 .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #000639 !important;
+  color: #0070f3 !important;
   border-radius: 8px 8px 0 0;
 }
 
 .ant-tabs-hover,
 .ant-tabs-tab.ant-tabs-tab-hover .ant-tabs-tab-btn {
-  color: #000639 !important;
+  color: #0070f3 !important;
   border-radius: 8px 8px 0 0;
 }
 
-/* Tabs Sopra Componetni Locale e Pacchetti on HOVER */
 .ant-tabs-tab:hover .ant-tabs-tab-btn {
-  color: #1827aa !important;
+  color: #0070f3 !important;
   background: transparent !important;
 }
+
 .ant-tabs-ink-bar {
-  background: #00063e !important; /* Colore blu scuro */
-  height: 3px !important; /* Spessore */
-  border-radius: 3px !important; /* Arrotondamento opzionale */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  height: 3px !important;
+  border-radius: 3px !important;
 }
 
-/* Tab con dropdown (SubMenu): mantieni background trasparente */
 .ant-tabs-dropdown {
   background: transparent !important;
 }
 
-/* Tabs ANT-MENU della SIDEBAR */
+/* ============================================
+   CHECKBOX STYLES
+   ============================================ */
 
-.ant-menu,
-.ant-menu-item,
-.ant-menu-submenu-title {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-}
-
-/* Menu item selezionato: blu scuro, testo bianco */
-.ant-menu-item-selected {
-  background: #00063e !important;
-  color: #fff !important;
-  border-radius: 10px !important;
-}
-.ant-menu-item svg {
-  color: inherit !important;
+.ant-checkbox-inner {
+  border-radius: 4px;
+  border-color: #0070f3 !important;
 }
 
-/* Icone coerenti */
-.ant-menu-item .anticon {
-  color: #00063e !important;
+.ant-checkbox-checked .ant-checkbox-inner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border-color: #667eea !important;
 }
-.ant-menu-item-selected .anticon,
-.ant-menu-item:hover .anticon {
-  color: #fff !important;
+
+.ant-checkbox-checked .ant-checkbox-inner::after {
+  border-color: white !important;
 }
+
+/* ============================================
+   GENERAL STYLES
+   ============================================ */
+
+html,
+body {
+  min-height: 100vh !important;
+  overflow-y: auto !important;
+  background: #ffffff !important;
+}
+
+/* ============================================
+   INPUT & PICKER STYLES
+   ============================================ */
 
 .ant-picker,
-ù .ant-picker-input > input,
+.ant-picker-input > input,
 .ant-picker-dropdown,
 .ant-picker-dropdown .ant-picker-time-panel,
 .ant-picker-dropdown .ant-picker-content th,
 .ant-picker-dropdown .ant-picker-content td {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-size: 15px; /* opzionale: adatta la dimensione */
+  font-size: 15px;
 }
 
-/* Rimuovi bordo azzurrino (outline/border blu) su input e bottoni Ant Design */
 .ant-input:focus,
 .ant-input-focused,
 .ant-input:hover,
@@ -127,16 +216,39 @@ body {
 .ant-picker-input > input:focus-visible,
 .ant-picker-input > input:hover {
   box-shadow: none !important;
-  border-color: #d9d9d9 !important; /* colore neutro coerente con il resto */
+  border-color: #0070f3 !important;
   outline: none !important;
-  color: #000639 !important; /* colore coerente con il tema */
 }
+
+/* ============================================
+   BUTTON STYLES - Primary with gradient
+   ============================================ */
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  color: white !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+.ant-btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
+}
+
+/* ============================================
+   POPCONFIRM STYLES
+   ============================================ */
 
 .ant-popconfirm {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   max-height: 216px !important;
   max-width: 214px !important;
 }
+
+/* ============================================
+   UPLOAD STYLES
+   ============================================ */
 
 .ant-upload-list-item-container {
   height: 207px !important;
@@ -148,7 +260,6 @@ body {
   padding-bottom: 24px !important;
 }
 
-/* Forza la griglia delle immagini upload Ant Design */
 .ant-upload-list-picture-card {
   display: flex !important;
   justify-content: start !important;
@@ -168,6 +279,7 @@ body {
   margin: 0 !important;
   padding: 0 !important;
 }
+
 .ant-upload-list-picture-card {
   width: 100% !important;
   justify-items: center !important;
@@ -176,17 +288,15 @@ body {
   margin-left: 0 !important;
 }
 
-/* Immagine upload: riempi tutto lo spazio disponibile */
 .ant-upload-list-item-image {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
   margin: 0 !important;
   padding: 0 !important;
-  border-radius: 8px; /* opzionale, per arrotondare */
+  border-radius: 8px;
 }
 
-/* Rimuovi padding dal contenitore */
 .ant-upload-list-item-thumbnail {
   padding: 0 !important;
   margin: 0 !important;
@@ -209,4 +319,25 @@ body {
 
 .ant-upload-select {
   display: contents !important;
+}
+
+/* ============================================
+   SCROLLBAR CUSTOM (optional)
+   ============================================ */
+
+.ant-layout-sider::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ant-layout-sider::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.ant-layout-sider::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.ant-layout-sider::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
