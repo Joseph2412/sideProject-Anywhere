@@ -33,7 +33,7 @@ export const LogoSidebar: React.FC<LogoSidebarProps> = ({
         <span
           className={styles.name}
           style={{
-            color: "black",
+            color: "white",
             padding: "4px",
             height: "35px",
             lineHeight: "24px",
