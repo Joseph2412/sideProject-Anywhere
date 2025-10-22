@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { ProfileIcon } from "@repo/components";
 
 export function Navbar() {
   const router = useRouter();
@@ -27,9 +28,6 @@ export function Navbar() {
 
         {/* Desktop Navigation */}
         <div className="navbar-links">
-          <Link href="/" className="navbar-link">
-            Home
-          </Link>
           <Link href="/venues" className="navbar-link">
             Esplora
           </Link>
@@ -49,7 +47,9 @@ export function Navbar() {
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
               >
                 <span className="navbar-user-name">Ciao {user?.firstName}!</span>
-                <span className="navbar-user-icon">👤</span>
+                <span className="navbar-user-icon">
+                  <ProfileIcon width={20} height={20} stroke="currentColor" />
+                </span>
               </button>
               
               {userMenuOpen && (
@@ -79,6 +79,10 @@ export function Navbar() {
             </div>
           ) : (
             <div className="navbar-auth-buttons">
+              <span className="navbar-user-name">Benvenuto!</span>
+                <span className="navbar-user-icon">
+                  <ProfileIcon width={20} height={20} stroke="currentColor" />
+                </span>
               <Link href="/login" className="navbar-auth-link">
                 Accedi
               </Link>

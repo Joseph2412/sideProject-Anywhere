@@ -155,29 +155,51 @@ a {
   color: var(--primary);
 }
 
+/* Mobile toggle button - Rendi tutto il bottone cliccabile */
 .navbar-mobile-toggle {
   display: none;
   background: none;
   border: none;
   cursor: pointer;
+  padding: 8px; /* Aumenta l'area cliccabile */
+  position: relative;
+  width: 40px; /* Larghezza fissa */
+  height: 40px; /* Altezza fissa */
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+  border-radius: 8px; /* Bordi arrotondati */
 }
 
+.navbar-mobile-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Feedback visivo hover */
+}
+
+.navbar-mobile-toggle:active {
+  background-color: rgba(255, 255, 255, 0.2); /* Feedback visivo click */
+}
+
+/* Hamburger icon */
 .hamburger {
   display: block;
-  width: 25px;
+  width: 24px; /* Larghezza linee */
   height: 2px;
-  background: var(--foreground);
+  background-color: #ededed;
   position: relative;
+  transition: background-color 0.3s ease;
+  pointer-events: none; /* Impedisce che le linee intercettino i click */
 }
 
 .hamburger::before,
 .hamburger::after {
-  content: '';
-  position: absolute;
-  width: 25px;
+  content: "";
+  display: block;
+  width: 24px;
   height: 2px;
-  background: var(--foreground);
-  transition: all 0.3s;
+  background-color: #ededed;
+  position: absolute;
+  transition: transform 0.3s ease, top 0.3s ease, bottom 0.3s ease;
+  pointer-events: none; /* Impedisce che le linee intercettino i click */
 }
 
 .hamburger::before {
@@ -185,7 +207,22 @@ a {
 }
 
 .hamburger::after {
-  top: 8px;
+  bottom: -8px;
+}
+
+/* Animazione hamburger quando aperto (opzionale ma bello) */
+.hamburger.open {
+  background-color: transparent;
+}
+
+.hamburger.open::before {
+  transform: rotate(45deg);
+  top: 0;
+}
+
+.hamburger.open::after {
+  transform: rotate(-45deg);
+  bottom: 0;
 }
 
 .navbar-mobile-menu {
@@ -198,9 +235,9 @@ a {
   }
 
   .navbar-mobile-toggle {
-    display: block;
+    display: flex; /* ✅ Mostra su mobile */
   }
-
+  
   .navbar-mobile-menu {
     display: flex;
     flex-direction: column;
@@ -1052,7 +1089,7 @@ a {
 
 .navbar-user-name {
   font-weight: 600;
-  color: #333;
+  color: var(--foreground);
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;

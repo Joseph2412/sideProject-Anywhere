@@ -48,3 +48,6 @@ export * from "./bookings/BookingsForm";
 // Sidebar Components
 export * from "./logoSidebar";
 export * from "./sidebarFooter";
+
+// Custom Icons
+export * from "./customIcons";
