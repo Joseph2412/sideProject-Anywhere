@@ -10,6 +10,7 @@ export * from "./GooglePlaces";
 // Booking hooks
 export * from "./useBookings";
 export * from "./useBookingsSSE";
+export * from "./useCalendarBookings";
 
 // Shared types
 export type * from "./types";

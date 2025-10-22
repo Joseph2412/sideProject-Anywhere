@@ -323,12 +323,12 @@ const LoginForm: React.FC<Props> = ({ onLoginSuccess, onGoToSignup }) => {
     <>
       <div className={styles.container}>
         <div className={styles.card}>
-          <img src="/logo.svg" alt="Nibol" className={styles.logo} />
+          <h1>Anywhere</h1>
 
           <Divider />
 
           <div className={styles.title}>
-            <b>Accedi per gestire il tuo locale su Nibol</b>
+            <b>Accedi per gestire il tuo locale su Anywhere</b>
           </div>
 
           <Form form={form} layout="vertical" style={{ width: "100%" }}>
