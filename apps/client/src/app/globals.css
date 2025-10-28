@@ -1089,7 +1089,7 @@ a {
 
 .navbar-user-name {
   font-weight: 600;
-  color: var(--foreground);
+  color: var(--primary);
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;

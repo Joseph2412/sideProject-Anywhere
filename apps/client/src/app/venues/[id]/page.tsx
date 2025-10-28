@@ -65,8 +65,8 @@ export default function VenueDetailPage() {
 
   const handleBookingSubmit = async (bookingData: BookingFormData) => {
     try {
-      // usa useAuthFetch con endpoint
-      const result = await post(`/api/bookings/booking/${venue?.id}`, bookingData);
+      // Endpoint senza venueId nell'URL
+      const result = await post(`/bookings/booking`, bookingData);
       
       console.log('✅ Booking created:', result);
       alert("Prenotazione effettuata con successo!");

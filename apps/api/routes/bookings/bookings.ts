@@ -23,7 +23,7 @@ export async function bookingsRoute(fastify: FastifyInstance) {
   );
 
   fastify.post(
-    "/booking/:id",
+    "/booking",
     { preValidation: fastify.authenticate, schema: createBookingSchema },
     createNewBooking,
   );

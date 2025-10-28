@@ -1,4 +1,5 @@
 export const availabilityBookingSchema = {
+  // ... (schema non modificato)
   schema: {
     params: {
       type: "object",
@@ -19,23 +20,17 @@ export const availabilityBookingSchema = {
 };
 
 export const deleteBookingSchema = {
+  // ... (schema non modificato)
   params: {
     type: "object",
     required: ["id"],
     properties: {
-      id: { type: "string" },
+      id: { type: "string" }, // L'ID nell'URL è una stringa
     },
   },
 };
 
 export const createBookingSchema = {
-  params: {
-    type: "object",
-    required: ["id"],
-    properties: {
-      id: { type: "string" },
-    },
-  },
   body: {
     type: "object",
     required: [
@@ -45,33 +40,38 @@ export const createBookingSchema = {
       "end",
       "people",
       "customerInfo",
+      // "userId", // RIMOSSO dai campi obbligatori
     ],
     properties: {
-      venueId: { type: "string" },
-      packageId: { type: "string" },
+      venueId: { type: "number" }, // Mantenuto come numero
+      packageId: { type: "number" }, // Mantenuto come numero
       start: { type: "string", format: "date-time" },
       end: { type: "string", format: "date-time" },
-      people: { type: "number" },
+      people: { type: "number", minimum: 1 }, // Aggiunto minimum
+      // userId: { type: "number" }, // RIMOSSO - non serve più inviarlo
       customerInfo: {
         type: "object",
         required: ["email", "firstName", "lastName"],
         properties: {
           email: { type: "string", format: "email" },
-          firstName: { type: "string" },
-          lastName: { type: "string" },
-          phone: { type: "string" },
+          firstName: { type: "string", minLength: 1 }, // Aggiunto minLength
+          lastName: { type: "string", minLength: 1 }, // Aggiunto minLength
+          phone: { type: "string", nullable: true }, // Reso esplicitamente nullable
         },
+        additionalProperties: false // Impedisce campi extra
       },
     },
+    additionalProperties: false // Impedisce campi extra nel body principale
   },
 };
 
 export const getVenueBookingsSchema = {
+  // ... (schema non modificato, ma l'endpoint potrebbe diventare obsoleto)
   params: {
     type: "object",
     required: ["venueId"],
     properties: {
-      venueId: { type: "string" },
+      venueId: { type: "string" }, // L'ID nell'URL è una stringa
     },
   },
   querystring: {
@@ -82,7 +82,28 @@ export const getVenueBookingsSchema = {
         enum: ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"],
       },
       limit: { type: "number", minimum: 1, maximum: 100, default: 20 },
-      offset: { type: "number", minimum: 0, default: 0 },
+      offset: { type: "number", minimum: 0, default: 0 }, // Offset deprecato, useremo 'page'
+      page: { type: "number", minimum: 1, default: 1 }, // Aggiunto 'page'
+      pageSize: { type: "number", minimum: 1, maximum: 100, default: 20} // Sinonimo di limit
+    },
+  },
+};
+
+// Nuovo schema per getMyVenueBookings (solo query params)
+export const getMyVenueBookingsSchema = {
+  querystring: {
+    type: "object",
+    properties: {
+      status: {
+        type: "string",
+        enum: ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"],
+        description: "Filtra per stato della prenotazione (case-insensitive)"
+      },
+      limit: { type: "number", minimum: 1, maximum: 100, default: 20, description: "Numero di risultati per pagina"},
+      page: { type: "number", minimum: 1, default: 1, description: "Numero della pagina" },
+      // Potresti aggiungere filtri per data qui
+      // startDate: { type: "string", format: "date", description: "Data inizio filtro (YYYY-MM-DD)"},
+      // endDate: { type: "string", format: "date", description: "Data fine filtro (YYYY-MM-DD)"},
     },
   },
 };

@@ -8,6 +8,8 @@ import fastifyJwt from "@fastify/jwt";
 import cors from "@fastify/cors";
 import { s3Plugin } from "./plugins/s3";
 
+const PORT = parseInt(process.env.PORT || "3001", 10);
+
 import { decorateAuth } from "./plugins/auth";
 import { authRoutes } from "./routes/auth/authRoutes";
 import { userRoute } from "./routes/user/userRoutes";
@@ -87,7 +89,7 @@ server.register(venuePayments, { prefix: "/api" });
 server.register(packagesRoutes, { prefix: "/api" });
 
 //Rotte per Prenotazioni/Booking
-server.register(bookingsRoutes, { prefix: "/api/bookings" });
+server.register(bookingsRoutes, { prefix: "/bookings" });
 
 //Rotta per GET/POST/DELETE Foto dell'intero Applicativo
 //Metodi GET POST DELETE Consentiti e previsiti
@@ -103,13 +105,49 @@ server.register(publicVenuesRoutes);
 
 
 //Rotta di Servizio per Avvio BACKEND
-server.listen({ port: 3001 }, (err, address) => {
-  if (err) {
-    console.error(err);
+const start = async () => {
+  try {
+    await server.listen({ port: PORT, host: "0.0.0.0" });
+    
+    console.log(`\n🚀 Server running on http://localhost:${PORT}\n`);
+    
+    // ✅ AGGIUNGI QUESTO per vedere tutte le rotte
+    console.log("📍 Registered API Routes:\n");
+    const routes = server.printRoutes({ commonPrefix: false });
+    
+    // Formatta l'output per renderlo più leggibile
+    const routeLines = routes.split('\n').filter(line => 
+      line.includes('POST') || 
+      line.includes('GET') || 
+      line.includes('PUT') || 
+      line.includes('DELETE')
+    );
+    
+    routeLines.forEach(line => {
+      const colorMap: Record<string, string> = {
+        'POST': '\x1b[34m',   // Blu
+        'GET': '\x1b[32m',    // Verde
+        'PUT': '\x1b[33m',    // Giallo
+        'DELETE': '\x1b[31m', // Rosso
+      };
+      
+      let coloredLine = line;
+      Object.entries(colorMap).forEach(([method, color]) => {
+        coloredLine = coloredLine.replace(method, `${color}${method}\x1b[0m`);
+      });
+      
+      console.log(coloredLine);
+    });
+    
+    console.log('\n');
+    
+  } catch (err) {
+    server.log.error(err);
     process.exit(1);
   }
-  console.log(`Server listening at ${address}`);
-});
+};
+
+start();
 
 //Continua con il Backend
 //Imposta un componente per visualizzare le prenotazioni presenti e passate.

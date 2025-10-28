@@ -6,13 +6,17 @@ export interface CustomerInfo {
 }
 
 export interface BookingFormData {
-  venueId: string;      // ✅ MODIFICATO: da number a string
-  packageId: string;    // ✅ MODIFICATO: da number a string
-  start: string;        // Formato ISO 8601 (es. "2025-10-09T10:30:00.000Z")
-  end: string;          // Formato ISO 8601
+  venueId: number;    // ✅ Change from string to number
+  packageId: number;  // ✅ Change from string to number
+  start: string;
+  end: string;
   people: number;
-  userId: number;       // Questo rimarrà un numero come da logica backend
-  customerInfo: CustomerInfo;
+  customerInfo: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+  };
 }
 
 export interface Booking {
